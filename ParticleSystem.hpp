@@ -2,7 +2,7 @@
  * ParticleSystem.hpp
  *
  *  Created on: Jan 24, 2014
- *      Author: aitatxo
+ *      Author: dazotaro
  */
 
 #ifndef PARTICLESYSTEM_HPP_

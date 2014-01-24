@@ -2,7 +2,7 @@
  * ParticleSystem.cpp
  *
  *  Created on: Jan 24, 2014
- *      Author: aitatxo
+ *      Author: dazotaro
  */
 
 #include "ParticleSystem.hpp"

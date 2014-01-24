@@ -2,7 +2,7 @@
  * Particle.hpp
  *
  *  Created on: Jan 24, 2014
- *      Author: aitatxo
+ *      Author: dazotaro
  */
 
 #ifndef PARTICLE_HPP_
@@ -10,10 +10,11 @@
 
 namespace JU {
 
-class Particle {
-public:
-	Particle();
-	virtual ~Particle();
+class Particle
+{
+	public:
+		Particle();
+		virtual ~Particle();
 };
 
 } /* namespace JU */

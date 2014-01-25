@@ -30,7 +30,7 @@ namespace JU
 		f32 position_[3];
 		f32 velocity_[3];
 		f32 mass_;
-		f32 lifetime_;
+		f32 lifetime_;		/**< Life left of the force (in milliseconds)*/
 		f32 forces_[3];
 };
 

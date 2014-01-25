@@ -6,6 +6,7 @@
 // Description : Hello World in C, Ansi-style
 //============================================================================
 
+// Global includes
 #include <iostream>
 
 int main(void)

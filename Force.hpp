@@ -23,13 +23,13 @@ class Force
 		Force(bool transient = false, f32 lifetime = 0.0f);
 		virtual ~Force();
 
-		virtual void addParticle(Particle* particle) = 0;
+		virtual void addParticle(Particle* particle);
 		virtual void apply(f32 time) = 0;
 
-		ParticleList particle_list;	/**< Particle subject to this force */
+		ParticleList particle_list_;	/**< Particle subject to this force */
 
-		bool transient_;	/**< Is force transient or eternal */
-		f32 lifetime_;		/**< Life left of the force (in milliseconds)*/
+		bool transient_;				/**< Is force transient or eternal */
+		f32 lifetime_;					/**< Life left of the force (in milliseconds)*/
 };
 
 } /* namespace JU */

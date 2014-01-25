@@ -14,8 +14,19 @@ Force::Force(bool transient, f32 lifetime) : transient_(transient), lifetime_(li
 {
 }
 
+
+
 Force::~Force()
 {
 }
+
+
+
+void Force::addParticle(Particle* particle)
+{
+	particle_list_.push_back(particle);
+}
+
+
 
 } /* namespace JU */

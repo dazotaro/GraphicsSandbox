@@ -8,6 +8,9 @@
 #ifndef DEFS_HPP_
 #define DEFS_HPP_
 
+namespace JU
+{
+
 // INTEGER TYPES
 // -------------
 typedef unsigned char 	uint8;
@@ -25,5 +28,6 @@ typedef float 		f32;
 typedef double		f64;
 typedef long double	f128;
 
+} /* namespace JU */
 
 #endif /* DEFS_HPP_ */

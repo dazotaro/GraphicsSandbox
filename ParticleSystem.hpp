@@ -9,34 +9,36 @@
 #define PARTICLESYSTEM_HPP_
 
 // Local includes
-#include "Defs.hpp"	// custom types
-
-// Global includes
-#include <list>		// std::list
+#include "Defs.hpp"						// custom types
+#include "ParticleSystemDefs.hpp"		// ParticleList, ForceList
 
 namespace JU
 {
 
 // Forward declarations
 class Particle;
+class Force;
 
 class ParticleSystem
 {
 	public:
 
-		ParticleSystem ();
-		virtual ~ParticleSystem ();
+		ParticleSystem();
+		virtual ~ParticleSystem();
 
-		void addParticle (Particle* particle);
-		void update (f32 time);
+		void addParticle(Particle* particle);
+		void addForce(Force* force);
+
+		void update(f32 time);
 
 	private:
 
-		typedef std::list<Particle*> ParticleList;
-		typedef ParticleList::const_iterator ParticleListConstIter;
-		typedef ParticleList::iterator ParticleListIter;
-
+		// Particle Storage
 		ParticleList particle_list_;
+		uint32 num_particles_;	// we want to guarantee O(1), independent of STL implementation
+
+		// Force Storage
+		ForceList force_list_;
 };
 
 } /* namespace JU */

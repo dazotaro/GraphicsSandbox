@@ -8,18 +8,24 @@
 #ifndef PARTICLE_HPP_
 #define PARTICLE_HPP_
 
+// Local includes
 #include "Defs.hpp"			// custom basic types
 
-namespace JU {
+namespace JU
+{
 
-class Particle
+/*! \class Particle
+    \brief Base class for all particle types
+
+    It provides all basic information required of a particle
+*/class Particle
 {
 	public:
 
 		Particle(f32 position[3], f32 velocity[3], f32 mass, f32 lifetime);
 		virtual ~Particle();
 
-	private:
+		virtual void render() const = 0;
 
 		f32 position_[3];
 		f32 velocity_[3];

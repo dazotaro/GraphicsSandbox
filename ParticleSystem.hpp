@@ -8,12 +8,35 @@
 #ifndef PARTICLESYSTEM_HPP_
 #define PARTICLESYSTEM_HPP_
 
-namespace JU {
+// Local includes
+#include "Defs.hpp"	// custom types
 
-class ParticleSystem {
-public:
-	ParticleSystem();
-	virtual ~ParticleSystem();
+// Global includes
+#include <list>		// std::list
+
+namespace JU
+{
+
+// Forward declarations
+class Particle;
+
+class ParticleSystem
+{
+	public:
+
+		ParticleSystem ();
+		virtual ~ParticleSystem ();
+
+		void addParticle (Particle* particle);
+		void update (f32 time);
+
+	private:
+
+		typedef std::list<Particle*> ParticleList;
+		typedef ParticleList::const_iterator ParticleListConstIter;
+		typedef ParticleList::iterator ParticleListIter;
+
+		ParticleList particle_list_;
 };
 
 } /* namespace JU */

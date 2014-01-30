@@ -26,7 +26,9 @@ class Force
 		virtual void addParticle(Particle* particle);
 		virtual void apply(f32 time) = 0;
 
-		ParticleList particle_list_;	/**< Particle subject to this force */
+		void removeParticle(ParticleId particle_id);
+
+		ParticleMap particle_map_;	/**< Particle subject to this force */
 
 		bool transient_;				/**< Is force transient or eternal */
 		f32 lifetime_;					/**< Life left of the force (in milliseconds)*/

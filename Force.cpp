@@ -6,7 +6,7 @@
  */
 
 #include "Force.hpp"	// JU::Force
-
+#include "Particle.hpp"	// JU::Particle
 namespace JU
 {
 
@@ -22,11 +22,16 @@ Force::~Force()
 
 
 
-void Force::addParticle(Particle* particle)
+inline void Force::addParticle(Particle* particle)
 {
-	particle_list_.push_back(particle);
+	particle_map_[particle->id_] = particle;
 }
 
 
+
+inline void Force::removeParticle(ParticleId particle_id)
+{
+	particle_map_.erase(particle_id);
+}
 
 } /* namespace JU */

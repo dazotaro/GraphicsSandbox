@@ -1,4 +1,4 @@
-CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
+CXXFLAGS =	-O2 -g -Wall -fmessage-length=0 -std=c++11
 
 OBJS =		Force.o main.o Particle.o ParticleSystem.o
 

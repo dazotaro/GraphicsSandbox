@@ -33,8 +33,16 @@ class ParticleSystem
 
 	private:
 
+		void cleanupParticles(f32 time);
+		void cleanupForces(f32 time);
+
+		void accumulateForces(f32 time);
+
+	private:
+
 		// Particle Storage
 		ParticleList particle_list_;
+		ParticleIdList dead_particle_list_;
 		uint32 num_particles_;	// we want to guarantee O(1), independent of STL implementation
 
 		// Force Storage

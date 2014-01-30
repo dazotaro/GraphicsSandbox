@@ -83,19 +83,71 @@ void ParticleSystem::addForce(Force* force)
 
 
 /**
-* Update all particles
+* Check all particles to see if they have expired
+*
+* @param time	Elapsed time since the last update (in milliseconds)
+*
+*/
+void ParticleSystem::cleanupParticles(f32 time)
+{
+	// PARTICLES: for all particles
+	ParticleListIter particle_iter = particle_list_.begin();
+	for (; particle_iter != particle_list_.end() ; particle_iter++)
+	{
+		// Update the life left
+		(*particle_iter)->lifetime_ -= time;
+
+		// Erase it: it's dead
+		if ((*particle_iter)->lifetime_ <= 0.0f)
+		{
+			particle_iter->releaseForces();
+
+			// Delete the data
+			if (*particle_iter != 0)
+			{
+				delete *particle_iter;
+			}
+			// Remove the pointer from the list
+			particle_list_.erase(particle_iter);
+
+			num_particles_--;
+		}
+		else
+		{
+			// Numerically integrate this particle
+		}
+	}
+}
+
+
+
+/**
+* Check all particles to see if they have expired
+*
+* @param time	Elapsed time since the last update (in milliseconds)
+*
+*/
+void ParticleSystem::cleanupForces(f32 time)
+{
+
+}
+
+
+
+/**
+* Accumulate the forces on the particles they affect
 *
 * @param time	Elapsed time since the last update (in milliseconds)
 *
 * \note do we need to check whether the iterator is pointing to NULL
 */
-void ParticleSystem::update(f32 time)
+void ParticleSystem::accumulateForces(f32 time)
 {
 	// FORCES: for all forces
 	ForceListIter force_iter = force_list_.begin();
 	for (; force_iter != force_list_.end(); force_iter++)
 	{
-		// If the particle is NOT ETERNAL, check whether it should be removed
+		// If the force is NOT ETERNAL, check whether it should be removed
 		if ((*force_iter)->transient_)
 		{
 			// Update the life left
@@ -112,34 +164,24 @@ void ParticleSystem::update(f32 time)
 				force_list_.erase(force_iter);
 			}
 		}
-
-
 	}
+}
 
-	// PARTICLES: for all particles
-	ParticleListIter particle_iter = particle_list_.begin();
-	for (; particle_iter != particle_list_.end() ; particle_iter++)
-	{
-		// Update the life left
-		(*particle_iter)->lifetime_ -= time;
 
-		if ((*particle_iter)->lifetime_ <= 0.0f)
-		{
-			// Delete the data
-			if (*particle_iter != 0)
-			{
-				delete *particle_iter;
-			}
-			// Remove the pointer from the list
-			particle_list_.erase(particle_iter);
 
-			num_particles_--;
-		}
-		else
-		{
-			// Numerically integrate this particle
-		}
-	}
+/**
+* Update all particles
+*
+* @param time	Elapsed time since the last update (in milliseconds)
+*
+* \note do we need to check whether the iterator is pointing to NULL
+*/
+void ParticleSystem::update(f32 time)
+{
+	// Accumulate forces for all the particles involved
+	accumulateForces(f32 time);
+
+
 }
 
 } /* namespace JU */

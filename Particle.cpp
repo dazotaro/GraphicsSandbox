@@ -61,7 +61,7 @@ inline void Particle::resetForceAcc()
 * #param pForce Pointer to new acting force
 *
 */
-inline void Particle::addForce(Force* pForce)
+void Particle::addForce(Force* pForce)
 {
 	force_set_.insert(pForce);
 }

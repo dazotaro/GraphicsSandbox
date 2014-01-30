@@ -38,7 +38,7 @@ class Particle
 		void removeForce(Force* pForce);
 		void releaseForces();
 
-		virtual void render() const = 0;
+		//virtual void render() const = 0;
 
 		// Friend functions
 		friend std::ostream& operator<<(std::ostream& out, const Particle& particle);

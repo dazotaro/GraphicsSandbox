@@ -21,6 +21,7 @@ namespace JU
 
 	// Typedefs
 	typedef uint32 ParticleId;
+	typedef uint32 ForceId;
 
 	typedef std::list<Particle*> ParticleList;
 	typedef ParticleList::const_iterator ParticleListConstIter;

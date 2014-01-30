@@ -12,6 +12,9 @@
 #include "Defs.hpp"					// Custom basic types
 #include "ParticleSystemDefs.hpp"	// ParticleId
 
+// Global includes
+#include <iostream>			// std:;ostream, std::endl
+
 namespace JU
 {
 
@@ -27,7 +30,7 @@ class Particle
 {
 	public:
 
-		Particle(ParticleId id, f32 position[3], f32 velocity[3], f32 mass, f32 lifetime);
+		Particle(ParticleId id, f32 mass, f32 position[3], f32 velocity[3], f32 lifetime);
 		virtual ~Particle();
 
 		void resetForceAcc();
@@ -37,13 +40,16 @@ class Particle
 
 		virtual void render() const = 0;
 
+		// Friend functions
+		friend std::ostream& operator<<(std::ostream& out, const Particle& particle);
+
 	public:
 
 		ParticleId id_;					/**< particle id (for debugging purposes */
 
+		f32 mass_;
 		f32 position_[3];
 		f32 velocity_[3];
-		f32 mass_;
 		f32 lifetime_;					/**< Life left of the force (in milliseconds) */
 		f32 force_acc_[3];				/**< Force accumulator*/
 

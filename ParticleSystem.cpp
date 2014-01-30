@@ -201,6 +201,11 @@ void ParticleSystem::accumulateForces(f32 time)
 */
 void ParticleSystem::update(f32 time)
 {
+	// Delete expired particles
+	cleanupParticles(time);
+	// Delete expired forces
+	cleanupForces(time);
+
 	// Accumulate forces for all the particles involved
 	accumulateForces(time);
 

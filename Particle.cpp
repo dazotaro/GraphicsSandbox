@@ -20,7 +20,7 @@ namespace JU
 * @param mass		Mass of the particle
 * @param lifetime	Life (in seconds) of this particle
 */
-Particle::Particle(ParticleId id, f32 position[3], f32 velocity[3], f32 mass, f32 lifetime)
+Particle::Particle(ParticleId id, f32 mass, f32 position[3], f32 velocity[3], f32 lifetime)
 					: id_(id), mass_ (mass), lifetime_(lifetime)
 {
 	for (uint8 i = 0; i < 3; i++)
@@ -91,6 +91,43 @@ void Particle::releaseForces()
 	{
 		(*iter)->removeParticle(id_);
 	}
+}
+
+
+
+/**
+* Overloaded output operator
+*
+* @param out output ostream
+* @param particle output ostream
+*
+* @return output stream
+*/
+std::ostream& operator<<(std::ostream& out, const Particle& particle)
+{
+
+	out << "Particle id: " 	<< particle.id_ << std::endl;
+	out << "\tMass: " 		<< particle.mass_ << std::endl;
+	out << "\tLife: " 		<< particle.lifetime_ << std::endl;
+	out << "\tPosition: (" 	<< particle.position_[0] << ", "
+							<< particle.position_[1] << ","
+							<< particle.position_[2] << ")" << std::endl;
+	out << "\tVelocity: (" 	<< particle.velocity_[0] << ", "
+							<< particle.velocity_[1] << ","
+							<< particle.velocity_[2] << ")" << std::endl;
+	out << "\tForce:    (" 	<< particle.force_acc_[0] << ", "
+							<< particle.force_acc_[1] << ","
+							<< particle.force_acc_[2] << ")" << std::endl;
+
+	out << "\tLinked forces: ";
+	ForceSetIter force_iter = particle.force_set_.begin();
+	for (; force_iter != particle.force_set_.end(); force_iter++)
+	{
+		out << (*force_iter)->id_ << ", ";
+	}
+	out << std::endl;
+
+	return out;
 }
 
 

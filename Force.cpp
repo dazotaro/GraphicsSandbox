@@ -12,7 +12,7 @@
 namespace JU
 {
 
-Force::Force(bool transient, f32 lifetime) : transient_(transient), lifetime_(lifetime)
+Force::Force(ForceId id, bool transient, f32 lifetime) : id_(id), transient_(transient), lifetime_(lifetime)
 {
 }
 
@@ -45,6 +45,33 @@ void Force::releaseParticles()
 	{
 		(particle_iter->second)->removeForce(this);
 	}
+}
+
+
+
+/**
+* Overloaded output operator
+*
+* @param out output ostream
+* @param force output ostream
+*
+* @return output stream
+*/
+std::ostream& operator<<(std::ostream& out, const Force& force)
+{
+	out << "Force id: " 	<< force.id_ << std::endl;
+	out << "\tTransient: " 	<< force.transient_ << std::endl;
+	out << "\tLife: " 		<< force.lifetime_ << std::endl;
+
+	out << "\tLinked particles: ";
+	ParticleMapConstIter particle_iter = force.particle_map_.begin();
+	for (; particle_iter != force.particle_map_.end(); particle_iter++)
+	{
+		out << particle_iter->first << ", ";
+	}
+	out << std::endl;
+
+	return out;
 }
 
 } /* namespace JU */

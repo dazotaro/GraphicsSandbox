@@ -24,9 +24,10 @@ class Force
 		virtual ~Force();
 
 		virtual void addParticle(Particle* particle);
-		virtual void apply(f32 time) = 0;
+		//virtual void apply(f32 time) = 0;
 
 		void removeParticle(ParticleId particle_id);
+		void releaseParticles();
 
 		ParticleMap particle_map_;	/**< Particle subject to this force */
 

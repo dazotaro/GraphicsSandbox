@@ -42,7 +42,6 @@ class ParticleSystem
 
 		// Particle Storage
 		ParticleList particle_list_;
-		ParticleIdList dead_particle_list_;
 		uint32 num_particles_;	// we want to guarantee O(1), independent of STL implementation
 
 		// Force Storage

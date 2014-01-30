@@ -7,6 +7,7 @@
 
 // Local includes
 #include "Particle.hpp"
+#include "Force.hpp"
 
 namespace JU
 {
@@ -73,7 +74,7 @@ inline void Particle::addForce(Force* pForce)
 * #param pForce Pointer to the force to be deleted
 *
 */
-inline void Particle::removeForce(Force* pForce)
+void Particle::removeForce(Force* pForce)
 {
 	force_set_.erase(pForce);
 }
@@ -84,11 +85,11 @@ inline void Particle::removeForce(Force* pForce)
 * Notify all forces acting on this particle that it is not longer under their influence
 *
 */
-inline void Particle::releaseForces()
+void Particle::releaseForces()
 {
 	for (ForceSetIter iter = force_set_.begin(); iter != force_set_.end(); iter++)
 	{
-		iter->removeParticle(id_);
+		(*iter)->removeParticle(id_);
 	}
 }
 

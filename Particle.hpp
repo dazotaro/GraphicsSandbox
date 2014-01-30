@@ -16,7 +16,7 @@ namespace JU
 {
 
 // Forward Declarations
-class Force;
+//class Force;
 
 /*! \class Particle
     \brief Base class for all particle types

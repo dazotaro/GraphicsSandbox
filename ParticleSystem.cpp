@@ -100,14 +100,16 @@ void ParticleSystem::cleanupParticles(f32 time)
 		// Erase it: it's dead
 		if ((*particle_iter)->lifetime_ <= 0.0f)
 		{
-			particle_iter->releaseForces();
+			// Disconnect forces from this particle
+			(*particle_iter)->releaseForces();
 
-			// Delete the data
+			// Delete the particle's data
 			if (*particle_iter != 0)
 			{
 				delete *particle_iter;
 			}
-			// Remove the pointer from the list
+
+			// Remove the pointer to the particle from the list
 			particle_list_.erase(particle_iter);
 
 			num_particles_--;
@@ -129,7 +131,28 @@ void ParticleSystem::cleanupParticles(f32 time)
 */
 void ParticleSystem::cleanupForces(f32 time)
 {
+	// FORCES: for all forces
+	ForceListIter force_iter = force_list_.begin();
+	for (; force_iter != force_list_.end(); force_iter++)
+	{
+		// If the force is NOT ETERNAL, check whether it should be removed
+		if ((*force_iter)->transient_)
+		{
+			// Update the life left
+			(*force_iter)->lifetime_ -= time;
 
+			if ((*force_iter)->lifetime_ <= 0.0f)
+			{
+				// Delete the data
+				if (*force_iter != 0)
+				{
+					delete *force_iter;
+				}
+				// Remove the pointer from the list
+				force_list_.erase(force_iter);
+			}
+		}
+	}
 }
 
 
@@ -179,7 +202,7 @@ void ParticleSystem::accumulateForces(f32 time)
 void ParticleSystem::update(f32 time)
 {
 	// Accumulate forces for all the particles involved
-	accumulateForces(f32 time);
+	accumulateForces(time);
 
 
 }

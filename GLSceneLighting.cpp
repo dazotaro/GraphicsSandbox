@@ -329,6 +329,10 @@ void GLSceneLighting::mouseClick(int button, int state, int x, int y)
 
 }
 
+void GLSceneLighting::mouseMotion(int x, int y)
+{
+}
+
 void GLSceneLighting::cleanup(void)
 {
     delete gl_sphere_;

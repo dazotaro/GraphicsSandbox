@@ -336,6 +336,10 @@ void GLSceneNormal::mouseClick(int button, int state, int x, int y)
     tp_camera_->mouse(button, state, x, y);
 }
 
+void GLSceneNormal::mouseMotion(int x, int y)
+{
+}
+
 void GLSceneNormal::cleanup(void)
 {
     delete gl_cube_instance_;

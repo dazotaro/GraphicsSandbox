@@ -38,6 +38,7 @@ class GLSceneLighting : public GLScene
         void render(void) const;
         void keyboard(unsigned char key, int x, int y);
         void mouseClick(int button, int state, int x, int y);
+        void mouseMotion(int x, int y);
         void resize(int width, int height);
 
     private:

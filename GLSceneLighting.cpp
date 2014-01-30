@@ -1,0 +1,344 @@
+/*
+ * GLScene.cpp
+ *
+ *  Created on: May 21, 2013
+ *      Author: jusabiaga
+ */
+
+#include "GLSceneLighting.hpp"      // GLSceneLighting
+#include "GLMesh.hpp"               // GLMesh
+#include "GLMeshInstance.hpp"       // GLMeshInstance
+#include "Node3D.hpp"               // Node3D
+#include "Object3D.hpp"             // Object3D
+#include "CameraInterface.hpp"      // camera_Interface
+#include "CameraFirstPerson.hpp"    // camera_FirstPerson
+#include "ShapeHelper.hpp"          // build Mesh helper funtions
+#include "TextureManager.hpp"       // loadTexture()
+
+GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height),
+									 gl_sphere_(0), gl_sphere_instance_(0),
+                                     gl_plane_(0), gl_plane_instance_(0),
+                                     sphere_node_(0), plane_node_(0),
+                                     camera_gps_(0), camera_(0)
+{
+}
+
+GLSceneLighting::~GLSceneLighting()
+{
+    // TODO Auto-generated destructor stub
+}
+
+/**
+* @brief Initialized the Scene
+*/
+void GLSceneLighting::init(void)
+{
+    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
+    glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
+    //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
+    //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+
+    current_program_iter_ = glsl_program_map_.find("perfragment");
+    
+    glClearColor(0.0,0.0,0.0,1.0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glDepthRange(0.0f, 1.0f);
+    glEnable(GL_CULL_FACE); // enables face culling
+    glCullFace(GL_BACK); // tells OpenGL to cull back faces (the sane default setting)
+
+    // TEXTURES
+    // --------
+    TextureManager::loadTexture("test", "texture/test.tga");
+
+    // SPHERE
+    // ------
+    // Create Mesh
+    gl_sphere_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE, 100, 50));
+    // Load the Mesh into VBO and VAO
+    gl_sphere_->init();
+    // Create instance of GLMEsh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
+    gl_sphere_instance_->addColorTexture("test");
+    // Give the sphere a position and a orientation
+    Object3D sphere(glm::vec3(0.0f, 10.0f, 0.0f), // Model's position
+                     glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                     glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                     glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    NodePointerList no_children;
+    sphere_node_ = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+
+    // PLANE
+    // ------
+    // Create Mesh
+    gl_plane_ = new GLMesh(Graphics::buildMesh(Graphics::PLANE));
+    // Load the Mesh into VBO and VAO
+    gl_plane_->init();
+    // Create instance of GLMEsh (there could be more than one)
+    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);
+    gl_plane_instance_->addColorTexture("test");
+    // Give the plane a position and a orientation
+    Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
+                   glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                   glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                   glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    plane_node_ = new Node3D(plane, gl_plane_instance_, no_children, true);
+
+    // Create the camera_
+    camera_gps_ = new Object3D(glm::vec3(0.0f, 10.0f, 10.0f), // camera_'s position (eye's coordinates)
+                              glm::vec3(1.0f, 0.0f, 0.0f), // camera_'s X axis
+                              glm::vec3(0.0f, 1.0f, 0.0f), // camera_'s Y axis
+                              glm::vec3(0.0f, 0.0f, 1.0f));// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
+    fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
+    camera_ = dynamic_cast<CameraInterface *>(fp_camera_);
+    //camera_ = new camera_ThirdPerson(camera_Intrinsic(90.f, WIDTH/(float)HEIGHT, 1.f, 1000.f), dynamic_cast<Object3D *>(sphere_node_));
+
+    /*
+    prog.setUniform("Kd", 0.9f, 0.5f, 0.3f);
+    prog.setUniform("Ld", 1.0f, 1.0f, 1.0f);
+    prog.setUniform("LightPosition", view * vec4(5.0f,5.0f,2.0f,1.0f) );
+    */
+
+    // LIGHTS
+    lights_positional_.push_back(LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f)));
+
+}
+
+void GLSceneLighting::loadMaterial(void) const
+{
+    (current_program_iter_->second).setUniform("Kd", 0.4f, 0.4f, 0.4f);
+    (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
+    (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
+    (current_program_iter_->second).setUniform("Shininess", 10.0f);
+}
+
+void GLSceneLighting::loadMaterialOld(void) const
+{
+    static const float ambient[4]  = {0.1f, 0.1f, 0.1f, 1.0f};
+    static const float diffuse[4]  = {1.0f, 0.8f, 0.0f, 1.0f};
+    static const float specular[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    static const float shininess[] = {120.0f};
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+
+    //glEnable(GL_COLOR_MATERIAL);
+}
+
+void GLSceneLighting::loadLights(void) const
+{
+    //for (LightPositionalIterator iter = lights_positional.begin(); iter != lights_positional.end(); ++iter)
+    //{
+
+    // 0
+    (current_program_iter_->second).setUniform("lights[0].Position",  glm::vec4(30.0f, 30.0f, -5.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[0].Intensity", glm::vec3(0.8f,0.8f,0.8f));
+    /*
+    // 1
+    (current_program_iter_->second).setUniform("lights[1].Position",  glm::vec4(0.0f,5.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[1].Intensity", glm::vec3(0.8f,0.8f,0.8f));
+    // 2
+    (current_program_iter_->second).setUniform("lights[2].Position",  glm::vec4(-5.0f,0.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[2].Intensity", glm::vec3(0.8f,0.8f,0.8f));
+    // 3
+    (current_program_iter_->second).setUniform("lights[3].Position",  glm::vec4(0.0f,-5.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[3].Intensity", glm::vec3(0.0f,0.0f,0.0f));
+    // 4
+    (current_program_iter_->second).setUniform("lights[4].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[4].Intensity", glm::vec3(0.0f,0.0f,0.0f));
+    // 5
+    (current_program_iter_->second).setUniform("lights[5].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[5].Intensity", glm::vec3(0.0f,0.0f,0.0f));
+    // 6
+    (current_program_iter_->second).setUniform("lights[6].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[6].Intensity", glm::vec3(0.0f,0.0f,0.0f));
+    // 7
+    (current_program_iter_->second).setUniform("lights[7].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[7].Intensity", glm::vec3(0.0f,0.0f,0.0f));
+    */
+    //}
+}
+
+void GLSceneLighting::loadLightsOld(void) const
+{
+    static const float position[4] = {0.0f, 0.0f, 2.0f, 1.0f};
+    static const float ambient[4]  = {0.1f, 0.1f, 0.1f, 1.0f};
+    static const float diffuse[4]  = {1.0f, 1.0f, 1.0f, 1.0f};
+    static const float lmodel_ambient[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    static const float lmodel_twoside[1] = {GL_FALSE};
+    static const float local_view[] = { 0.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+    glLightModelfv(GL_LIGHT_MODEL_TWO_SIDE, lmodel_twoside);
+    //glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+}
+
+/**
+* @brief Update everything that needs to be updated in the scene
+*
+* @param time Time elapsed since the last update
+*/
+void GLSceneLighting::update(float time)
+{
+    // camera_: update position and orientation
+    //camera_->update(*camera_gps_);
+    // LIGHTS: update position
+
+}
+
+/**
+* @brief Render all the renderable objects in the scene
+*/
+void GLSceneLighting::render(void) const
+{
+    glClearColor(0.0f, 0.1f, 0.1f, 0.0f);
+    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    current_program_iter_->second.use();
+
+    // LOAD MATERIAL
+    loadMaterial();
+    // LOAD LIGHTS
+    loadLights();
+    
+    // Model Matrix
+    glm::mat4 M(1.0f);
+    // View matrix
+    glm::mat4 V(fp_camera_->getViewMatrix());
+    // Perspective Matrix
+    glm::mat4 P(fp_camera_->getPerspectiveMatrix());
+    // Draw each object
+    sphere_node_->draw(current_program_iter_->second, M, V, P);
+    plane_node_->draw(current_program_iter_->second, M, V, P);
+}
+
+/**
+* @brief Resize the scene
+*
+* @param width  Width of the window
+* @param height Height of the window
+*/
+void GLSceneLighting::resize(int width, int height)
+{
+    GLScene::resize(width, height);
+    camera_->setAspectRatio(static_cast<float>(width)/height);
+}
+
+
+/**
+* @brief Handle keyboard input
+*
+* @param key    Id of key pressed
+* @param x      Location of the mouse when the key was pressed
+* @param y      Location of the mouse when the key was pressed
+*/
+void GLSceneLighting::keyboard(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+        case '0':
+            if(++current_program_iter_ == glsl_program_map_.end())
+                current_program_iter_ = glsl_program_map_.begin();
+            break;
+
+        case 'a':
+        case 'A':
+            sphere_node_->rotateX(-1.0f);
+            break;
+
+        case 'd':
+        case 'D':
+            sphere_node_->rotateX(1.0f);
+            break;
+
+        case 'q':
+        case 'Q':
+            sphere_node_->rotateY(1.0f);
+            break;
+
+        case 'e':
+        case 'E':
+            sphere_node_->rotateY(-1.0f);
+            break;
+
+        case 'w':
+        case 'W':
+            sphere_node_->rotateZ(-1.0f);
+            break;
+
+        case 's':
+        case 'S':
+            sphere_node_->rotateZ(1.0f);
+            break;
+
+        case 'k':
+        case 'K':
+            fp_camera_->rotateY(1.0f);  // Yaw
+            break;
+
+        case ';':
+        case ':':
+            fp_camera_->rotateY(-1.0f);  // Yaw
+            break;
+
+        case 'i':
+        case 'I':
+            fp_camera_->rotateZ(1.0f);  // Roll
+            break;
+
+        case 'p':
+        case 'P':
+            fp_camera_->rotateZ(-1.0f); // Roll
+            break;
+
+        case 'o':
+        case 'O':
+            fp_camera_->rotateX(-1.0f);  // Pitch
+            break;
+
+        case 'l':
+        case 'L':
+            fp_camera_->rotateX(1.0f); // Pitch
+            break;
+
+        case 'u':
+        case 'U':
+            fp_camera_->translate(glm::vec3(0.0f, 0.0f, -0.1f));
+            break;
+
+        case 'j':
+        case 'J':
+            fp_camera_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
+            break;
+    }
+}
+
+void GLSceneLighting::mouseClick(int button, int state, int x, int y)
+{
+
+}
+
+void GLSceneLighting::cleanup(void)
+{
+    delete gl_sphere_;
+    delete gl_sphere_instance_;
+    delete gl_plane_;
+    delete gl_plane_instance_;
+    delete sphere_node_;
+    delete plane_node_;
+    delete camera_gps_;
+    delete fp_camera_;
+}
+
+

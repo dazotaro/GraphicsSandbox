@@ -1,0 +1,21 @@
+TO DO
+-----
+- Continue with the port of this project to its git location. The initial work on that part of the project was to add a "Virtual Trackball and Arcball" controller. This is explained in Foley's book (chapter 11.6 of the lastest edition).
+
+- Add 'registerTexture' to TextureManager so we can avoid conflicts like the one between GLSceneNormal's FBO and ColorTex0 and NormalMapTex
+- Add global (static class?) Uniform location unordered_map so we can avoid 'glGet*' functions. Maybe we need a unordered_map<GLuint, unodered_map<string, GLuint>>. A map key-ed by the program handle, with a map associated as value. This 'child' map would be key-ed by uniform name string, and it would return the uniform location.
+- Removed redudante OpenGL State Machine setting functions (e.g. glClear).:wq
+
+DESIGN ISSUES
+--------------
+- Revise GLMeshInstance name. Should it be called GLMeshCopy or GLMeshObject?
+- Add Material, Texture, Scale at the GLMeshInstance level.
+- Test Node3D structure by building the cs250 plane, or by building a complex object made out of several shapes: with a "Merry Go Round"?
+- In 'GLMesh', replace the pointer to 'Mesh' with:
+	1- A 'flyweight' object.
+	2- or a 'smart pointer'.
+- In 'Node3D', replace the pointer to a 'GLMeshInstance' with:
+	1- a 'flyweight' object
+	2- or a 'smart pointer'.
+- Is Scene already API agnostic? or we need GLScene and DXScene?
+

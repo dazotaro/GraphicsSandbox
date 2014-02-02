@@ -26,8 +26,9 @@ class ParticleSystem
 		ParticleSystem();
 		virtual ~ParticleSystem();
 
-		void addParticle(Particle* particle);
-		void addForce(Force* force);
+		void addParticle(Particle* pParticle);
+		void addForce(Force* pForce);
+		void linkForceToParticle(Force* pForce, Particle* pParticle);
 
 		void update(f32 time);
 

@@ -60,9 +60,9 @@ ParticleSystem::~ParticleSystem()
 * @param particle	Pointer to the new particle
 *
 */
-void ParticleSystem::addParticle(Particle* particle)
+void ParticleSystem::addParticle(Particle* pParticle)
 {
-	particle_list_.push_back(particle);
+	particle_list_.push_back(pParticle);
 	num_particles_++;
 }
 
@@ -74,10 +74,25 @@ void ParticleSystem::addParticle(Particle* particle)
 * @param force	Pointer to the new force
 *
 */
-void ParticleSystem::addForce(Force* force)
+void ParticleSystem::addForce(Force* pForce)
 {
-	force_list_.push_back(force);
+	force_list_.push_back(pForce);
 	num_particles_++;
+}
+
+
+
+/**
+* Connect a force and a particle
+*
+* @param pForce		Pointer to force
+* @param pParticle	Pointer to particle
+*
+*/
+void ParticleSystem::linkForceToParticle(Force* pForce, Particle* pParticle)
+{
+	pParticle->addForce(pForce);
+	pForce->addParticle(pParticle);
 }
 
 

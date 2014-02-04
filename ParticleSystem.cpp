@@ -227,4 +227,36 @@ void ParticleSystem::update(f32 time)
 
 }
 
+
+
+/**
+* Overloaded output operator
+*
+* @param out output ostream
+* @param particle_system particle system to output
+*
+* @return output stream
+*/
+std::ostream& operator<<(std::ostream& out, const ParticleSystem& particle_system)
+{
+	out << "Forces: " << std::endl;
+	out << "---------------------------------------------" << std::endl;
+
+	ForceListConstIter force_iter = particle_system.force_list_.begin();
+	for( ; force_iter != particle_system.force_list_.end(); force_iter++)
+		//out << *(*force_iter) << std::endl;
+
+	out << "Particles: " << particle_system.num_particles_<<  std::endl;
+	out << "---------------------------------------------" << std::endl;
+
+	ParticleListConstIter particle_iter = particle_system.particle_list_.begin();
+	for( ; particle_iter != particle_system.particle_list_.end(); particle_iter++)
+		out << *(*particle_iter) << std::endl;
+
+	return out;
+}
+
+
+
+
 } /* namespace JU */

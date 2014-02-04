@@ -39,6 +39,11 @@ class ParticleSystem
 
 		void accumulateForces(f32 time);
 
+	public:
+
+		// Friend functions
+		friend std::ostream& operator<<(std::ostream& out, const ParticleSystem& particle_system);
+
 	private:
 
 		// Particle Storage

@@ -58,9 +58,48 @@ void testForce01()
 
 }
 
+
+
+void testForce02()
+{
+	JU::ParticleSystem particle_system;
+
+	std::map<std::string, JU::Force*> force_map;
+
+	force_map["spring01"] = new JU::Force(0, true, 1111);
+	force_map["gravity"]  = new JU::Force(1, false, 2222);
+	force_map["friction"] = new JU::Force(2, false, 3333);
+	force_map["spring02"] = new JU::Force(3, true, 4444);
+
+	JU::f32 pos[3] = {1.1f, 2.2f, 3.3f};
+	JU::f32 vel[3] = {7.1f, 7.2f, 7.3f};
+	JU::Particle particle(17, 333.3, pos, vel, 13);
+	particle.addForce(force_map["spring01"]);
+	particle.addForce(force_map["gravity"]);
+	particle.addForce(force_map["friction"]);
+
+	force_map["spring01"]->addParticle(&particle);
+	force_map["gravity"]->addParticle(&particle);
+	force_map["friction"]->addParticle(&particle);
+
+	// Add FORCES to the system
+	particle_system.addForce(force_map["friction01"]);
+	particle_system.addForce(force_map["gravity"]);
+	particle_system.addForce(force_map["friction"]);
+	particle_system.addForce(force_map["spring02"]);
+
+	// Add particles to the system
+	particle_system.addParticle(&particle);
+
+	std::cout << "Printing the whole particle system" << std::endl;
+	std::cout << particle_system << std::endl;
+}
+
+
+
 int main(void)
 {
-	testForce01();
+	testForce02();
 
 	return 0;
 }

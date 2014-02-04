@@ -239,12 +239,12 @@ void ParticleSystem::update(f32 time)
 */
 std::ostream& operator<<(std::ostream& out, const ParticleSystem& particle_system)
 {
-	out << "Forces: " << std::endl;
+	out << "Forces: " << particle_system.force_list_.size() << std::endl;
 	out << "---------------------------------------------" << std::endl;
 
 	ForceListConstIter force_iter = particle_system.force_list_.begin();
 	for( ; force_iter != particle_system.force_list_.end(); force_iter++)
-		//out << *(*force_iter) << std::endl;
+		out << *(*force_iter) << std::endl;
 
 	out << "Particles: " << particle_system.num_particles_<<  std::endl;
 	out << "---------------------------------------------" << std::endl;

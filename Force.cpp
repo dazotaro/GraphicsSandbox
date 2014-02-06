@@ -24,7 +24,7 @@ Force::~Force()
 
 
 
-void Force::addParticle(Particle* particle)
+void Force::addParticle(Particle* pParticle)
 {
 	particle_map_[particle->id_] = particle;
 }

@@ -107,6 +107,7 @@ std::ostream& operator<<(std::ostream& out, const Particle& particle)
 {
 
 	out << "Particle id: " 	<< particle.id_ << std::endl;
+	out << "\tAddress: " 	<< &particle << std::endl;
 	out << "\tMass: " 		<< particle.mass_ << std::endl;
 	out << "\tLife: " 		<< particle.lifetime_ << std::endl;
 	out << "\tPosition: (" 	<< particle.position_[0] << ", "

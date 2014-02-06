@@ -26,7 +26,7 @@ Force::~Force()
 
 void Force::addParticle(Particle* pParticle)
 {
-	particle_map_[particle->id_] = particle;
+	particle_map_[pParticle->id_] = pParticle;
 }
 
 
@@ -60,6 +60,7 @@ void Force::releaseParticles()
 std::ostream& operator<<(std::ostream& out, const Force& force)
 {
 	out << "Force id: " 	<< force.id_ << std::endl;
+	out << "\tAddress: " 	<< &force << std::endl;
 	out << "\tTransient: " 	<< force.transient_ << std::endl;
 	out << "\tLife: " 		<< force.lifetime_ << std::endl;
 

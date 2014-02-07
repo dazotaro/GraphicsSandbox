@@ -26,8 +26,8 @@ class ParticleSystem
 		ParticleSystem();
 		virtual ~ParticleSystem();
 
-		void addParticle(Particle* pParticle);
-		void addForce(Force* pForce);
+		ParticleId addParticle(Particle* pParticle);
+		ForceId addForce(Force* pForce);
 		void linkForceToParticle(Force* pForce, Particle* pParticle);
 
 		void update(f32 time);
@@ -47,11 +47,13 @@ class ParticleSystem
 	private:
 
 		// Particle Storage
-		ParticleList particle_list_;
-		uint32 num_particles_;	// we want to guarantee O(1), independent of STL implementation
+		ParticleList 	particle_list_;
+		uint32	 		num_particles_;	// we want to guarantee O(1), independent of STL implementation
+		ParticleId 		particle_id_;
 
 		// Force Storage
-		ForceList force_list_;
+		ForceList 		force_list_;
+		ForceId 		force_id_;
 };
 
 } /* namespace JU */

@@ -16,7 +16,7 @@ namespace JU
 /**
 * Constructor
 */
-ParticleSystem::ParticleSystem() : num_particles_(0)
+ParticleSystem::ParticleSystem() : num_particles_(0), particle_id_(0), force_id_(0)
 {
 }
 
@@ -59,11 +59,16 @@ ParticleSystem::~ParticleSystem()
 *
 * @param particle	Pointer to the new particle
 *
+* @return Return this particle's id
+*
 */
-void ParticleSystem::addParticle(Particle* pParticle)
+ParticleId ParticleSystem::addParticle(Particle* pParticle)
 {
+	pParticle->id_ = particle_id_++;
 	particle_list_.push_back(pParticle);
 	num_particles_++;
+
+	return pParticle->id_;
 }
 
 
@@ -73,10 +78,15 @@ void ParticleSystem::addParticle(Particle* pParticle)
 *
 * @param force	Pointer to the new force
 *
+* @return Return this force's id
+*
 */
-void ParticleSystem::addForce(Force* pForce)
+ForceId ParticleSystem::addForce(Force* pForce)
 {
+	pForce->id_ = force_id_++;
 	force_list_.push_back(pForce);
+
+	return pForce->id_;
 }
 
 

@@ -20,8 +20,8 @@ namespace JU
 * @param mass		Mass of the particle
 * @param lifetime	Life (in seconds) of this particle
 */
-Particle::Particle(ParticleId id, f32 mass, f32 position[3], f32 velocity[3], f32 lifetime)
-					: id_(id), mass_ (mass), lifetime_(lifetime)
+Particle::Particle(f32 mass, f32 position[3], f32 velocity[3], f32 lifetime)
+					: id_(0), mass_ (mass), lifetime_(lifetime)
 {
 	for (uint8 i = 0; i < 3; i++)
 	{

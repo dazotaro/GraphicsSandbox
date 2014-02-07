@@ -33,7 +33,7 @@ class Force
 			TRANSIENT_ON_TIME,		/**< it is deleted when it reaches a maximum lifetime */
 		};
 
-		Force(ForceId id, ForceType type = PERSISTENT, f32 lifetime = 0.0f);
+		Force(ForceType type = PERSISTENT, f32 lifetime = 0.0f);
 		virtual ~Force();
 
 		virtual void addParticle(Particle* pParticle);

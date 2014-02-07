@@ -30,7 +30,7 @@ class Particle
 {
 	public:
 
-		Particle(ParticleId id, f32 mass, f32 position[3], f32 velocity[3], f32 lifetime);
+		Particle(f32 mass, f32 position[3], f32 velocity[3], f32 lifetime);
 		virtual ~Particle();
 
 		void resetForceAcc();

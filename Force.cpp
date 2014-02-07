@@ -12,7 +12,7 @@
 namespace JU
 {
 
-Force::Force(ForceId id, ForceType type, f32 lifetime) : id_(id), type_(type), lifetime_(lifetime)
+Force::Force(ForceType type, f32 lifetime) : id_(0), type_(type), lifetime_(lifetime)
 {
 }
 

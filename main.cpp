@@ -84,9 +84,6 @@ void testForce02()
 	force_map["friction"]->addParticle(particle);
 
 	// Add FORCES to the system
-	std::cout << "ParticleSystem::addForce Adding force " << pForce << std::endl;
-	std::cout << *pForce << std::endl;
-
 	particle_system.addForce(force_map["spring01"]);
 	particle_system.addForce(force_map["gravity"]);
 	particle_system.addForce(force_map["friction"]);

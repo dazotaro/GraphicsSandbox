@@ -245,7 +245,7 @@ std::ostream& operator<<(std::ostream& out, const ParticleSystem& particle_syste
 	for( ; force_iter != particle_system.force_list_.end(); force_iter++)
 		out << *(*force_iter) << std::endl;
 
-	out << "Particles: " << particle_system.num_particles_<< ":" << particle_system.particle_list_.size() << std::endl;
+	out << "Particles: " << particle_system.num_particles_<< "(" << particle_system.particle_list_.size() << ")" << std::endl;
 	out << "---------------------------------------------" << std::endl;
 
 	ParticleListConstIter particle_iter = particle_system.particle_list_.begin();

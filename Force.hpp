@@ -28,9 +28,9 @@ class Force
 		 */
 		enum ForceType
 		{
-			PERSISTENT,				**< it has to be explicitly deleted */
-			TRANSIENT_ON_PARTICLES,	**< it is deleted when all the particles it is linked to die */
-			TRANSIENT_ON_TIME,		**< it is deleted when it reaches a maximum lifetime */
+			PERSISTENT,				/**< it has to be explicitly deleted */
+			TRANSIENT_ON_PARTICLES,	/**< it is deleted when all the particles it is linked to die */
+			TRANSIENT_ON_TIME,		/**< it is deleted when it reaches a maximum lifetime */
 		};
 
 		Force(ForceId id, ForceType type = PERSISTENT, f32 lifetime = 0.0f);

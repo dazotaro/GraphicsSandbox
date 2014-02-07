@@ -46,9 +46,9 @@ class Force
 
 	public:
 
-		ForceId id_;
-		ForceType type_;				/**< Is force transient or eternal */
-		f32 lifetime_;					/**< Life left of the force (in milliseconds)*/
+		ForceId 	id_;
+		ForceType 	type_;				/**< Is force transient or eternal */
+		f32 		lifetime_;			/**< Life left of the force (in milliseconds)*/
 
 		ParticleMap particle_map_;		/**< Particle subject to this force */
 };

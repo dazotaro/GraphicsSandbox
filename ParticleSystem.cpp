@@ -74,6 +74,27 @@ ParticleId ParticleSystem::addParticle(Particle* pParticle)
 
 
 /**
+* Add particle to the system
+*
+* @param particle	Pointer to the new particle
+*
+* @return Return this particle's id
+*
+*/
+ParticleId ParticleSystem::addParticle(Particle* pParticle, const ForceIdVector& force_vector)
+{
+	for(ForceIdVectorConstIter iter = force_vector.begin(); iter != force_vector.end(); iter++)
+	{
+		linkForceAndParticle(force_map_[*iter], pParticle);
+	}
+
+	return addParticle(pParticle);
+}
+
+
+
+
+/**
 * Add force to the system
 *
 * @param force	Pointer to the new force
@@ -98,7 +119,7 @@ ForceId ParticleSystem::addForce(Force* pForce)
 * @param pParticle	Pointer to particle
 *
 */
-void ParticleSystem::linkForceToParticle(Force* pForce, Particle* pParticle)
+void ParticleSystem::linkForceAndParticle(Force* pForce, Particle* pParticle)
 {
 	pParticle->addForce(pForce);
 	pForce->addParticle(pParticle);

@@ -101,6 +101,8 @@ void testForce03()
 {
 	JU::ParticleSystem particle_system;
 
+	// PARTICLE SYSTEM: add forces
+	// ---------------------------
 	std::map<std::string, JU::ForceId> force_map;
 
 	force_map["spring01"] = particle_system.addForce(new JU::Force(JU::Force::PERSISTENT));
@@ -108,12 +110,38 @@ void testForce03()
 	force_map["friction"] = particle_system.addForce(new JU::Force(JU::Force::TRANSIENT_ON_TIME, 3333));
 	force_map["spring02"] = particle_system.addForce(new JU::Force(JU::Force::TRANSIENT_ON_PARTICLES));
 
-	JU::f32 pos[3] = {1.1f, 2.2f, 3.3f};
-	JU::f32 vel[3] = {7.1f, 7.2f, 7.3f};
-	JU::Particle* particle = new JU::Particle(333.3, pos, vel, 13);
+	// PARTICLE SYSTEM: add particles
+	// ------------------------------
+	JU::Particle* particle;
+	JU::ForceIdVector force_vec(4);
 
-	// Add particles to the system
-	particle_system.addParticle(particle);
+	// PARTICLE 01
+	// -----------
+	JU::f32 pos1[3] = {1.1f, 2.2f, 3.3f};
+	JU::f32 vel1[3] = {7.1f, 7.2f, 7.3f};
+	particle = new JU::Particle(111.1, pos1, vel1, 1000);
+
+	// Compile list of force ids that control this particle
+	force_vec.clear();
+	force_vec.push_back(force_map["gravity"]);
+	force_vec.push_back(force_map["friction"]);
+	force_vec.push_back(force_map["spring01"]);
+
+	particle_system.addParticle(particle, force_vec);
+
+	// PARTICLE 02
+	// -----------
+	JU::f32 pos2[3] = {4.1f, 5.2f, 6.3f};
+	JU::f32 vel2[3] = {9.1f, 9.2f, 9.3f};
+	particle = new JU::Particle(222.2, pos2, vel2, 5000);
+
+	// Compile list of force ids that control this particle
+	force_vec.clear();
+	force_vec.push_back(force_map["gravity"]);
+	force_vec.push_back(force_map["friction"]);
+	force_vec.push_back(force_map["spring02"]);
+
+	particle_system.addParticle(particle, force_vec);
 
 	std::cout << "Printing the whole particle system" << std::endl;
 	std::cout << particle_system << std::endl;
@@ -123,7 +151,7 @@ void testForce03()
 
 int main(void)
 {
-	testForce02();
+	testForce03();
 
 	return 0;
 }

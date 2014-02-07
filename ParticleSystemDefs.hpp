@@ -9,9 +9,10 @@
 #define PARTICLESYSTEMDEFS_HPP_
 
 // Global includes
-#include <list>	// std::list
-#include <map>	// std::map
-#include <set>	// std::unordered_set
+#include <list>		// std::list
+#include <map>		// std::map
+#include <set>		// std::unordered_set
+#include <vector>	// std::vector
 
 namespace JU
 {
@@ -41,6 +42,10 @@ namespace JU
 
 	typedef std::set<Force*> 				ForceSet;
 	typedef ForceSet::iterator 				ForceSetIter;
+
+	typedef std::vector<ForceId>			ForceIdVector;
+	typedef ForceIdVector::const_iterator	ForceIdVectorConstIter;
+	typedef ForceIdVector::iterator			ForceIdVectorIter;
 } /* namespace JU */
 
 

@@ -27,8 +27,9 @@ class ParticleSystem
 		virtual ~ParticleSystem();
 
 		ParticleId addParticle(Particle* pParticle);
+		ParticleId addParticle(Particle* pParticle, const ForceIdVector& force_vector);
+
 		ForceId addForce(Force* pForce);
-		void linkForceToParticle(Force* pForce, Particle* pParticle);
 
 		void update(f32 time);
 
@@ -38,6 +39,8 @@ class ParticleSystem
 		void cleanupForces(f32 time);
 
 		void accumulateForces(f32 time);
+
+		void linkForceAndParticle(Force* pForce, Particle* pParticle);
 
 	public:
 

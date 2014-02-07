@@ -61,7 +61,29 @@ std::ostream& operator<<(std::ostream& out, const Force& force)
 {
 	out << "Force id: " 	<< force.id_ 		<< std::endl;
 	out << "\tAddress: " 	<< &force 			<< std::endl;
-	out << "\tType: " 		<< force.type_ 		<< std::endl;
+	out << "\tType: " 		<< force.type_ 		<< " (";
+
+	switch (force.type_)
+	{
+	case Force::PERSISTENT:
+		out << "PERSISTENT";
+		break;
+
+	case Force::TRANSIENT_ON_PARTICLES:
+		out << "TRANSIENT_ON_PARTICLES";
+		break;
+
+	case Force::TRANSIENT_ON_TIME:
+		out << "TRANSIENT_ON_TIME";
+		break;
+
+	default:
+		out << "UNKNOWN TYPE";
+		break;
+	}
+
+	out << ")" << std::endl;
+
 	out << "\tLife: " 		<< force.lifetime_ 	<< std::endl;
 
 	out << "\tLinked particles: ";

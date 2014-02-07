@@ -19,10 +19,10 @@ void testForce01()
 {
 	std::map<std::string, JU::Force*> force_map;
 
-	force_map["spring01"] = new JU::Force(0, true, 1111);
-	force_map["gravity"]  = new JU::Force(1, false, 2222);
-	force_map["friction"] = new JU::Force(2, false, 3333);
-	force_map["spring02"] = new JU::Force(3, true, 4444);
+	force_map["spring01"] = new JU::Force(0, JU::Force::PERSISTENT);
+	force_map["gravity"]  = new JU::Force(1, JU::Force::TRANSIENT_ON_PARTICLES);
+	force_map["friction"] = new JU::Force(2, JU::Force::TRANSIENT_ON_TIME, 3333);
+	force_map["spring02"] = new JU::Force(3, JU::Force::PERSISTENT);
 
 	JU::f32 pos[3] = {1.1f, 2.2f, 3.3f};
 	JU::f32 vel[3] = {7.1f, 7.2f, 7.3f};
@@ -66,11 +66,10 @@ void testForce02()
 
 	std::map<std::string, JU::Force*> force_map;
 
-	JU::Force* pForce = new JU::Force(0, true, 1111);
-	force_map["spring01"] = pForce;
-	force_map["gravity"]  = new JU::Force(1, false, 2222);
-	force_map["friction"] = new JU::Force(2, false, 3333);
-	force_map["spring02"] = new JU::Force(3, true, 4444);
+	force_map["spring01"] = new JU::Force(0, JU::Force::PERSISTENT);
+	force_map["gravity"]  = new JU::Force(1, JU::Force::TRANSIENT_ON_PARTICLES);
+	force_map["friction"] = new JU::Force(2, JU::Force::TRANSIENT_ON_TIME, 3333);
+	force_map["spring02"] = new JU::Force(3, JU::Force::TRANSIENT_ON_PARTICLES);
 
 	JU::f32 pos[3] = {1.1f, 2.2f, 3.3f};
 	JU::f32 vel[3] = {7.1f, 7.2f, 7.3f};

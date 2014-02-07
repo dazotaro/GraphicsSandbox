@@ -18,12 +18,22 @@
 namespace JU
 {
 
+/*! Force base class */
 class Force
 {
 
 	public:
 
-		Force(ForceId id, bool transient = false, f32 lifetime = 0.0f);
+		/** Types of forces (based on the way they are eliminated).
+		 */
+		enum ForceType
+		{
+			PERSISTENT,				**< it has to be explicitly deleted */
+			TRANSIENT_ON_PARTICLES,	**< it is deleted when all the particles it is linked to die */
+			TRANSIENT_ON_TIME,		**< it is deleted when it reaches a maximum lifetime */
+		};
+
+		Force(ForceId id, ForceType type = PERSISTENT, f32 lifetime = 0.0f);
 		virtual ~Force();
 
 		virtual void addParticle(Particle* pParticle);
@@ -37,7 +47,7 @@ class Force
 	public:
 
 		ForceId id_;
-		bool transient_;				/**< Is force transient or eternal */
+		ForceType type_;				/**< Is force transient or eternal */
 		f32 lifetime_;					/**< Life left of the force (in milliseconds)*/
 
 		ParticleMap particle_map_;		/**< Particle subject to this force */

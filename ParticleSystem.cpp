@@ -149,22 +149,44 @@ void ParticleSystem::cleanupForces(f32 time)
 	ForceListIter force_iter = force_list_.begin();
 	for (; force_iter != force_list_.end(); force_iter++)
 	{
-		// If the force is NOT ETERNAL, check whether it should be removed
-		if ((*force_iter)->transient_)
-		{
-			// Update the life left
-			(*force_iter)->lifetime_ -= time;
+		bool delete_force = false;
 
-			if ((*force_iter)->lifetime_ <= 0.0f)
-			{
-				// Delete the data
-				if (*force_iter != 0)
+		switch ((*force_iter)->type_)
+		{
+			case Force::TRANSIENT_ON_TIME:
 				{
-					delete *force_iter;
+					// Update the life left
+					(*force_iter)->lifetime_ -= time;
+
+					if ((*force_iter)->lifetime_ <= 0.0f)
+					{
+						delete_force = true;
+					}
 				}
-				// Remove the pointer from the list
-				force_list_.erase(force_iter);
+				break;
+
+			case Force::TRANSIENT_ON_PARTICLES:
+				{
+					if ((*force_iter)->particle_map_.size() == 0)
+					{
+						delete_force = true;
+					}
+				}
+				break;
+
+			default:
+				break;
+		}
+
+		if (delete_force)
+		{
+			// Delete the data
+			if (*force_iter != 0)
+			{
+				delete *force_iter;
 			}
+			// Remove the pointer from the list
+			force_list_.erase(force_iter);
 		}
 	}
 }
@@ -184,23 +206,6 @@ void ParticleSystem::accumulateForces(f32 time)
 	ForceListIter force_iter = force_list_.begin();
 	for (; force_iter != force_list_.end(); force_iter++)
 	{
-		// If the force is NOT ETERNAL, check whether it should be removed
-		if ((*force_iter)->transient_)
-		{
-			// Update the life left
-			(*force_iter)->lifetime_ -= time;
-
-			if ((*force_iter)->lifetime_ <= 0.0f)
-			{
-				// Delete the data
-				if (*force_iter != 0)
-				{
-					delete *force_iter;
-				}
-				// Remove the pointer from the list
-				force_list_.erase(force_iter);
-			}
-		}
 	}
 }
 

@@ -30,13 +30,13 @@ ParticleSystem::ParticleSystem() : num_particles_(0), particle_id_(0), force_id_
 ParticleSystem::~ParticleSystem()
 {
 	// FORCES: for all forces
-	ForceListIter force_iter = force_list_.begin();
-	for (; force_iter != force_list_.end() ; force_iter++)
+	ForceMapIter force_iter = force_map_.begin();
+	for (; force_iter != force_map_.end() ; force_iter++)
 	{
 		// Delete the data
-		if (*force_iter != 0)
+		if (force_iter->second != 0)
 		{
-			delete *force_iter;
+			delete force_iter->second;
 		}
 	}
 
@@ -84,7 +84,7 @@ ParticleId ParticleSystem::addParticle(Particle* pParticle)
 ForceId ParticleSystem::addForce(Force* pForce)
 {
 	pForce->id_ = force_id_++;
-	force_list_.push_back(pForce);
+	force_map_[pForce->id_] =  pForce;
 
 	return pForce->id_;
 }
@@ -156,19 +156,19 @@ void ParticleSystem::cleanupParticles(f32 time)
 void ParticleSystem::cleanupForces(f32 time)
 {
 	// FORCES: for all forces
-	ForceListIter force_iter = force_list_.begin();
-	for (; force_iter != force_list_.end(); force_iter++)
+	ForceMapIter force_iter = force_map_.begin();
+	for (; force_iter != force_map_.end(); force_iter++)
 	{
 		bool delete_force = false;
 
-		switch ((*force_iter)->type_)
+		switch ((force_iter->second)->type_)
 		{
 			case Force::TRANSIENT_ON_TIME:
 				{
 					// Update the life left
-					(*force_iter)->lifetime_ -= time;
+					(force_iter->second)->lifetime_ -= time;
 
-					if ((*force_iter)->lifetime_ <= 0.0f)
+					if ((force_iter->second)->lifetime_ <= 0.0f)
 					{
 						delete_force = true;
 					}
@@ -177,7 +177,7 @@ void ParticleSystem::cleanupForces(f32 time)
 
 			case Force::TRANSIENT_ON_PARTICLES:
 				{
-					if ((*force_iter)->particle_map_.size() == 0)
+					if ((force_iter->second)->particle_map_.size() == 0)
 					{
 						delete_force = true;
 					}
@@ -191,12 +191,12 @@ void ParticleSystem::cleanupForces(f32 time)
 		if (delete_force)
 		{
 			// Delete the data
-			if (*force_iter != 0)
+			if (force_iter->second != 0)
 			{
-				delete *force_iter;
+				delete force_iter->second;
 			}
 			// Remove the pointer from the list
-			force_list_.erase(force_iter);
+			force_map_.erase(force_iter);
 		}
 	}
 }
@@ -213,8 +213,8 @@ void ParticleSystem::cleanupForces(f32 time)
 void ParticleSystem::accumulateForces(f32 time)
 {
 	// FORCES: for all forces
-	ForceListIter force_iter = force_list_.begin();
-	for (; force_iter != force_list_.end(); force_iter++)
+	ForceMapConstIter force_iter = force_map_.begin();
+	for (; force_iter != force_map_.end(); force_iter++)
 	{
 	}
 }
@@ -253,12 +253,12 @@ void ParticleSystem::update(f32 time)
 */
 std::ostream& operator<<(std::ostream& out, const ParticleSystem& particle_system)
 {
-	out << "Forces: " << particle_system.force_list_.size() << std::endl;
+	out << "Forces: " << particle_system.force_map_.size() << std::endl;
 	out << "---------------------------------------------" << std::endl;
 
-	ForceListConstIter force_iter = particle_system.force_list_.begin();
-	for( ; force_iter != particle_system.force_list_.end(); force_iter++)
-		out << *(*force_iter) << std::endl;
+	ForceMapConstIter force_iter = particle_system.force_map_.begin();
+	for( ; force_iter != particle_system.force_map_.end(); force_iter++)
+		out << *(force_iter->second) << std::endl;
 
 	out << "Particles: " << particle_system.num_particles_<< "(" << particle_system.particle_list_.size() << ")" << std::endl;
 	out << "---------------------------------------------" << std::endl;

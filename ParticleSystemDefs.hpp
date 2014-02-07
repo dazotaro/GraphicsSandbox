@@ -23,20 +23,24 @@ namespace JU
 	typedef uint32 ParticleId;
 	typedef uint32 ForceId;
 
-	typedef std::list<Particle*> ParticleList;
-	typedef ParticleList::const_iterator ParticleListConstIter;
-	typedef ParticleList::iterator ParticleListIter;
+	typedef std::list<Particle*> 			ParticleList;
+	typedef ParticleList::const_iterator 	ParticleListConstIter;
+	typedef ParticleList::iterator 			ParticleListIter;
 
 	typedef std::map<ParticleId, Particle*> ParticleMap;
-	typedef ParticleMap::const_iterator ParticleMapConstIter;
-	typedef ParticleMap::iterator ParticleMapIter;
+	typedef ParticleMap::const_iterator 	ParticleMapConstIter;
+	typedef ParticleMap::iterator 			ParticleMapIter;
 
-	typedef std::list<Force*> ForceList;
-	typedef ForceList::const_iterator ForceListConstIter;
-	typedef ForceList::iterator ForceListIter;
+	typedef std::list<Force*> 				ForceList;
+	typedef ForceList::const_iterator 		ForceListConstIter;
+	typedef ForceList::iterator 			ForceListIter;
 
-	typedef std::set<Force*> ForceSet;
-	typedef ForceSet::iterator ForceSetIter;
+	typedef std::map<ForceId, Force*> 		ForceMap;
+	typedef ForceMap::const_iterator 		ForceMapConstIter;
+	typedef ForceMap::iterator 				ForceMapIter;
+
+	typedef std::set<Force*> 				ForceSet;
+	typedef ForceSet::iterator 				ForceSetIter;
 } /* namespace JU */
 
 

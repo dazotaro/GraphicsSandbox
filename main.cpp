@@ -97,6 +97,30 @@ void testForce02()
 
 
 
+void testForce03()
+{
+	JU::ParticleSystem particle_system;
+
+	std::map<std::string, JU::ForceId> force_map;
+
+	force_map["spring01"] = particle_system.addForce(new JU::Force(JU::Force::PERSISTENT));
+	force_map["gravity"]  = particle_system.addForce(new JU::Force(JU::Force::TRANSIENT_ON_PARTICLES));
+	force_map["friction"] = particle_system.addForce(new JU::Force(JU::Force::TRANSIENT_ON_TIME, 3333));
+	force_map["spring02"] = particle_system.addForce(new JU::Force(JU::Force::TRANSIENT_ON_PARTICLES));
+
+	JU::f32 pos[3] = {1.1f, 2.2f, 3.3f};
+	JU::f32 vel[3] = {7.1f, 7.2f, 7.3f};
+	JU::Particle* particle = new JU::Particle(333.3, pos, vel, 13);
+
+	// Add particles to the system
+	particle_system.addParticle(particle);
+
+	std::cout << "Printing the whole particle system" << std::endl;
+	std::cout << particle_system << std::endl;
+}
+
+
+
 int main(void)
 {
 	testForce02();

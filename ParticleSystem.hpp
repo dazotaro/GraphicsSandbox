@@ -52,7 +52,7 @@ class ParticleSystem
 		ParticleId 		particle_id_;
 
 		// Force Storage
-		ForceList 		force_list_;
+		ForceMap 		force_map_;
 		ForceId 		force_id_;
 };
 

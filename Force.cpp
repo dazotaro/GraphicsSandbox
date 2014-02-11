@@ -123,7 +123,11 @@ GravityForce::~GravityForce()
 
 void GravityForce::apply(f32 time) const
 {
-
+	ParticleMapConstIter particle_iter = particle_map_.begin();
+	for (; particle_iter != particle_map_.end(); particle_iter++)
+	{
+		(particle_iter->second)->force_acc_ += glm::vec3(0.0f, -1.0f, 0.0f);
+	}
 }
 
 

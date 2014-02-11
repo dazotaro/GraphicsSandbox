@@ -14,7 +14,7 @@
 
 // Global includes
 #include <iostream>						// std:;ostream, std::endl
-#include <glm/glm.hpp>      	// glm::vec3
+#include <glm/glm.hpp>      			// glm::vec3
 
 namespace JU
 {

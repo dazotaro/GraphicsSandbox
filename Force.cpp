@@ -126,7 +126,7 @@ void GravityForce::apply(f32 time) const
 	ParticleMapConstIter particle_iter = particle_map_.begin();
 	for (; particle_iter != particle_map_.end(); particle_iter++)
 	{
-		(particle_iter->second)->force_acc_ += glm::vec3(0.0f, -1.0f, 0.0f);
+		(particle_iter->second)->force_acc_ += glm::vec3(0.0f, -g_, 0.0f);
 	}
 }
 
@@ -158,7 +158,11 @@ DragForce::~DragForce()
 
 void DragForce::apply(f32 time) const
 {
-
+	ParticleMapConstIter particle_iter = particle_map_.begin();
+	for (; particle_iter != particle_map_.end(); particle_iter++)
+	{
+		(particle_iter->second)->force_acc_ += -drag_ * (particle_iter->second)->velocity_;
+	}
 }
 
 
@@ -189,7 +193,11 @@ ThrustForce::~ThrustForce()
 
 void ThrustForce::apply(f32 time) const
 {
-
+	ParticleMapConstIter particle_iter = particle_map_.begin();
+	for (; particle_iter != particle_map_.end(); particle_iter++)
+	{
+		(particle_iter->second)->force_acc_ += force_;
+	}
 }
 
 

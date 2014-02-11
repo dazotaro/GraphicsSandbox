@@ -105,10 +105,10 @@ void testForce03()
 	// ---------------------------
 	std::map<std::string, JU::ForceId> force_map;
 
-	force_map["spring01"] = particle_system.addForce(new JU::SpringForce(0.8f));
+	force_map["spring01"] = particle_system.addForce(new JU::SpringForce(0.8f, 2.0f));
 	force_map["gravity"]  = particle_system.addForce(new JU::GravityForce());
 	force_map["friction"] = particle_system.addForce(new JU::DragForce(427.2f));
-	force_map["spring02"] = particle_system.addForce(new JU::SpringForce(0.3f));
+	force_map["spring02"] = particle_system.addForce(new JU::SpringForce(0.3f, 2.0f));
 	force_map["thrust"]   = particle_system.addForce(new JU::ThrustForce(glm::vec3(1.0f, 200.0f, 3.0f), 5.0f));
 
 	// PARTICLE SYSTEM: add particles

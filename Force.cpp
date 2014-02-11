@@ -204,7 +204,8 @@ std::string ThrustForce::getInfoString() const
 
 
 
-SpringForce::SpringForce(f32 stiffness) : Force(TRANSIENT_ON_PARTICLES), stiffness_(stiffness)
+SpringForce::SpringForce(f32 stiffness, f32 equilibrium_distance)
+				: Force(TRANSIENT_ON_PARTICLES), stiffness_(stiffness), equilibrium_distance_(equilibrium_distance)
 {
 }
 
@@ -229,6 +230,7 @@ std::string SpringForce::getInfoString() const
 
 	out << "\tDescription: Spring Force" << std::endl;
 	out << "\tStiffness coefficient: " << stiffness_ << std::endl;
+	out << "\tEquilibrium distance: " << equilibrium_distance_ << std::endl;
 
 	return Force::getInfoString() + out.str();
 }

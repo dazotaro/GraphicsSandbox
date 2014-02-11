@@ -112,7 +112,7 @@ class ThrustForce : public Force
 class SpringForce : public Force
 {
 	public:
-		SpringForce(f32 stiffness);
+		SpringForce(f32 stiffness, f32 equilibrium_distance);
 		virtual ~SpringForce();
 
 		void apply(f32 time) const;
@@ -121,7 +121,8 @@ class SpringForce : public Force
 
 	private:
 
-		f32 stiffness_;		/**< Stiffness of the spring to be applied in Hooke's Law*/
+		f32 stiffness_;				/**< Stiffness of the spring to be applied in Hooke's Law */
+		f32 equilibrium_distance_;	/**< Distance of equilibrium */
 };
 
 

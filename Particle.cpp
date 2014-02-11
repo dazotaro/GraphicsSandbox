@@ -20,14 +20,9 @@ namespace JU
 * @param mass		Mass of the particle
 * @param lifetime	Life (in seconds) of this particle
 */
-Particle::Particle(f32 mass, f32 position[3], f32 velocity[3], f32 lifetime)
-					: id_(0), mass_ (mass), lifetime_(lifetime)
+Particle::Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, f32 lifetime)
+					: id_(0), mass_ (mass), position_(position), velocity_(velocity), force_acc_(glm::vec3(0.0f)), lifetime_(lifetime)
 {
-	for (uint8 i = 0; i < 3; i++)
-	{
-		position_[i] = position[i];
-		velocity_[i] = velocity[i];
-	}
 }
 
 
@@ -48,9 +43,9 @@ Particle::~Particle()
 */
 inline void Particle::resetForceAcc()
 {
-	force_acc_[0] = 0.0f;
-	force_acc_[1] = 0.0f;
-	force_acc_[2] = 0.0f;
+	force_acc_.x = 0.0f;
+	force_acc_.y = 0.0f;
+	force_acc_.z = 0.0f;
 }
 
 
@@ -110,15 +105,15 @@ std::ostream& operator<<(std::ostream& out, const Particle& particle)
 	out << "\tAddress: " 	<< &particle << std::endl;
 	out << "\tMass: " 		<< particle.mass_ << std::endl;
 	out << "\tLife: " 		<< particle.lifetime_ << std::endl;
-	out << "\tPosition: (" 	<< particle.position_[0] << ", "
-							<< particle.position_[1] << ","
-							<< particle.position_[2] << ")" << std::endl;
-	out << "\tVelocity: (" 	<< particle.velocity_[0] << ", "
-							<< particle.velocity_[1] << ","
-							<< particle.velocity_[2] << ")" << std::endl;
-	out << "\tForce:    (" 	<< particle.force_acc_[0] << ", "
-							<< particle.force_acc_[1] << ","
-							<< particle.force_acc_[2] << ")" << std::endl;
+	out << "\tPosition: (" 	<< particle.position_.x << ", "
+							<< particle.position_.y << ", "
+							<< particle.position_.z << ")" << std::endl;
+	out << "\tVelocity: (" 	<< particle.velocity_.x << ", "
+							<< particle.velocity_.y << ", "
+							<< particle.velocity_.z << ")" << std::endl;
+	out << "\tForce:    (" 	<< particle.force_acc_.x << ", "
+							<< particle.force_acc_.y << ", "
+							<< particle.force_acc_.z << ")" << std::endl;
 
 	out << "\tLinked forces: ";
 	ForceSetIter force_iter = particle.force_set_.begin();

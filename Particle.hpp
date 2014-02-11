@@ -14,6 +14,7 @@
 
 // Global includes
 #include <iostream>			// std:;ostream, std::endl
+#include <glm/glm.hpp>      	// glm::vec3
 
 namespace JU
 {
@@ -30,7 +31,7 @@ class Particle
 {
 	public:
 
-		Particle(f32 mass, f32 position[3], f32 velocity[3], f32 lifetime);
+		Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, f32 lifetime);
 		virtual ~Particle();
 
 		void resetForceAcc();
@@ -48,10 +49,11 @@ class Particle
 		ParticleId id_;					/**< particle id (for debugging purposes */
 
 		f32 mass_;
-		f32 position_[3];
-		f32 velocity_[3];
+		glm::vec3 position_;
+		glm::vec3 velocity_;
+		glm::vec3 force_acc_;		/**< Force accumulator*/
+
 		f32 lifetime_;					/**< Life left of the force (in milliseconds) */
-		f32 force_acc_[3];				/**< Force accumulator*/
 
 		ForceSet force_set_;	/**< To store pointer to forces acting on this particle */
 };

@@ -6,7 +6,7 @@ OBJS =	Force.o main.o Particle.o ParticleSystem.o
 
 LIBS =
 
-INC = -I$(HOME)/include/ -I$(HOME)/include/glm/
+INC =
 
 TARGET = particle_system
 

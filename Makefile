@@ -12,9 +12,9 @@
 # VARIABLE DEFINITIONS
 # --------------------
 CC = g++
-LIBS_DIR = -L$(HOME)/lib/
+LIBS_DIR =
 LIBS_ALL = -lSOIL -lglut -lGL -lTiming -lrt
-INC = -I$(HOME)/include/ -I$(HOME)/include/glm/
+INC = 
 MACROS =
 OPTS = -g -std=gnu++11
 OBJS = Mesh.o ShapeHelper.o Object3D.o GLMesh.o Node3D.o GLMeshInstance.o CameraIntrinsic.o CameraFirstPerson.o CameraThirdPerson.o GLScene.o GLSLProgram.o GLSceneLighting.o GLSceneNormal.o GLSceneShadow.o NormalMapHelper.o TextureManager.o GLSceneSprite.o ArcBallController.o CoordinateHelper.o

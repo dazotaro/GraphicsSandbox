@@ -15,6 +15,8 @@
 #include "ShapeHelper.hpp"          // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
 
+
+
 GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
@@ -23,10 +25,14 @@ GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height)
 {
 }
 
+
+
 GLSceneLighting::~GLSceneLighting()
 {
     // TODO Auto-generated destructor stub
 }
+
+
 
 /**
 * @brief Initialized the Scene
@@ -50,12 +56,12 @@ void GLSceneLighting::init(void)
 
     // TEXTURES
     // --------
-    TextureManager::loadTexture("test", "texture/test.tga");
+    //TextureManager::loadTexture("test", "texture/test.tga");
 
     // SPHERE
     // ------
     // Create Mesh
-    gl_sphere_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE, 100, 50));
+    gl_sphere_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE, 64, 32));
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
@@ -80,16 +86,20 @@ void GLSceneLighting::init(void)
     gl_plane_instance_->addColorTexture("test");
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
-                   glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                   glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                   glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+                   glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
+                   glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
+                   glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
     plane_node_ = new Node3D(plane, gl_plane_instance_, no_children, true);
 
     // Create the camera_
-    camera_gps_ = new Object3D(glm::vec3(0.0f, 10.0f, 10.0f), // camera_'s position (eye's coordinates)
-                              glm::vec3(1.0f, 0.0f, 0.0f), // camera_'s X axis
-                              glm::vec3(0.0f, 1.0f, 0.0f), // camera_'s Y axis
-                              glm::vec3(0.0f, 0.0f, 1.0f));// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
+    glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 camera_z = glm::normalize(camera_position);
+    glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
+    glm::vec3 camera_y = glm::normalize(glm::cross(camera_z, camera_x));
+    camera_gps_ = new Object3D(camera_position, // camera_'s position (eye's coordinates)
+                               camera_x, // camera_'s X axis
+                               camera_y, // camera_'s Y axis
+                               camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
     camera_ = dynamic_cast<CameraInterface *>(fp_camera_);
     //camera_ = new camera_ThirdPerson(camera_Intrinsic(90.f, WIDTH/(float)HEIGHT, 1.f, 1000.f), dynamic_cast<Object3D *>(sphere_node_));
@@ -105,28 +115,17 @@ void GLSceneLighting::init(void)
 
 }
 
+
+
 void GLSceneLighting::loadMaterial(void) const
 {
-    (current_program_iter_->second).setUniform("Kd", 0.4f, 0.4f, 0.4f);
+    (current_program_iter_->second).setUniform("Kd", 0.8f, 0.1f, 0.1f);
     (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
     (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
     (current_program_iter_->second).setUniform("Shininess", 10.0f);
 }
 
-void GLSceneLighting::loadMaterialOld(void) const
-{
-    static const float ambient[4]  = {0.1f, 0.1f, 0.1f, 1.0f};
-    static const float diffuse[4]  = {1.0f, 0.8f, 0.0f, 1.0f};
-    static const float specular[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-    static const float shininess[] = {120.0f};
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-    glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-
-    //glEnable(GL_COLOR_MATERIAL);
-}
 
 void GLSceneLighting::loadLights(void) const
 {
@@ -134,8 +133,10 @@ void GLSceneLighting::loadLights(void) const
     //{
 
     // 0
-    (current_program_iter_->second).setUniform("lights[0].Position",  glm::vec4(30.0f, 30.0f, -5.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[0].Intensity", glm::vec3(0.8f,0.8f,0.8f));
+    glm::vec4 light_position (camera_gps_->getPosition(), 1.0f);
+    light_position = camera_->getViewMatrix() * light_position;
+    (current_program_iter_->second).setUniform("Light.Position",  light_position);
+    (current_program_iter_->second).setUniform("Light.Intensity", glm::vec3(0.8f,0.8f,0.8f));
     /*
     // 1
     (current_program_iter_->second).setUniform("lights[1].Position",  glm::vec4(0.0f,5.0f,0.0f,1.0f));
@@ -162,26 +163,7 @@ void GLSceneLighting::loadLights(void) const
     //}
 }
 
-void GLSceneLighting::loadLightsOld(void) const
-{
-    static const float position[4] = {0.0f, 0.0f, 2.0f, 1.0f};
-    static const float ambient[4]  = {0.1f, 0.1f, 0.1f, 1.0f};
-    static const float diffuse[4]  = {1.0f, 1.0f, 1.0f, 1.0f};
-    static const float lmodel_ambient[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-    static const float lmodel_twoside[1] = {GL_FALSE};
-    static const float local_view[] = { 0.0 };
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
-
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
-    glLightModelfv(GL_LIGHT_MODEL_TWO_SIDE, lmodel_twoside);
-    //glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-}
 
 /**
 * @brief Update everything that needs to be updated in the scene
@@ -196,12 +178,14 @@ void GLSceneLighting::update(float time)
 
 }
 
+
+
 /**
 * @brief Render all the renderable objects in the scene
 */
 void GLSceneLighting::render(void) const
 {
-    glClearColor(0.0f, 0.1f, 0.1f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -219,9 +203,15 @@ void GLSceneLighting::render(void) const
     // Perspective Matrix
     glm::mat4 P(fp_camera_->getPerspectiveMatrix());
     // Draw each object
+    (current_program_iter_->second).setUniform("Ka", 0.0f, 0.1f, 0.1f);
+    (current_program_iter_->second).setUniform("Kd", 0.0f, 1.0f, 0.1f);
     sphere_node_->draw(current_program_iter_->second, M, V, P);
+    (current_program_iter_->second).setUniform("Ka", 0.2f, 0.2f, 0.2f);
+    (current_program_iter_->second).setUniform("Kd", 0.2f, 0.2f, 0.2f);
     plane_node_->draw(current_program_iter_->second, M, V, P);
 }
+
+
 
 /**
 * @brief Resize the scene
@@ -234,6 +224,7 @@ void GLSceneLighting::resize(int width, int height)
     GLScene::resize(width, height);
     camera_->setAspectRatio(static_cast<float>(width)/height);
 }
+
 
 
 /**
@@ -324,14 +315,20 @@ void GLSceneLighting::keyboard(unsigned char key, int x, int y)
     }
 }
 
+
+
 void GLSceneLighting::mouseClick(int button, int state, int x, int y)
 {
 
 }
 
+
+
 void GLSceneLighting::mouseMotion(int x, int y)
 {
 }
+
+
 
 void GLSceneLighting::cleanup(void)
 {

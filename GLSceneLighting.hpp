@@ -45,8 +45,6 @@ class GLSceneLighting : public GLScene
         void cleanup(void);
         void loadMaterial(void) const;
         void loadLights(void) const;
-        void loadMaterialOld(void) const;
-        void loadLightsOld(void) const;
 
     private:
         GLMesh*          gl_sphere_;

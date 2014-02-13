@@ -100,8 +100,8 @@ static void display()
 static void init(void)
 {
     //scene = new GLSceneNormal(WIDTH, HEIGHT);
-    //scene = new GLSceneLighting(WIDTH, HEIGHT);
-    scene = new GLSceneShadow(WIDTH, HEIGHT);
+    scene = new GLSceneLighting(WIDTH, HEIGHT);
+    //scene = new GLSceneShadow(WIDTH, HEIGHT);
     scene->init();
 
 	#ifndef WIN32
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
 
-    glutInitContextVersion(4, 0);
+    glutInitContextVersion(4, 2);
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
     glutInitContextProfile(GLUT_CORE_PROFILE);
 

@@ -24,7 +24,7 @@ class ArcBallController
         void windowResize(int width, int height);
 
     private:
-        float normalize(int value, int range_pixels, int range_angle);
+        float normalize(int value, int range_pixels);
 
     private:
         int width_;

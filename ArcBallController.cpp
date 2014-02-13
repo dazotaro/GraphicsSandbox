@@ -31,8 +31,8 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
             {
                 std::cout << "Left button down" << std::endl;
                 active_ = true;
-                last_x_ = normalize(x, width_, max_azimuth_);
-                last_y_ = normalize(y, height_, max_inclination_);
+                last_x_ = normalize(x, width_);
+                last_y_ = normalize(y, height_);
                 curr_x_ = last_x_;
                 curr_y_ = last_y_;
             }
@@ -66,9 +66,11 @@ void ArcBallController::mouseMotion(int x, int y)
 {
     if (active_)
     {
-        curr_x_ = normalize(x, width_, max_azimuth_);
-        curr_y_ = normalize(y, height_, max_inclination_);
+        curr_x_ = normalize(x, width_);
+        curr_y_ = normalize(y, height_);
     }
+
+	std::cout << "Mouse motion " << x << ", " << y << ", " << curr_x_ << ", " << curr_y_ << std::endl;
 }
 
 void ArcBallController::update(float &radius_delta, float &inclination, float &azimuth)
@@ -88,7 +90,13 @@ void ArcBallController::update(float &radius_delta, float &inclination, float &a
     {
         last_x_ = curr_x_;
         last_y_ = curr_y_;
+
+        std::cout << "Radius delta = " << radius_delta << std::endl;
+        std::cout << "Azimuth      = " << azimuth << std::endl;
+        std::cout << "Inclination  = " << inclination << std::endl;
     }
+
+    radius_delta_ = 0.0f;
 }
 
 void ArcBallController::windowResize(int width, int height)
@@ -97,7 +105,7 @@ void ArcBallController::windowResize(int width, int height)
     height_ = height;
 }
 
-float ArcBallController::normalize(int value, int range_pixels, int range_angle)
+float ArcBallController::normalize(int value, int range_pixels)
 {
     return ((float)value / (range_pixels - 1) * 2.0f - 1.0f);
 

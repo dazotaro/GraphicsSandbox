@@ -8,8 +8,9 @@
 #ifndef GLSCENELIGHTING_HPP_
 #define GLSCENELIGHTING_HPP_
 
-#include "GLScene.hpp"      // GLScene
-#include "Lights.hpp"       // LightPositionalVector, LightDirectionalVector, LightSpotlightVector
+#include "GLScene.hpp"      	// GLScene
+#include "Lights.hpp"       	// LightPositionalVector, LightDirectionalVector, LightSpotlightVector
+#include "ArcBallController.hpp"// ArcBallController
 
 // Forward Declarations
 class GLMesh;
@@ -60,6 +61,8 @@ class GLSceneLighting : public GLScene
         LightPositionalVector  lights_positional_;
         LightDirectionalVector lights_directional_;
         LightSpotlightVector   lights_spotlight_;
+
+        ArcBallController camera_controller_;
 };
 
 #endif /* GLSCENELIGHTING_HPP_ */

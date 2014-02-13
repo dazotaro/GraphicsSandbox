@@ -21,7 +21,8 @@ GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height)
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
                                      sphere_node_(0), plane_node_(0),
-                                     camera_gps_(0), camera_(0)
+                                     camera_gps_(0), camera_(0),
+                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 10.0f)
 {
 }
 
@@ -176,6 +177,9 @@ void GLSceneLighting::update(float time)
     //camera_->update(*camera_gps_);
     // LIGHTS: update position
 
+	float radius, inclination, azimuth;
+	camera_controller_.update(radius, inclination, azimuth);
+
 }
 
 
@@ -319,13 +323,14 @@ void GLSceneLighting::keyboard(unsigned char key, int x, int y)
 
 void GLSceneLighting::mouseClick(int button, int state, int x, int y)
 {
-
+	camera_controller_.mouseClick(button, state, x, y);
 }
 
 
 
 void GLSceneLighting::mouseMotion(int x, int y)
 {
+	camera_controller_.mouseMotion(x, y);
 }
 
 

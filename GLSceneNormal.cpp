@@ -308,32 +308,32 @@ void GLSceneNormal::keyboard(unsigned char key, int x, int y)
         case 'o':
         case 'O':
             camera_gps_->rotateX(-1.0f);  // Pitch
-            tp_camera_->addHeightToTarget(0.1f);
+            //tp_camera_->addHeightToTarget(0.1f);
             break;
 
         case 'l':
         case 'L':
             camera_gps_->rotateX(1.0f); // Pitch
-            tp_camera_->addHeightToTarget(-0.1f);
+            //tp_camera_->addHeightToTarget(-0.1f);
             break;
 
         case 'u':
         case 'U':
             camera_gps_->translate(glm::vec3(0.0f, 0.0f, -0.1f));
-            tp_camera_->addDistanceToTarget(0.1f);
+            //tp_camera_->addDistanceToTarget(0.1f);
             break;
 
         case 'j':
         case 'J':
             camera_gps_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
-            tp_camera_->addDistanceToTarget(-0.1f);
+            //tp_camera_->addDistanceToTarget(-0.1f);
             break;
     }
 }
 
 void GLSceneNormal::mouseClick(int button, int state, int x, int y)
 {
-    tp_camera_->mouse(button, state, x, y);
+    //tp_camera_->mouse(button, state, x, y);
 }
 
 void GLSceneNormal::mouseMotion(int x, int y)

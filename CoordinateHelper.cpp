@@ -5,7 +5,10 @@
  *      Author: aitatxo
  */
 
-#include "CoordinateHelper.h"
+// Local includes
+#include "CoordinateHelper.hpp"
+
+// Global includes
 #include <cmath>	// sqrt, cos, acos, sin, atan
 
 namespace CoordinateHelper

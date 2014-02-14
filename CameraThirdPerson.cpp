@@ -101,10 +101,10 @@ void CameraThirdPerson::setFrameSpherical(const Object3D &target)
     CoordinateHelper::spherical2cartesian(distance_to_target_, inclination_, azimuth_, point_on_sphere[0], point_on_sphere[1], point_on_sphere[2]);
 
     // For testing purposes (clarity)
-    glm::vec3 cop  = position_;
-    glm::vec3 u    = x_axis_;
-    glm::vec3 up   = y_axis_;
-    glm::vec3 view = z_axis_;
+    glm::vec3& cop  = position_;
+    glm::vec3& u    = x_axis_;
+    glm::vec3& up   = y_axis_;
+    glm::vec3& view = z_axis_;
 
 
     cop  = point_on_sphere + target.getPosition();

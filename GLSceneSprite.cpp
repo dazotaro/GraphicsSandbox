@@ -54,7 +54,7 @@ void GLSceneSprite::init(void)
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
     gl_plane_instance_ = new GLMeshInstance(gl_plane_, 1.0f, 1.0f, 1.0f);
-    int width, height, channels = 0;
+
     TextureManager::loadTexture("test", "texture/test.tga");
     gl_plane_instance_->addColorTexture("test");
 

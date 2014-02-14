@@ -22,7 +22,7 @@
 * @param max_inclination    Maximum inclination angle from swiping the whole range of the viewport
 * @param radius_delta       Increment/decrement of the radius
 */
-ArcBallController::ArcBallController(int width, int height, float max_azimuth, float max_inclination, float radius_delta)
+ArcBallController::ArcBallController(int width, int height, float max_azimuth, float max_inclination, float radius_inc)
     : width_(width),
       height_(height),
       max_azimuth_(max_azimuth),
@@ -30,7 +30,10 @@ ArcBallController::ArcBallController(int width, int height, float max_azimuth, f
       active_(false),
       last_x_(0.0f),
       last_y_(0.0f),
-      radius_delta_(radius_delta)
+      curr_x_(0.0f),
+      curr_y_(0.0f),
+      radius_inc_(radius_inc),
+      radius_delta_(0.0f)
 {}
 
 
@@ -70,12 +73,12 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
 
         case MIDDLE_BUTTON_SCROLL_DOWN:
             std::cout << "Middle button scroll DOWN" << std::endl;
-            radius_delta_ += 0.1f;
+            radius_delta_ += radius_inc_;
             break;
 
         case MIDDLE_BUTTON_SCROLL_UP:
             std::cout << "Middle button scroll UP" << std::endl;
-            radius_delta_ -= 0.1f;
+            radius_delta_ -= radius_inc_;
             break;
 
         default:

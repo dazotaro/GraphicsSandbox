@@ -15,7 +15,7 @@
 class ArcBallController
 {
     public:
-        ArcBallController(int width, int height, float max_azimuth, float max_inclination, float radius_delta = 0.0f);
+        ArcBallController(int width, int height, float max_azimuth, float max_inclination, float radius_inc = 0.1f);
 
         void mouseClick(int button, int state, int x, int y);
         void mouseMotion(int x, int y);
@@ -36,7 +36,8 @@ class ArcBallController
         float last_y_;
         float curr_x_;
         float curr_y_;
-        float radius_delta_;	// Delta in distance to apply to the object controlled by this controller
+        float radius_inc_;      //!< Increment to apply to the radius for each input signal
+        float radius_delta_;    //!< Increase/decrease in radius accumulated since last update
 };
 
 #endif /* ARCBALLCONTROLLER_HPP_ */

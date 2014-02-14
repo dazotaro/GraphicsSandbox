@@ -353,7 +353,7 @@ void GLSceneLighting::cleanup(void)
     delete sphere_node_;
     delete plane_node_;
     delete camera_gps_;
-    delete fp_camera_;
+    //delete fp_camera_;
     delete tp_camera_;
 }
 

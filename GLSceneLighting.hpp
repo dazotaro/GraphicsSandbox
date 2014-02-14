@@ -57,7 +57,7 @@ class GLSceneLighting : public GLScene
         Node3D*          sphere_node_;
         Node3D*          plane_node_;
         Object3D*        camera_gps_;
-        CameraFirstPerson *fp_camera_;
+        //CameraFirstPerson *fp_camera_;
         CameraThirdPerson *tp_camera_;
         CameraInterface* camera_;
 

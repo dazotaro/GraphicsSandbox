@@ -5,13 +5,15 @@
  *      Author: jusabiaga
  */
 
+// Local includes
 #include "GLSceneLighting.hpp"      // GLSceneLighting
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
 #include "Object3D.hpp"             // Object3D
 #include "CameraInterface.hpp"      // camera_Interface
-#include "CameraFirstPerson.hpp"    // camera_FirstPerson
+#include "CameraFirstPerson.hpp"    // CameraFirstPerson
+#include "CameraThirdPerson.hpp"    // CameraThirdPerson
 #include "ShapeHelper.hpp"          // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
 
@@ -101,9 +103,9 @@ void GLSceneLighting::init(void)
                                camera_x, // camera_'s X axis
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
-    fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    camera_ = dynamic_cast<CameraInterface *>(fp_camera_);
-    //camera_ = new camera_ThirdPerson(camera_Intrinsic(90.f, WIDTH/(float)HEIGHT, 1.f, 1000.f), dynamic_cast<Object3D *>(sphere_node_));
+    //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), static_cast<Object3D>(*sphere_node_));
+    camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     /*
     prog.setUniform("Kd", 0.9f, 0.5f, 0.3f);
@@ -177,8 +179,13 @@ void GLSceneLighting::update(float time)
     //camera_->update(*camera_gps_);
     // LIGHTS: update position
 
-	float radius, inclination, azimuth;
-	camera_controller_.update(radius, inclination, azimuth);
+	float radius_delta, inclination_delta, azimuth_delta;
+	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+
+	tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
+	                   radius_delta,
+	                   inclination_delta,
+	                   azimuth_delta);
 
 }
 
@@ -203,9 +210,9 @@ void GLSceneLighting::render(void) const
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
-    glm::mat4 V(fp_camera_->getViewMatrix());
+    glm::mat4 V(tp_camera_->getViewMatrix());
     // Perspective Matrix
-    glm::mat4 P(fp_camera_->getPerspectiveMatrix());
+    glm::mat4 P(tp_camera_->getPerspectiveMatrix());
     // Draw each object
     (current_program_iter_->second).setUniform("Ka", 0.0f, 0.1f, 0.1f);
     (current_program_iter_->second).setUniform("Kd", 0.0f, 1.0f, 0.1f);
@@ -277,6 +284,7 @@ void GLSceneLighting::keyboard(unsigned char key, int x, int y)
             sphere_node_->rotateZ(1.0f);
             break;
 
+        /*
         case 'k':
         case 'K':
             fp_camera_->rotateY(1.0f);  // Yaw
@@ -316,6 +324,7 @@ void GLSceneLighting::keyboard(unsigned char key, int x, int y)
         case 'J':
             fp_camera_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
             break;
+        */
     }
 }
 
@@ -345,6 +354,7 @@ void GLSceneLighting::cleanup(void)
     delete plane_node_;
     delete camera_gps_;
     delete fp_camera_;
+    delete tp_camera_;
 }
 
 

@@ -8,6 +8,7 @@
 #ifndef GLSCENELIGHTING_HPP_
 #define GLSCENELIGHTING_HPP_
 
+// Local includes
 #include "GLScene.hpp"      	// GLScene
 #include "Lights.hpp"       	// LightPositionalVector, LightDirectionalVector, LightSpotlightVector
 #include "ArcBallController.hpp"// ArcBallController
@@ -19,6 +20,7 @@ class Node3D;
 class Object3D;
 class CameraInterface;
 class CameraFirstPerson;
+class CameraThirdPerson;
 
 /*
  * @brief Scene class
@@ -56,6 +58,7 @@ class GLSceneLighting : public GLScene
         Node3D*          plane_node_;
         Object3D*        camera_gps_;
         CameraFirstPerson *fp_camera_;
+        CameraThirdPerson *tp_camera_;
         CameraInterface* camera_;
 
         LightPositionalVector  lights_positional_;

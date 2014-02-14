@@ -25,7 +25,6 @@ class CameraThirdPerson : public CameraInterface, public Object3D
         CameraThirdPerson(const CameraIntrinsic &camera_intrinsic,
                           const Object3D &target,
                           float distance_to_target = 10.0f,
-                          //float height_to_target = 0.0f,
                           float azimuth = 0.0f,
                           float inclination = M_PI / 2.0f);
 
@@ -40,9 +39,6 @@ class CameraThirdPerson : public CameraInterface, public Object3D
 
         // Setters
         void update(const Object3D &target, float distance_delta, float inclination_delta, float azimuth_delta);
-        //void addDistanceToTarget(float distance);
-        //void addHeightToTarget(float distance);
-        //void mouse(int button, int state, int x, int y);
 
         // Algorithms
         void setFrameCartesian(const Object3D &target);
@@ -51,7 +47,6 @@ class CameraThirdPerson : public CameraInterface, public Object3D
     private:
         CameraIntrinsic intrinsic_;     //!< Intrinsic parameters of the camera
         float distance_to_target_;      //!< Distance to the target (i.e. radius of the sphere in spherical coordinates
-        //float height_to_target_;        //!< Height to the target
         float azimuth_;                 //!< Azimuth angle in spherical coordinates
         float inclination_;             //!< Inclination angle in spherical coordinates
 };

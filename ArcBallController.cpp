@@ -53,7 +53,6 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
         case GLUT_LEFT_BUTTON:
             if (state == GLUT_DOWN)
             {
-                std::cout << "Left button down" << std::endl;
                 active_ = true;
                 last_x_ = normalize(x, width_);
                 last_y_ = normalize(y, height_);
@@ -62,22 +61,18 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
             }
             else if (state == GLUT_UP)
             {
-                std::cout << "Left button up" << std::endl;
                 active_ = false;
             }
             break;
 
         case GLUT_MIDDLE_BUTTON:
-            std::cout << "Middle button state " << state << std::endl;
             break;
 
         case MIDDLE_BUTTON_SCROLL_DOWN:
-            std::cout << "Middle button scroll DOWN" << std::endl;
             radius_delta_ += radius_inc_;
             break;
 
         case MIDDLE_BUTTON_SCROLL_UP:
-            std::cout << "Middle button scroll UP" << std::endl;
             radius_delta_ -= radius_inc_;
             break;
 
@@ -101,8 +96,6 @@ void ArcBallController::mouseMotion(int x, int y)
         curr_x_ = normalize(x, width_);
         curr_y_ = normalize(y, height_);
     }
-
-	std::cout << "Mouse motion " << x << ", " << y << ", " << curr_x_ << ", " << curr_y_ << std::endl;
 }
 
 
@@ -117,8 +110,8 @@ void ArcBallController::mouseMotion(int x, int y)
 void ArcBallController::update(float &radius_delta, float &inclination, float &azimuth)
 {
     radius_delta = radius_delta_;
-    azimuth = (curr_x_ - last_x_) * max_azimuth_;
-    inclination = (curr_y_ - last_y_) * max_inclination_;
+    azimuth      = (last_x_ - curr_x_) * max_azimuth_;
+    inclination  = (last_y_ - curr_y_) * max_inclination_;
 
     if (!active_)
     {
@@ -131,10 +124,6 @@ void ArcBallController::update(float &radius_delta, float &inclination, float &a
     {
         last_x_ = curr_x_;
         last_y_ = curr_y_;
-
-        std::cout << "Radius delta = " << radius_delta << std::endl;
-        std::cout << "Azimuth      = " << azimuth << std::endl;
-        std::cout << "Inclination  = " << inclination << std::endl;
     }
 
     radius_delta_ = 0.0f;

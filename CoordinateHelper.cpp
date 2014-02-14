@@ -14,6 +14,7 @@
 namespace CoordinateHelper
 {
 
+/*
 void cartesian2spherical(float x, float y, float z, float &radius, float &inclination, float &azimuth)
 {
 	radius 		= sqrt(x*x + y*y + z*z);
@@ -22,12 +23,15 @@ void cartesian2spherical(float x, float y, float z, float &radius, float &inclin
 		azimuth = 0.0f;;
 	azimuth 	= atan(y / x);
 }
+*/
+
+
 
 void spherical2cartesian(float radius, float inclination, float azimuth, float &x, float &y, float &z)
 {
-    x = radius * sin(inclination) * cos(azimuth);
-    y = radius * sin(inclination) * sin(azimuth);
-    z = radius * cos(inclination);
+    z = radius * sin(inclination) * cos(azimuth);
+    x = radius * sin(inclination) * sin(azimuth);
+    y = radius * cos(inclination);
 }
 
 } /* namespace CoordinateHelper */

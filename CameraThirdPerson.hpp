@@ -27,7 +27,7 @@ class CameraThirdPerson : public CameraInterface, public Object3D
                           float distance_to_target = 10.0f,
                           //float height_to_target = 0.0f,
                           float azimuth = 0.0f,
-                          float inclination = M_PI);
+                          float inclination = M_PI / 2.0f);
 
 
         virtual ~CameraThirdPerson();

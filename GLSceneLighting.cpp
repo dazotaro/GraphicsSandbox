@@ -24,7 +24,7 @@ GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height)
                                      gl_plane_(0), gl_plane_instance_(0),
                                      sphere_node_(0), plane_node_(0),
                                      camera_gps_(0), camera_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 10.0f)
+                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.2f)
 {
 }
 

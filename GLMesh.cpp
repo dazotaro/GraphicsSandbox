@@ -237,5 +237,6 @@ void GLMesh::draw(void) const
 
     glBindVertexArray(vao_handle_);
     glDrawArrays(GL_TRIANGLES, 0, 3 * faces.size());
+    //glDrawArrays(GL_LINE_LOOP, 0, 3 * faces.size());
 }
 

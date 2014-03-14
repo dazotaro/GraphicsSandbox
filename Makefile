@@ -1,31 +1,19 @@
-CC = g++
+SRC_DIR = ./src/
+TEST_DIR = ./test/
+LIB_DIR = /usr/local/lib/
+INC_DIR = /usr/local/include/JU/
+LIB_NAME = Particles
+LIB_FILENAME = lib$(LIB_NAME).a
 
-LIBNAME = particles
+all :
+	cd $(SRC_DIR); make LIB_NAME=$(LIB_NAME)
 
-OPTS =	-O2 -g -Wall -fmessage-length=0 -std=c++11
+install:
+	cp $(SRC_DIR)$(LIB_FILENAME) $(LIB_DIR); cp $(SRC_DIR)*.hpp $(INC_DIR)
 
-OBJS =	Force.o Particle.o ParticleSystem.o
-
-TESTOBJS = main.o
-
-LIBS = -l$(LIBNAME)
-
-LIBDIR = -L.
-
-INC =
-
-TEST_TARGET = particle_system
-
-all: $(OBJS)
-	ar crv lib$(LIBNAME).a $(OBJS)
-
-$(TEST_TARGET): $(OBJS) $(TESTOBJS)
-	$(CC) -o $(TEST_TARGET) $(TESTOBJS) $(OPTS) $(OBJS) $(LIBDIR) $(LIBS)
-	
-%.o : %.cpp 
-	$(CC) -c $< $(OPTS) $(INC)
-
-test: $(TEST_TARGET)
+test:
+	cd $(TEST_DIR); make LIB_NAME=$(LIB_NAME)
 
 clean:
-	rm -f $(OBJS) $(TEST_TARGET) lib$(LIBNAME).a
+	cd $(SRC_DIR); make LIB_NAME=$(LIB_NAME) clean; cd $(TEST_DIR); make clean
+

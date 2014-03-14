@@ -6,10 +6,6 @@
  */
 
 #include "GLScene.hpp"              // GLScene
-#include "GLMesh.hpp"               // GLMesh
-#include "GLMeshInstance.hpp"       // GLMeshInstance
-#include "Node3D.hpp"               // Node3D
-#include "Object3D.hpp"             // Object3D
 
 GLScene::GLScene(int width, int height) : width_(width), height_(height)
 {

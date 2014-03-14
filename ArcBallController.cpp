@@ -7,8 +7,8 @@
 
 #include "GL/glew.h"                // Glut
 #include "GL/freeglut.h"            // Glut
-#include "Defs.hpp"                 // MIDDLE_BUTTON_SCROLL_DOWN/UP
-#include <iostream>					// std::cout and std::endl
+#include "GraphicsDefs.hpp"         // MIDDLE_BUTTON_SCROLL_DOWN/UP
+#include <iostream>		    // std::cout and std::endl
 #include "ArcBallController.hpp"
 
 

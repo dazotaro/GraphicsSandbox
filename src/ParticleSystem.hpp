@@ -9,7 +9,7 @@
 #define PARTICLESYSTEM_HPP_
 
 // Local includes
-#include "Defs.hpp"						// custom types
+#include <JU/Defs.hpp>				// custom types
 #include "ParticleSystemDefs.hpp"		// ParticleList, ForceList
 
 namespace JU

@@ -9,11 +9,11 @@
 #define FORCE_HPP_
 
 // Local includes
-#include "Defs.hpp"						// custom types
+#include <JU/Defs.hpp>				// custom types
 #include "ParticleSystemDefs.hpp"		// ParticleList, ForceList
 
 // Global includes
-#include <iostream>						// std:;ostream, std::endl
+#include <iostream>				// std:;ostream, std::endl
 #include <glm/glm.hpp>      			// glm::vec3
 
 namespace JU

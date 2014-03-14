@@ -6,16 +6,18 @@ OPTS = -O2 -g -Wall -fmessage-length=0 -std=c++11
 
 OBJS = test.o
 
-LIBDIR = -L.
+INC = -iquote../src/
 
-LIBS = $(LIB_NAME)
+LIBDIR = -L../src/
+
+LIBS = -l$(LIB_NAME)
 
 TARGET = particle_system
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $(TARGET) $(OBJS) $(OPTS) $(OBJS) $(LIBDIR) $(LIBS)
+	$(CC) -o $(TARGET) $(OBJS) $(OPTS) $(LIBDIR) $(LIBS)
 	
 %.o : %.cpp 
 	$(CC) -c $< $(OPTS) $(INC)

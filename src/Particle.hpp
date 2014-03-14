@@ -9,12 +9,12 @@
 #define PARTICLE_HPP_
 
 // Local includes
-#include "Defs.hpp"					// Custom basic types
+#include <JU/Defs.hpp>			// Custom basic types
 #include "ParticleSystemDefs.hpp"	// ParticleId
 
 // Global includes
 #include <iostream>			// std:;ostream, std::endl
-#include <glm/glm.hpp>      	// glm::vec3
+#include <glm/glm.hpp>          	// glm::vec3
 
 namespace JU
 {

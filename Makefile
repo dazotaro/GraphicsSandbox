@@ -12,8 +12,9 @@
 # VARIABLE DEFINITIONS
 # --------------------
 CC = g++
-LIBS_DIR =
-LIBS_ALL = -lSOIL -lglut -lGL -lTiming -lrt
+LIB_NAME = graphics
+LIBS_DIR = -L.
+LIBS_ALL = -l$(LIB_NAME) -lSOIL -lglut -lGL -lTiming -lrt 
 INC = 
 MACROS =
 OPTS = -g -std=gnu++11
@@ -37,8 +38,11 @@ endif
 
 # TARGETS
 # -------
-all: main_test.hpp  main_glew.hpp main_scene.hpp main.cpp $(OBJS)
-	$(CC) -o $(EXEC) main.cpp $(OPTS) $(OBJS) $(LIBS) $(MACROS) $(INC) $(LIBS_DIR)
+all: $(OBJS)
+	ar cvr lib$(LIB_NAME).a $(OBJS)
+
+test: $(OBJS) main_test.hpp  main_glew.hpp main_scene.hpp main.cpp
+	$(CC) -o $(EXEC) main.cpp $(OPTS) $(LIBS) $(MACROS) $(INC) $(LIBS_DIR)
 
 %.o : %.cpp 
 	$(CC) -c $< $(OPTS) $(MACROS) $(INC)

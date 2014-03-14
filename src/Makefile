@@ -12,20 +12,12 @@
 # VARIABLE DEFINITIONS
 # --------------------
 CC = g++
-LIB_NAME = graphics
+LIB_FILENAME = 
 LIBS_DIR = -L.
-LIBS_ALL = -l$(LIB_NAME) -lSOIL -lglut -lGL -lTiming -lrt 
 INC = 
 MACROS =
 OPTS = -g -std=gnu++11
 OBJS = Mesh.o ShapeHelper.o Object3D.o GLMesh.o Node3D.o GLMeshInstance.o CameraIntrinsic.o CameraFirstPerson.o CameraThirdPerson.o GLScene.o GLSLProgram.o GLSceneLighting.o GLSceneNormal.o GLSceneShadow.o NormalMapHelper.o TextureManager.o GLSceneSprite.o ArcBallController.o CoordinateHelper.o
-EXEC = shapes
-
-# GLEW SPECIFIC VARIABLE DEFINITIONS 
-# ----------------------------------
-GLEW = true
-LIB_GLEW = -lGLEW
-MACROS_GLEW = -DUSING_GLEW
 
 # CONDITIONAL UPDATE OF VARIABLES
 # -------------------------------
@@ -39,10 +31,7 @@ endif
 # TARGETS
 # -------
 all: $(OBJS)
-	ar cvr lib$(LIB_NAME).a $(OBJS)
-
-test: $(OBJS) main_test.hpp  main_glew.hpp main_scene.hpp main.cpp
-	$(CC) -o $(EXEC) main.cpp $(OPTS) $(LIBS) $(MACROS) $(INC) $(LIBS_DIR)
+	ar cvr $(LIB_FILENAME) $(OBJS)
 
 %.o : %.cpp 
 	$(CC) -c $< $(OPTS) $(MACROS) $(INC)
@@ -51,7 +40,7 @@ doc :
 	doxygen
 
 clean:
-	rm $(OBJS) *~ $(EXEC) 
+	rm $(OBJS) *~ $(LIB_FILENAME) 
 
 cleandoc:
 	rm -rf html; rm -rf latex

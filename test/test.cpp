@@ -9,10 +9,10 @@
 //#pragma comment(lib, "freeglut.lib")
 //#pragma comment(lib, "SOIL.lib")
 
-//#include "main_test_gl.hpp"     // Test triangle-drawing code from Cookbook
-//#include "main_glew.hpp"        // Test my GL code
-#include "main_scene.hpp"         // Test the GL code within a GLScene object
-//#include "main_test.hpp"        // Test individual parts
+//#include "test_test_gl.hpp"     // Test triangle-drawing code from Cookbook
+//#include "test_glew.hpp"        // Test my GL code
+#include "test_scene.hpp"         // Test the GL code within a GLScene object
+//#include "test_test.hpp"        // Test individual parts
 
 
 /* This file is here just to choose among the three different drivers.

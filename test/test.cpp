@@ -7,10 +7,10 @@
 //============================================================================
 
 // Local includes
-#include "Force.hpp"
-#include "Particle.hpp"
-#include "ParticleSystem.hpp"
-#include "Defs.hpp"
+#include <JU/Force.hpp>
+#include <JU/Particle.hpp>
+#include <JU/ParticleSystem.hpp>
+#include <JU/Defs.hpp>
 
 // Global includes
 #include <iostream>

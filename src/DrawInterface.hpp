@@ -23,7 +23,10 @@ class DrawInterface
 {
     public:
         virtual ~DrawInterface() {}
-        virtual void draw(const GLSLProgram &program, const glm::mat4 & model, const glm::mat4 &view, const glm::mat4 &projection) const = 0;
+        virtual void draw(const GLSLProgram &program,
+                          const glm::mat4 & model,
+                          const glm::mat4 &view,
+                          const glm::mat4 &projection) const = 0;
 };
 
 typedef std::vector<DrawInterface *> DrawList;

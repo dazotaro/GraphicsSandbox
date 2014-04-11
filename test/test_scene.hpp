@@ -5,6 +5,7 @@
 #include "GLSceneLighting.hpp"          // GLSceneLighting
 #include "GLSceneNormal.hpp"            // GLSceneNormal
 #include "GLSceneShadow.hpp"            // GLSceneShadow
+#include "GLSceneParticles.hpp"			// GLSceneParticles
 #include "glm/gtc/matrix_transform.hpp" // glm::perspective
 #ifndef WIN32
 	#include <JU/Timer.hpp>                 // Timer
@@ -100,8 +101,9 @@ static void display()
 static void init(void)
 {
     //scene = new GLSceneNormal(WIDTH, HEIGHT);
-    scene = new GLSceneLighting(WIDTH, HEIGHT);
+    //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
+    scene = new GLSceneParticles(WIDTH, HEIGHT);
     scene->init();
 
 	#ifndef WIN32

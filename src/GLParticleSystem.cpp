@@ -9,6 +9,8 @@
 
 GLParticleSystem::GLParticleSystem() : num_particles_(0)
 {
+    vao_handle_  = 0;
+    vbo_handles_ = 0;
 }
 
 

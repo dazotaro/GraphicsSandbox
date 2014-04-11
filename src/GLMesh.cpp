@@ -15,7 +15,8 @@
 */
 GLMesh::GLMesh(const Mesh &mesh) : Mesh(mesh)
 {
-    vao_handle_ = 0;
+    vao_handle_  = 0;
+    vbo_handles_ = 0;	// NULL
 }
 
 /**

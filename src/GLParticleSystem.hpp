@@ -27,14 +27,14 @@ class GLParticleSystem: public DrawInterface
         GLParticleSystem();
         virtual ~GLParticleSystem();
 
+        bool init(JU::uint32 num_particles);
+
         // DrawInterface
         // -------------
         virtual void draw(const GLSLProgram &program,
                           const glm::mat4 & model,
                           const glm::mat4 &view,
                           const glm::mat4 &projection) const;
-
-        bool init(JU::uint32 num_particles);
 
     private:
         bool initVBOs(void);

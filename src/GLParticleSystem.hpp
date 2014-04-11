@@ -29,6 +29,10 @@ class GLParticleSystem: public DrawInterface
 
         bool init(JU::uint32 num_particles);
 
+        void setParticleData(const std::vector<glm::vec3>& positions, const std::vector<glm::vec4>& colors);
+        void set_positions(const std::vector<glm::vec3>& positions);
+        void set_colors(const std::vector<glm::vec4>& colors);
+
         // DrawInterface
         // -------------
         virtual void draw(const GLSLProgram &program,
@@ -40,7 +44,7 @@ class GLParticleSystem: public DrawInterface
         bool initVBOs(void);
 
     private:
-        JU::uint32 num_particles_;          //!< Max number of particles supported
+        JU::uint32 max_particles_;          //!< Max number of particles supported
         // Buffer handles
         GLuint vao_handle_;                 //!< Handle to VAO
         GLuint *vbo_handles_;               //!< Handles to VBOs

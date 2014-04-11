@@ -5,7 +5,9 @@
  *      Author: jusabiaga
  */
 
-#include "GLParticleSystem.hpp"
+// Local includes
+#include "GLParticleSystem.hpp"		// GLParticleSystem
+#include "GLSLProgram.hpp"			// GLSLProgram
 
 GLParticleSystem::GLParticleSystem() : max_particles_(0)
 {
@@ -114,7 +116,7 @@ void GLParticleSystem::setParticleData(const std::vector<glm::vec3>& positions, 
 {
 	if (positions.size() != colors.size())
 	{
-		printf("Position and color vectors differ in size (%i vs %i)\n", positions.size(), colors.size());
+		printf("Position and color vectors differ in size (%li vs %li)\n", positions.size(), colors.size());
 		exit(0);
 	}
 
@@ -126,9 +128,9 @@ void GLParticleSystem::setParticleData(const std::vector<glm::vec3>& positions, 
 
 void GLParticleSystem::set_positions(const std::vector<glm::vec3>& positions)
 {
-	if (positions_.size() >= max_particles_)
+	if (positions_.size() > max_particles_)
 	{
-		printf("Number of positions of particles (%i) larger than max (%i)\n", positions.size(), max_particles_);
+		printf("Number of positions of particles (%li) larger than max (%i)\n", positions.size(), max_particles_);
 		exit(0);
 	}
 
@@ -139,9 +141,9 @@ void GLParticleSystem::set_positions(const std::vector<glm::vec3>& positions)
 
 void GLParticleSystem::set_colors(const std::vector<glm::vec4>& colors)
 {
-	if (colors_.size() >= max_particles_)
+	if (colors_.size() > max_particles_)
 	{
-		printf("Number of colors of particles (%i) larger than max (%i)\n", colors.size(), max_particles_);
+		printf("Number of colors of particles (%li) larger than max (%i)\n", colors.size(), max_particles_);
 		exit(0);
 	}
 

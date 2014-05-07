@@ -8,7 +8,8 @@
 #ifndef GLMESH_HPP_
 #define GLMESH_HPP_
 
-#include "GL/glew.h"    // GL and GLEW
+#include "gl_core_4_2.h"                // glLoadGen generated header file
+//#include "GL/glew.h"    // GL and GLEW
 #include "Mesh.hpp"     // Mesh
 
 /**

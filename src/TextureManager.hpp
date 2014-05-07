@@ -8,7 +8,7 @@
 #ifndef TEXTUREMANAGER_HPP_
 #define TEXTUREMANAGER_HPP_
 
-#include <GL/glew.h>
+#include "gl_core_4_2.h"                // glLoadGen generated header file
 #include <string>
 #include <map>
 

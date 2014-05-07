@@ -8,7 +8,7 @@
 #ifndef GLMESHINSTANCE_HPP_
 #define GLMESHINSTANCE_HPP_
 
-#include "GL/glew.h"            // GL and GLEW
+#include "gl_core_4_2.h"                // glLoadGen generated header file
 #include <string>               // std:string
 #include <map>                  // std::map
 #include "DrawInterface.hpp"    // DrawInterface

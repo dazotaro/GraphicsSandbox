@@ -10,7 +10,7 @@ INC = -iquote../src/
 
 LIBDIR = -L../src/
 
-LIBS = -l$(LIB_NAME) -lGLEW -lSOIL -lglut -lGL -lTiming -lrt
+LIBS = -l$(LIB_NAME) -lSOIL -lglut -lGL -lTiming -lrt
 
 TARGET = graphics 
 

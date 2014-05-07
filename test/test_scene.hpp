@@ -1,5 +1,5 @@
 #include <stdio.h>                      // printf
-#include <GL/glew.h>
+#include "gl_core_4_2.h"                // glLoadGen generated header file
 #include "GL/freeglut.h"                // Glut
 #include "GLSceneSprite.hpp"            // GLSceneSprite
 #include "GLSceneLighting.hpp"          // GLSceneLighting
@@ -125,6 +125,18 @@ int main(int argc, char** argv)
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
     glutInitContextProfile(GLUT_CORE_PROFILE);
 
+    //------------------------------------
+    // glLoadGen required initialization
+    int loaded = ogl_LoadFunctions();
+    if(loaded == ogl_LOAD_FAILED)
+    {
+      //Destroy the context and abort
+      return 0;
+    }
+
+    int num_failed = loaded - ogl_LOAD_SUCCEEDED; printf("Number of functions that failed to load: %i.\n",num_failed);
+    //------------------------------------
+
     //glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
     
@@ -137,19 +149,6 @@ int main(int argc, char** argv)
     printf("GL version: %s\n", glGetString(GL_VERSION));
     printf("GLSL version: %s\n", (char *) glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-//#if defined(USING_GLEW)
-    // WARNING: Without this one line I could not use 'glutInitContextVersion' or 'glutInitContextProfile'
-    // 'glewExperimental' needs to be set to true before calling glewInit()
-    glewExperimental = GL_TRUE;
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        // Problem: glewInit failed, something is seriously wrong.
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    }
-    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-//#endif
-    
     // Do all the initialization
     init();
 

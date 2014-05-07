@@ -37,7 +37,10 @@ class GLMeshInstance : public DrawInterface
         void addColorTexture(const std::string &texture_name);
         void addNormalTexture(const std::string &texture_name);
 
-        void draw(const GLSLProgram &program, const glm::mat4 & model, const glm::mat4 &view, const glm::mat4 &projection) const;
+        void draw(const GLSLProgram &program,
+        		  const glm::mat4 & model,
+        		  const glm::mat4 &view,
+        		  const glm::mat4 &projection) const;
 
     private:
         const GLMesh *mesh_;                //!< Shared Mesh object

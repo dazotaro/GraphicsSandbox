@@ -13,7 +13,7 @@
 
 // Global includes
 #include <JU/Defs.hpp>          // uint32
-#include <GL/glew.h>            // GL and GLEW
+#include "gl_core_4_2.h"                // glLoadGen generated header file
 #include <glm/glm.hpp>          // glm::vec3/vec4
 #include <vector>               // std::vector
 
@@ -27,6 +27,12 @@ class GLParticleSystem: public DrawInterface
         GLParticleSystem();
         virtual ~GLParticleSystem();
 
+        bool init(JU::uint32 num_particles);
+
+        void setParticleData(const std::vector<glm::vec3>& positions, const std::vector<glm::vec4>& colors);
+        void set_positions(const std::vector<glm::vec3>& positions);
+        void set_colors(const std::vector<glm::vec4>& colors);
+
         // DrawInterface
         // -------------
         virtual void draw(const GLSLProgram &program,
@@ -34,13 +40,11 @@ class GLParticleSystem: public DrawInterface
                           const glm::mat4 &view,
                           const glm::mat4 &projection) const;
 
-        bool init(JU::uint32 num_particles);
-
     private:
         bool initVBOs(void);
 
     private:
-        JU::uint32 num_particles_;          //!< Max number of particles supported
+        JU::uint32 max_particles_;          //!< Max number of particles supported
         // Buffer handles
         GLuint vao_handle_;                 //!< Handle to VAO
         GLuint *vbo_handles_;               //!< Handles to VBOs

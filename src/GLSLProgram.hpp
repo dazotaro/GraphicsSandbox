@@ -1,8 +1,6 @@
 #ifndef GLSLPROGRAM_H
 #define GLSLPROGRAM_H
 
-//#include <GL/glew.h>
-//#include <GL/gl.h>
 #include "gl_core_4_2.h"                // glLoadGen generated header file
 
 #include <string>

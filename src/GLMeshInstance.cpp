@@ -62,6 +62,8 @@ GLMeshInstance::~GLMeshInstance()
 {
 }
 
+
+
 /**
 * @brief    Draw using OpenGL API
 *
@@ -107,5 +109,4 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
 
     // Deactivate Shader Program
     //glUseProgram(0);
-
 }

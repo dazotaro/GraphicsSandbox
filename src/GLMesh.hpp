@@ -9,7 +9,6 @@
 #define GLMESH_HPP_
 
 #include "gl_core_4_2.h"                // glLoadGen generated header file
-//#include "GL/glew.h"    // GL and GLEW
 #include "Mesh.hpp"     // Mesh
 
 /**

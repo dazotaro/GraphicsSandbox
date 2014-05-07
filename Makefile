@@ -11,7 +11,7 @@ all :
 	cd $(SRC_DIR); make LIB_FILENAME=$(LIB_FILENAME)
 
 install:
-	cp $(SRC_DIR)$(LIB_FILENAME) $(LIB_DIR); cp $(SRC_DIR)*.hpp $(INC_DIR)
+	cp $(SRC_DIR)$(LIB_FILENAME) $(LIB_DIR); cp $(SRC_DIR)*.hpp $(INC_DIR); cp $(SRC_DIR)*.h $(INC_DIR)
 
 test:
 	cd $(TEST_DIR); make LIB_NAME=$(LIB_NAME)

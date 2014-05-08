@@ -6,7 +6,8 @@ layout(location = 2) in vec2 VertexTexture;
 layout(location = 3) in vec3 VertexNormal;
 layout(location = 4) in vec4 VertexTangent;
 
-struct LightInfo {
+struct LightInfo
+{
   vec4 Position;  // Light position in eye coords.
   vec3 Intensity; // A,D,S intensity
 };
@@ -45,8 +46,8 @@ void main()
 
     // Matrix for transformation to tangent space (remember that glsl matrices are column-major order)
     mat3 fromEyeToTangentSpace = mat3(tang_eye.x, binormal_eye.x, norm_eye.x,
-    							 	  tang_eye.y, binormal_eye.y, norm_eye.y,
-    							 	  tang_eye.z, binormal_eye.z, norm_eye.z);
+                                      tang_eye.y, binormal_eye.y, norm_eye.y,
+                                      tang_eye.z, binormal_eye.z, norm_eye.z);
 
     // The fragment shader needs the light and view vectors in Tangent Space
     vec3 pos_eye = vec3(ModelViewMatrix * vec4(VertexPosition,1.0));

@@ -15,6 +15,13 @@
 // Global includes
 #include <iostream>
 
+
+
+/**
+* It tests:
+* 	- Adds Force objects to Particle objects
+* 	- Adds Particle objects to Force objects
+*/
 void testForce01()
 {
 	std::map<std::string, JU::Force*> force_map;
@@ -60,6 +67,13 @@ void testForce01()
 
 
 
+/**
+* It tests:
+* 	- Adds Force objects to Particle objects
+* 	- Adds Particle objects to Force objects
+* 	- Adds Force objects to a ParticleSystem object
+* 	- Adds Particle objects to a ParticleSystem object
+*/
 void testForce02()
 {
 	JU::ParticleSystem particle_system;
@@ -97,6 +111,13 @@ void testForce02()
 
 
 
+/**
+* It tests:
+* 	- Adds Force objects to Particle objects
+* 	- Adds Particle objects to Force objects
+* 	- Adds Force objects to a ParticleSystem object
+* 	- Adds several Particle objects to a ParticleSystem object
+*/
 void testForce03()
 {
 	JU::ParticleSystem particle_system;

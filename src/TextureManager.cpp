@@ -83,3 +83,16 @@ void TextureManager::unbindAllTextures()
 {
     num_tex_bound_ = 0;
 }
+
+
+
+void TextureManager::deleteAllTextures()
+{
+    TextureMapIterator iter = texture_map_.begin();
+    for(; iter != texture_map_.end(); ++iter)
+    {
+    	glDeleteTextures(1, &iter->second);
+    }
+}
+
+

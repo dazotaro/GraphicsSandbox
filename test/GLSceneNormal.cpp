@@ -213,6 +213,9 @@ void GLSceneNormal::render(void) const
     // LOAD LIGHTS
     loadLights();
     
+    TextureManager::bindTexture(current_program_iter_->second, "normal_map", "NormalMapTex");
+    TextureManager::bindTexture(current_program_iter_->second, "test", "ColorTex0");
+
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix

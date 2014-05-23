@@ -101,11 +101,11 @@ static void display()
 
 static void init(void)
 {
-    //scene = new GLSceneNormal(WIDTH, HEIGHT);
+    scene = new GLSceneNormal(WIDTH, HEIGHT);
     //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
-    scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
+    //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
     scene->init();
 
 	#ifndef WIN32

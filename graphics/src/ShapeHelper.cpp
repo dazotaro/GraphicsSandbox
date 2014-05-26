@@ -1,5 +1,5 @@
-#define _USE_MATH_DEFINES
-#include <math.h>
+//#define _USE_MATH_DEFINES
+#include <cmath>
 #include <iostream>
 #include "ShapeHelper.hpp"  // ShapeHelper definitions
 #include "Mesh.hpp"         // Mesh class
@@ -767,10 +767,18 @@ void computeTangents(const Mesh::PositionList &positions,
         std::printf("%f, %f)\n", tex_coords[tex_coord_indices[1]].x, tex_coords[tex_coord_indices[1]].y);
         std::printf("%f, %f)\n", tex_coords[tex_coord_indices[2]].x, tex_coords[tex_coord_indices[2]].y);
 
+        /*
         glm::vec2 tex1 = glm::normalize(tex_coords[tex_coord_indices[1]] -tex_coords[tex_coord_indices[0]]);
         glm::vec2 tex2 = glm::normalize(tex_coords[tex_coord_indices[2]] -tex_coords[tex_coord_indices[0]]);
+        */
+        glm::vec2 tex1 = tex_coords[tex_coord_indices[1]] -tex_coords[tex_coord_indices[0]];
+        glm::vec2 tex2 = tex_coords[tex_coord_indices[2]] -tex_coords[tex_coord_indices[0]];
 
         float factor = 1 / (tex1.s*tex2.t - tex2.s*tex1.t);
+
+        /* REDO these next two lines. The program is crashing when the factor is inf/nan */
+        if (std::isinf(factor) || std::isnan(factor))
+        	continue;
 
         glm::vec3 tmp_tan (factor * ( tex2.t * vec1.x - tex1.t * vec2.x),
                            factor * ( tex2.t * vec1.y - tex1.t * vec2.y),
@@ -779,7 +787,13 @@ void computeTangents(const Mesh::PositionList &positions,
                            factor * (-tex2.s * vec1.y + tex1.s * vec2.y),
                            factor * (-tex2.s * vec1.z + tex1.s * vec2.z));
 
-        tan[vertex_indices[0]] += tmp_tan;
+		std::printf("Tex1 %i   = (%f, %f)\n", face_id, tex1.x, tex1.y);
+		std::printf("Tex2 %i   = (%f, %f)\n", face_id, tex2.x, tex2.y);
+        std::printf("Factor %i %f\n", face_id, factor);
+		std::printf("Tan %i    = (%f, %f, %f)\n", face_id, tmp_tan.x, tmp_tan.y, tmp_tan.z);
+		std::printf("Bit %i    = (%f, %f, %f)\n", face_id++, tmp_bit.x, tmp_bit.y, tmp_bit.z);
+
+		tan[vertex_indices[0]] += tmp_tan;
         tan[vertex_indices[1]] += tmp_tan;
         tan[vertex_indices[2]] += tmp_tan;
         bit[vertex_indices[0]] += tmp_bit;
@@ -790,13 +804,22 @@ void computeTangents(const Mesh::PositionList &positions,
     for(unsigned int index = 0; index < num_vertices; ++index)
     {
     	// ??? Compute the per-vertex tangent and bitangent. Not sure about these next two lines
-    	tan[index] = glm::normalize(tan[index]);
-    	bit[index] = glm::normalize(bit[index]);
+    	//tan[index] = glm::normalize(tan[index]);
+    	//bit[index] = glm::normalize(bit[index]);
 
+		std::printf("Vertex %i = (%f, %f, %f)\n", index, positions[index].x, positions[index].y, positions[index].z);
+		std::printf("Tan %i    = (%f, %f, %f)\n", index, tan[index].x, tan[index].y, tan[index].z);
+		std::printf("Bit %i    = (%f, %f, %f)\n", index, bit[index].x, bit[index].y, bit[index].z);
+		std::printf("Normal %i = (%f, %f, %f)\n", index, normals[index].x, normals[index].y, normals[index].z);
+		/*
+		// Gram-Schmidt orthogonalize
         glm::vec3 tangent (glm::normalize(tan[index] - (glm::dot(normals[index], tan[index]) * normals[index])));
+
+        // Calculate handedness
         float w = (glm::dot(glm::cross(normals[index], tan[index]), bit[index])) < 0.0f ? -1.0f : 1.0f;
 
         tangents[index] = glm::vec4(tangent, w);
+        */
     }
 }
 

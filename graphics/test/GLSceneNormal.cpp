@@ -68,7 +68,7 @@ void GLSceneNormal::init(void)
     // --------------
     // 1- CUBE
     // Create Cube Mesh
-    gl_cube_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE, 100, 100));
+    gl_cube_ = new GLMesh(Graphics::buildMesh(Graphics::CYLINDER, 100, 100));
     // and LOAD the Mesh into VBO and VAO
     gl_cube_->init();
     // Create instance of GLMesh (there could be more than one)

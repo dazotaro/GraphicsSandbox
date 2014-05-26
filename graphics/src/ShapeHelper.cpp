@@ -372,7 +372,7 @@ void buildCylinder(std::string        &name,
         // Triangle on the bottom disk
         faces.push_back(Mesh::TriangleFace(bottom_center_index, bottom_right, bottom_left,                           // Positions
                                            0, 0, 0,                                                                  // Colors
-                                           tex_coord_bottom_right, tex_coord_bottom_right, tex_coord_bottom_left));  // Texture Coordinates
+                                           tex_coord_bot_center, tex_coord_bottom_right, tex_coord_bottom_left));  // Texture Coordinates
     }
 }
 
@@ -753,12 +753,20 @@ void computeTangents(const Mesh::PositionList &positions,
         // Retrieve indices to the positions of the vertices of this face
         Mesh::IndexList vertex_indices;
         iter->getIndices(Mesh::Face::VERTEX_INDEX, vertex_indices);
+
         // Compute the normal of the face
         glm::vec3 vec1 = glm::normalize(positions[vertex_indices[1]] - positions[vertex_indices[0]]);
         glm::vec3 vec2 = glm::normalize(positions[vertex_indices[2]] - positions[vertex_indices[0]]);
 
         Mesh::IndexList tex_coord_indices;
         iter->getIndices(Mesh::Face::TEXTURE_INDEX, tex_coord_indices);
+
+        static unsigned face_id = 0;
+        std::printf("Face %i/%i\n", face_id++, faces.size());
+        std::printf("%f, %f)\n", tex_coords[tex_coord_indices[0]].x, tex_coords[tex_coord_indices[0]].y);
+        std::printf("%f, %f)\n", tex_coords[tex_coord_indices[1]].x, tex_coords[tex_coord_indices[1]].y);
+        std::printf("%f, %f)\n", tex_coords[tex_coord_indices[2]].x, tex_coords[tex_coord_indices[2]].y);
+
         glm::vec2 tex1 = glm::normalize(tex_coords[tex_coord_indices[1]] -tex_coords[tex_coord_indices[0]]);
         glm::vec2 tex2 = glm::normalize(tex_coords[tex_coord_indices[2]] -tex_coords[tex_coord_indices[0]]);
 

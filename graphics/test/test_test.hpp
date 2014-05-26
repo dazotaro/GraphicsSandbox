@@ -124,11 +124,11 @@ void testObject3D(void)
 int main(void)
 {
     // Test
-    testPlane();
-    testCube();
+    //testPlane();
+    //testCube();
     testCylinder();
-    testCone();
-    testSphere();
+    //testCone();
+    //testSphere();
     //testObject3D();
     //testGLMeshInstance();
     //testGLM();

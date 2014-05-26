@@ -16,7 +16,7 @@ TARGET = graphics
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) ../src/$(LIBNAME)
 	$(CC) -o $(TARGET) $(OBJS) $(OPTS) $(LIBDIR) $(LIBS)
 	
 %.o : %.cpp 

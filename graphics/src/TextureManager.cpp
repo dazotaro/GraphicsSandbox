@@ -5,9 +5,12 @@
  *      Author: jusabiaga
  */
 
+// Local includes
 #include "TextureManager.hpp"       // Class declaration
-#include <SOIL.h>                   // SOIL_load_image
 #include "GLSLProgram.hpp"          // GLSLProgram
+#include "ImageHelper.hpp"			// imageInvertVertically
+// Global includes
+#include <SOIL.h>                   // SOIL_load_image
 #include <iostream>                 // cout, endl
 
 // STATIC VARIABLES
@@ -15,7 +18,7 @@ std::map<std::string, GLuint> TextureManager::texture_map_;  //!< Handle to the 
 int TextureManager::num_tex_bound_ = 0;
 
 // FUNCTIONS
-/*
+
 bool TextureManager::loadTexture(const std::string &texture_name, const std::string &filename)
 {
     // If the texture is not yet in memory
@@ -26,11 +29,32 @@ bool TextureManager::loadTexture(const std::string &texture_name, const std::str
         texture_map_[texture_name] = tex_2d;
     }
 
+
     int width, height, channels;
-    unsigned char *image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_RGB);
+    unsigned char *image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
+
+    GLuint mode;
+
+    switch (channels)
+    {
+    	case 3:
+			mode = GL_RGB;
+			break;
+
+		case 4:
+			mode = GL_RGBA;
+			break;
+
+		default:
+			std::printf("Loading \"%s\": number or channels %i not supported\n", filename.c_str(), channels);
+			exit(0);
+    }
+
+    // Flip the image vertically
+    JU::imageInvertVertically(width, height, channels, image);
 
     glBindTexture(GL_TEXTURE_2D, texture_map_[texture_name]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, image);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -38,8 +62,9 @@ bool TextureManager::loadTexture(const std::string &texture_name, const std::str
 
     return true;
 }
-*/
 
+
+/*
 bool TextureManager::loadTexture(const std::string &texture_name, const std::string &filename)
 {
 	//std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -68,6 +93,9 @@ bool TextureManager::loadTexture(const std::string &texture_name, const std::str
 
     return true;
 }
+*/
+
+
 
 void TextureManager::bindTexture(const GLSLProgram &program, const std::string &texture_name, const std::string &uniform_name)
 {
@@ -75,6 +103,8 @@ void TextureManager::bindTexture(const GLSLProgram &program, const std::string &
     glBindTexture(GL_TEXTURE_2D, texture_map_[texture_name]);
 
     program.setUniform(uniform_name.c_str(), num_tex_bound_);
+
+    std::printf("%s  = %i\n", texture_name.c_str(), num_tex_bound_);
 
     num_tex_bound_++;
 }

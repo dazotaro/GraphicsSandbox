@@ -17,7 +17,7 @@ LIBS_DIR = -L.
 INC = 
 MACROS =
 OPTS = -g -std=gnu++11
-OBJS = gl_core_4_2.o Mesh.o ShapeHelper.o Object3D.o GLMesh.o Node3D.o GLMeshInstance.o CameraIntrinsic.o CameraFirstPerson.o CameraThirdPerson.o GLScene.o GLSLProgram.o NormalMapHelper.o TextureManager.o ArcBallController.o CoordinateHelper.o GLParticleSystem.o
+OBJS = gl_core_4_2.o Mesh.o ShapeHelper.o Object3D.o GLMesh.o Node3D.o GLMeshInstance.o CameraIntrinsic.o CameraFirstPerson.o CameraThirdPerson.o GLScene.o GLSLProgram.o NormalMapHelper.o TextureManager.o ArcBallController.o CoordinateHelper.o GLParticleSystem.o ImageHelper.o
 
 # TARGETS
 # -------

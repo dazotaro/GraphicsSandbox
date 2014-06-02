@@ -136,7 +136,7 @@ void GLSceneParticles::update(float time)
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneParticles::render(void) const
+void GLSceneParticles::render(void)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

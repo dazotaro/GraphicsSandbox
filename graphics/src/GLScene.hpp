@@ -30,7 +30,7 @@ class GLScene
         // PURE VIRTUAL
         virtual void init() = 0;
         virtual void update(float time) = 0;
-        virtual void render(void) const = 0;
+        virtual void render(void) = 0;
         virtual void keyboard(unsigned char key, int x, int y) = 0;
         virtual void mouseClick(int button, int state, int x, int y) = 0;
         virtual void mouseMotion(int x, int y) = 0;
@@ -42,7 +42,8 @@ class GLScene
 
     protected:
         virtual void cleanup(void) = 0;
-        GLSLProgram compileAndLinkShader(const char *vertex, const char *fragment);
+        GLSLProgram compileAndLinkShader(const char* vertex, const char* fragment);
+        GLSLProgram compileAndLinkShader(const char* vertex, const char* geometry, const char* fragment);
 
     protected:
         GLSLProgramMap     glsl_program_map_;      //!< Map of GLSLProgram objects used by this GLScene

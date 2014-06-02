@@ -104,7 +104,7 @@ void GLSceneCometTail::update(float time)
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneCometTail::render(void) const
+void GLSceneCometTail::render(void)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

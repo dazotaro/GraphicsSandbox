@@ -46,6 +46,9 @@ void GLSceneLighting::init(void)
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
     //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
     //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+    glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
+                                                               "shaders/normal_drawing.gs",
+                                                               "shaders/simple.frag");
 
     current_program_iter_ = glsl_program_map_.find("perfragment");
     
@@ -194,12 +197,13 @@ void GLSceneLighting::update(float time)
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneLighting::render(void) const
+void GLSceneLighting::render(void)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    current_program_iter_ = glsl_program_map_.find("perfragment");
     current_program_iter_->second.use();
 
     // LOAD MATERIAL
@@ -219,6 +223,11 @@ void GLSceneLighting::render(void) const
     sphere_node_->draw(current_program_iter_->second, M, V, P);
     (current_program_iter_->second).setUniform("Ka", 0.2f, 0.2f, 0.2f);
     (current_program_iter_->second).setUniform("Kd", 0.2f, 0.2f, 0.2f);
+    plane_node_->draw(current_program_iter_->second, M, V, P);
+
+    current_program_iter_ = glsl_program_map_.find("normal_drawing");
+    current_program_iter_->second.use();
+    sphere_node_->draw(current_program_iter_->second, M, V, P);
     plane_node_->draw(current_program_iter_->second, M, V, P);
 }
 

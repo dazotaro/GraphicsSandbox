@@ -281,7 +281,7 @@ void GLSceneShadow::drawScene(const CameraFirstPerson *camera) const
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneShadow::render(void) const
+void GLSceneShadow::render(void)
 {
     if(current_program_iter_ == glsl_program_map_.find("perfragment"))
     {

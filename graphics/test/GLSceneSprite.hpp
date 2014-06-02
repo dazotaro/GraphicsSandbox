@@ -30,7 +30,7 @@ class GLSceneSprite : public GLScene
 
         void init(void);
         void update(float time);
-        void render(void) const;
+        void render(void);
         void keyboard(unsigned char key, int x, int y);
         void mouseClick(int button, int state, int x, int y);
         void resize(int width, int height);

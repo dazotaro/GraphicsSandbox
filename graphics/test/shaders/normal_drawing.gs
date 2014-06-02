@@ -1,38 +1,75 @@
 #version 400
 
+// Input primitive
 layout(triangles) in;
 
-// Three lines will be generated: 6 vertices
-layout(line_strip, max_vertices=6) out;
+// Output primitive and required number of vertices:
+// We need two vertices per line segment
+layout(line_strip, max_vertices=12) out;
 
 uniform mat4 MVP;
 
 in Vertex
 {
-  vec4 normal;
-  vec4 color;
+    vec4 normal;
+    vec4 color;
 } vertex[];
 
 out vec4 Color;
 
 void main()
 {
-  int i;
-  float normal_length = 0.05f;
-  
-  for(i=0; i<gl_in.length(); i++)
-  {
-    vec3 P = gl_in[i].gl_Position.xyz;
-    vec3 N = vertex[i].normal.xyz;
+    float normal_length = 0.05f;
+    vec4 position[3];
     
-    gl_Position = MVP * vec4(P, 1.0);
-    Color = vertex[i].color;
+    // Draw Normals
+    int i;
+    for(i=0; i<gl_in.length(); i++)
+    {
+        vec4 P = gl_in[i].gl_Position;
+        vec4 N = vertex[i].normal;
+
+        position[i] = MVP * P;
+        gl_Position = position[i];
+        Color = vertex[i].color;
+        EmitVertex();
+
+        gl_Position = MVP * (P + N * normal_length);
+        Color = vertex[i].color;
+        EmitVertex();
+
+        EndPrimitive();
+    }
+    
+    // Draw the Wireframe
+    gl_Position = position[0];
+    Color = vertex[0].color;
     EmitVertex();
     
-    gl_Position = MVP * vec4(P + N * normal_length, 1.0);
-    Color = vertex[i].color;
+    gl_Position = position[1];
+    Color = vertex[1].color;
     EmitVertex();
     
     EndPrimitive();
-  }
+
+    gl_Position = position[1];
+    Color = vertex[1].color;
+    EmitVertex();
+    
+    gl_Position = position[2];
+    Color = vertex[2].color;
+    EmitVertex();
+    
+    EndPrimitive();
+
+    gl_Position = position[2];
+    Color = vertex[2].color;
+    EmitVertex();
+    
+    gl_Position = position[0];
+    Color = vertex[0].color;
+    EmitVertex();
+    
+    EndPrimitive();
+
 }

@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>      // glm::vec3, glm::vec2
 #include <vector>           // std::vector
 #include <string>           // std::string
+#include <JU/Defs.hpp>		// uint32
 
 
 
@@ -21,13 +22,24 @@ class Mesh2
     public:
         struct Vertex
         {
-            glm::vec3 position;
-            glm::vec3 normal;
-            glm::vec2 tex_coords;
+            JU::f32 position[3];
+            JU::f32 normal[3];
+            JU::f32 tex_coords[2];
+
+            Vertex(JU::f32 px = 0.0f, JU::f32 py = 0.0f, JU::f32 pz = 0.0f,
+            	   JU::f32 nx = 0.0f, JU::f32 ny = 0.0f, JU::f32 nz = 0.0f,
+            	   JU::f32 s = 0.0f, JU::f32 t = 0.0f)
+            {
+            	position[0] = px; 	position[1] = py; 	position[2] = pz;
+            	normal[0] = nx; 	normal[1] = ny; 	normal[2] = nz;
+            	tex_coords[0] = s; 	tex_coords[1] = t;
+            }
 
             bool operator==(const Vertex& rhs) const
             {
-                if (position != rhs.position || normal != rhs.normal || tex_coords != rhs.tex_coords)
+                if (position[0] != rhs.position[0] || position[1] != rhs.position[1] || position[2] != rhs.position[2]
+                    || normal[0] != rhs.normal[0] || normal[1] != rhs.normal[1] || normal[2] != rhs.normal[2]
+                    || tex_coords[0] != rhs.tex_coords[0] || tex_coords[1] != rhs.tex_coords[1])
                     return false;
 
                 return true;

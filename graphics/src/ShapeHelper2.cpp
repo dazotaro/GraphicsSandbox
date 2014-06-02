@@ -22,10 +22,12 @@ size_t vertexHash(const Mesh2::Vertex& vertex)
             ^ std::hash<float>()(vertex.normal[1])
             ^ std::hash<float>()(vertex.normal[2])
             ^ std::hash<float>()(vertex.tex_coords[0])
-            ^ std::hash<float>()(vertex.tex_coords[1])
-            ^ std::hash<float>()(vertex.tex_coords[2]));
+            ^ std::hash<float>()(vertex.tex_coords[1]));
 }
 
+// TYPEDEFS
+typedef std::unordered_map<Mesh2::Vertex, int, std::function<decltype(vertexHash)> > VertexHashMap;
+typedef VertexHashMap::const_iterator VertexHashMapConstIter;
 
 
 /**
@@ -40,7 +42,7 @@ size_t vertexHash(const Mesh2::Vertex& vertex)
 *
 * @return The Mesh
 */
-void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, unsigned int num_slices = 10, unsigned int num_stacks = 10)
+void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, unsigned int num_slices, unsigned int num_stacks)
 {
     std::string         shape_name;
     Mesh2::IndexVector  vIndices;
@@ -69,7 +71,7 @@ void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, unsigned int num
             break;
 
         default:
-            std::cout << "Error: Shape type " << shape_type << " not handled by 'buildMesh'" << std::endl;
+            std::printf("Error: Shape type %i not handled by 'buildMesh'\n", shape_type);
             break;
     }
 }
@@ -79,6 +81,70 @@ void ShapeHelper2::buildPlane(std::string&         name,
                               Mesh2::VertexVector& vVertices)
 {
     name = std::string("Plane");
+    vIndices.clear();
+    vVertices.clear();
+
+    JU::uint32 vertex_count = 0;		// Vertex counter
+    JU::uint32 vertex_index;			// Vertex index
+    Mesh2::Vertex vertex;				// Vertex data
+    VertexHashMap vtx_hashmap(8);		// Hash map to keep track of uniqueness of vertices and their indices
+    VertexHashMapConstIter vtx_iter;
+
+    // Triangle 0
+    // ----------
+    // V0
+    vertex = (-0.5f, 0.5f, 0.0f, // position
+    		   1.0f, 0.0f, 0.0f, // normal
+    		   0.0f, 1.0f);		 // texture coordinates
+
+    // Does this vertex already exist?
+    vtx_iter = vtx_hashmap.find(vertex);
+    if (vtx_iter == vtx_hashmap.end())
+    {
+    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
+    	vVertices.push_back(vertex);
+    }
+    else
+    	vertex_index = vtx_iter->second;
+
+	vIndices.push_back(vertex_index);
+
+    // V1
+    vertex = (-0.5f, -0.5f, 0.0f, // position
+    		   1.0f,  0.0f, 0.0f, // normal
+    		   0.0f,  0.0f);	  // texture coordinates
+
+    // Does this vertex already exist?
+    vtx_iter = vtx_hashmap.find(vertex);
+    if (vtx_iter == vtx_hashmap.end())
+    {
+    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
+    	vVertices.push_back(vertex);
+    }
+    else
+    	vertex_index = vtx_iter->second;
+
+	vIndices.push_back(vertex_index);
+
+    // V2
+    vertex = ( 0.5f, -0.5f, 0.0f, // position
+    		   1.0f,  0.0f, 0.0f, // normal
+    		   1.0f,  0.0f);	  // texture coordinates
+
+    // Does this vertex already exist?
+    vtx_iter = vtx_hashmap.find(vertex);
+    if (vtx_iter == vtx_hashmap.end())
+    {
+    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
+    	vVertices.push_back(vertex);
+    }
+    else
+    	vertex_index = vtx_iter->second;
+
+	vIndices.push_back(vertex_index);
+
+
+
 }
 
 

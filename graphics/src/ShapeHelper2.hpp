@@ -8,6 +8,9 @@
 #ifndef SHAPEHELPER2_HPP_
 #define SHAPEHELPER2_HPP_
 
+// Local includes
+#include "Mesh2.hpp"	// Mesh2
+
 
 class ShapeHelper2
 {

@@ -5,8 +5,8 @@
  *      Author: jusabiaga
  */
 
-#include "Mesh.hpp"         // Vertex, Face, Mesh
-#include "ShapeHelper.hpp"  // buildPlane()
+#include "Mesh2.hpp"         // Vertex, Face, Mesh
+#include "ShapeHelper2.hpp"  // buildPlane()
 #include "Object3D.hpp"     // Object3D
 #include <iostream>         // std::cout, std::endl
 #include "DebugGlm.hpp"     // overloaded ostream operator for glm types
@@ -16,16 +16,18 @@
 void testPlane(void)
 {
     // Create Mesh
-    Mesh mesh(Graphics::buildMesh(Graphics::PLANE));
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
     mesh.exportOBJ();
 
     mesh.export2OBJ("plane.obj");
 }
 
+/*
 void testCube(void)
 {
     // Create Mesh
-    Mesh mesh(Graphics::buildMesh(Graphics::CUBE));
+    Mesh mesh(buildMesh(CUBE));
     mesh.exportOBJ();
 
     mesh.export2OBJ("cube.obj");
@@ -34,29 +36,29 @@ void testCube(void)
 void testCylinder(void)
 {
     // Create a Mesh
-    Mesh mesh(Graphics::buildMesh(Graphics::CYLINDER, 8));
+    Mesh mesh(buildMesh(CYLINDER, 8));
     mesh.export2OBJ("cylinder_8.obj");
 }
 
 void testCone(void)
 {
     // Create a Mesh
-    Mesh mesh(Graphics::buildMesh(Graphics::CONE, 8));
+    Mesh mesh(buildMesh(CONE, 8));
     mesh.export2OBJ("cone_8.obj");
 }
 
 void testSphere(void)
 {
     // Create a Mesh
-    Mesh mesh(Graphics::buildMesh(Graphics::SPHERE, 8, 4));
+    Mesh mesh(buildMesh(SPHERE, 8, 4));
     mesh.export2OBJ("sphere_8_4.obj");
 }
 
 void testGLMeshInstance(void)
 {
     // Create Mesh
-    GLMesh *gl_mesh01 = new GLMesh(Graphics::buildMesh(Graphics::CUBE));
-    GLMesh *gl_mesh02 = new GLMesh(Graphics::buildMesh(Graphics::CUBE));
+    GLMesh *gl_mesh01 = new GLMesh(buildMesh(CUBE));
+    GLMesh *gl_mesh02 = new GLMesh(buildMesh(CUBE));
 
     GLMeshInstance *gl_mesh_instance_a = new GLMeshInstance(gl_mesh01);
     GLMeshInstance *gl_mesh_instance_b = new GLMeshInstance(gl_mesh01);
@@ -120,13 +122,14 @@ void testObject3D(void)
     std::cout << "Product = " << std::endl;
     std::cout << camera_object_3d.getTransformFromParent() * camera_object_3d.getTransformToParent() << std::endl;
 }
+*/
 
 int main(void)
 {
     // Test
-    //testPlane();
+    testPlane();
     //testCube();
-    testCylinder();
+    //testCylinder();
     //testCone();
     //testSphere();
     //testObject3D();

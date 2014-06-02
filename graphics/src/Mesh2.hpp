@@ -18,56 +18,176 @@
 
 class Mesh2
 {
-    // TYPEDEFS and Structure Definitions
-    public:
-        struct Vertex
-        {
-            JU::f32 position[3];
-            JU::f32 normal[3];
-            JU::f32 tex_coords[2];
+	public:
 
-            Vertex(JU::f32 px = 0.0f, JU::f32 py = 0.0f, JU::f32 pz = 0.0f,
-            	   JU::f32 nx = 0.0f, JU::f32 ny = 0.0f, JU::f32 nz = 0.0f,
-            	   JU::f32 s = 0.0f, JU::f32 t = 0.0f)
-            {
-            	position[0] = px; 	position[1] = py; 	position[2] = pz;
-            	normal[0] = nx; 	normal[1] = ny; 	normal[2] = nz;
-            	tex_coords[0] = s; 	tex_coords[1] = t;
-            }
+		// CONSTANT DEFINITIONS
+		static const unsigned int POSITION_VECTOR_SIZE     = 3;
+		static const unsigned int NORMAL_VECTOR_SIZE       = 3;
+		static const unsigned int TANGENT_VECTOR_SIZE      = 4;
+		static const unsigned int COLOR_VECTOR_SIZE        = 4;
+		static const unsigned int TEX_COORDS_VECTOR_SIZE   = 2;
 
-            bool operator==(const Vertex& rhs) const
-            {
-                if (position[0] != rhs.position[0] || position[1] != rhs.position[1] || position[2] != rhs.position[2]
-                    || normal[0] != rhs.normal[0] || normal[1] != rhs.normal[1] || normal[2] != rhs.normal[2]
-                    || tex_coords[0] != rhs.tex_coords[0] || tex_coords[1] != rhs.tex_coords[1])
-                    return false;
+		// TYPEDEFS
+		typedef std::vector<unsigned int> IndexList;
+		typedef IndexList::const_iterator IndexListConstIterator;
 
-                return true;
-            }
-        };
+		/**
+		 * @brief      Contains the information to define a Face
+		 *
+		 * @details    Contains the indices to the lists of positions, normals...
+		 */
+		class Face
+		{
+			public:
 
-        typedef std::vector<JU::uint32>         IndexVector;
-        typedef IndexVector::const_iterator     IndexListConstIter;
-        typedef std::vector<Vertex>             VertexVector;
-        typedef VertexVector::const_iterator    VertexVectorConstIter;
+				enum IndexType
+				{
+					VERTEX_INDEX,
+					NORMAL_INDEX,
+					TEXTURE_INDEX
+				};
 
-    // Member functions
-    public:
-        Mesh2(const std::string& name, const IndexVector& vIndices, const VertexVector& vVertices);
-        virtual ~Mesh2();
+				Face () {}
+				Face (IndexList vertex_indices,
+					  IndexList normal_indices,
+					  IndexList tex_coord_indices)
+				{
+					setIndices(VERTEX_INDEX,  vertex_indices);
+					setIndices(NORMAL_INDEX,  normal_indices);
+					setIndices(TEXTURE_INDEX, tex_coord_indices);
+				}
 
-        // Getter and Setters
-        const std::string& getName() const;
-        void getIndices(IndexVector& vIndices) const;
-        void getPositions(std::vector<glm::vec3>& vPositions) const;
-        void getNormals(std::vector<glm::vec3>& vNormals) const;
-        void getTexCoords(std::vector<glm::vec2>& vTexCoords) const;
+				void setIndices(IndexType index_type, const IndexList &index_list)
+				{
+					switch(index_type)
+					{
+					case VERTEX_INDEX:
+						vertex_indices_ = index_list;
+						break;
 
-    // Member variables
-    private:
-        std::string  name_;
-        IndexVector  vIndices_;
-        VertexVector vVertices_;;
+					case NORMAL_INDEX:
+						normal_indices_ = index_list;
+						break;
+
+					case TEXTURE_INDEX:
+						tex_coord_indices_ = index_list;
+						break;
+
+					default:
+						break;
+
+					}
+				}
+
+				void getIndices(IndexType index_type, IndexList &index_list) const
+				{
+					switch(index_type)
+					{
+					case VERTEX_INDEX:
+						index_list = vertex_indices_;
+						break;
+
+					case NORMAL_INDEX:
+						index_list = normal_indices_;
+						break;
+
+					case TEXTURE_INDEX:
+						index_list = tex_coord_indices_;
+						break;
+
+					default:
+						break;
+
+					}
+				}
+
+			private:
+				// Member variables
+				IndexList vertex_indices_;      //!< Indices to the list of vertex/normal/tangent coordinates
+				IndexList normal_indices_;       //!< Indices to the list of vertex nornals
+				IndexList tex_coord_indices_;   //!< Indices to the list of vertex texture coordinates
+		};
+
+		/**
+		 * @brief      Wrapper over the Face class to provide a simplified constructor for Triangles.
+		 */
+		class TriangleFace : public Face
+		{
+			public:
+				TriangleFace (unsigned int vertex0, unsigned int vertex1, unsigned vertex2,
+							  unsigned int normal0, unsigned int normal1, unsigned normal2,
+							  unsigned int tex0,    unsigned int tex1,    unsigned tex2)
+				{
+					std::vector<unsigned int> index_list(3);
+
+					index_list[0] = vertex0;
+					index_list[1] = vertex1;
+					index_list[2] = vertex2;
+					setIndices(VERTEX_INDEX, index_list);
+
+					index_list[0] = normal0;
+					index_list[1] = normal1;
+					index_list[2] = normal2;
+					setIndices(NORMAL_INDEX, index_list);
+
+					index_list[0] = tex0;
+					index_list[1] = tex1;
+					index_list[2] = tex2;
+					setIndices(TEXTURE_INDEX, index_list);
+				}
+		};
+
+		// TYPEDEFS
+		typedef std::vector<glm::vec3>          PositionList;
+		typedef PositionList::const_iterator    PositionListConstIterator;
+		typedef std::vector<glm::vec3>          NormalList;
+		typedef NormalList::const_iterator      NormalListConstIterator;
+		typedef NormalList::iterator            NormalListIterator;
+		typedef std::vector<glm::vec4>          TangentList;
+		typedef TangentList::const_iterator     TangentListConstIterator;
+		typedef TangentList::iterator           TangentListIterator;
+		typedef std::vector<glm::vec4>          ColorList;
+		typedef ColorList::const_iterator       ColorListConstIterator;
+		typedef std::vector<glm::vec2>          TexCoordList;
+		typedef TexCoordList::const_iterator    TexCoordListConstIterator;
+		typedef std::vector<Face>               FaceList;
+		typedef FaceList::const_iterator        FaceListConstIterator;
+
+
+		Mesh2();
+		Mesh2(const std::string  &name,
+			  const PositionList &positions,
+			  const NormalList   &normals,
+			  const TangentList  &tangents,
+			  const ColorList    &colors,
+			  const TexCoordList &tex_coords,
+			  const FaceList     &faces);
+
+		virtual ~Mesh2();
+
+		// GETTERS
+		const ColorList& getColors() const;
+		const FaceList& getFaces() const;
+		const std::string& getName() const;
+		const NormalList& getNormals() const;
+		const TangentList& getTangents() const;
+		const PositionList& getPositions() const;
+		const TexCoordList& getTexCoords() const;
+
+		// EXPORT AND OUTPUT FUNCTIONS
+		void exportOBJ(void) const;
+		void export2OBJ(const char *filename) const;
+		friend std::ostream& operator<<(std::ostream &out, const Mesh2 &rhs);
+
+	private:
+
+		std::string     name_;          //!< ID of the Mesh
+		PositionList    positions_;     //!< List of vertex coordinates
+		NormalList      normals_;       //!< List of vertex normals
+		TangentList     tangents_;      //!< List of vertex tangent vectors
+		ColorList       colors_;        //!< List of vertex colors
+		TexCoordList    tex_coords_;    //!< List of vertex texture coordinates
+		FaceList        faces_;         //!< List of faces
 };
 
 #endif /* MESH2_HPP_ */

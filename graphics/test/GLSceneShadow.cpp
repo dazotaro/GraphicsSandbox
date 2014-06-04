@@ -572,6 +572,9 @@ void GLSceneShadow::spitOutDepthBuffer() const
     								   4/* channels*/,
     								   imgBuffer);
 
+    if (save_result == 0)
+        std::printf("ERROR: could not save depth texture\n");
+
     delete [] buffer;
     delete [] imgBuffer;
     exit(1);

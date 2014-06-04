@@ -762,7 +762,7 @@ void computeTangents(const Mesh::PositionList &positions,
         iter->getIndices(Mesh::Face::TEXTURE_INDEX, tex_coord_indices);
 
         static unsigned face_id = 0;
-        std::printf("Face %i/%i\n", face_id++, faces.size());
+        std::printf("Face %i/%li\n", face_id++, faces.size());
         std::printf("%f, %f)\n", tex_coords[tex_coord_indices[0]].x, tex_coords[tex_coord_indices[0]].y);
         std::printf("%f, %f)\n", tex_coords[tex_coord_indices[1]].x, tex_coords[tex_coord_indices[1]].y);
         std::printf("%f, %f)\n", tex_coords[tex_coord_indices[2]].x, tex_coords[tex_coord_indices[2]].y);

@@ -57,8 +57,6 @@ class ShapeHelper2
 			//TORUS
 		};
 
-	private:
-
 		// TYPEDEFS and ENUMs
 		typedef std::vector<JU::uint32>         IndexVector;
 		typedef IndexVector::const_iterator     IndexVectorConstIter;

@@ -33,6 +33,41 @@ typedef std::unordered_map<ShapeHelper2::Vertex, int, std::function<decltype(ver
 typedef VertexHashMap::const_iterator VertexHashMapConstIter;
 
 
+
+/**
+* @brief Helper function
+*
+* Helper function to aid the buildShape functions in handling vertex duplication
+*
+* @oaram vertex             The new vertex
+* @oaram hpVertexIndices    A hash map with all the vertex indices per vertex-key
+* @param vVertices          A vector with all the vertices
+* @param vIndices           A vector with all the indices to the vertices
+*
+* @return The Mesh
+*/
+inline JU::uint32 processVertex(const ShapeHelper2::Vertex& vertex,
+                                VertexHashMap& hpVertexIndices,
+                                ShapeHelper2::VertexVector& vVertices,
+                                ShapeHelper2::IndexVector& vIndices)
+{
+    JU::uint32 vertex_index;
+
+    // Does this vertex already exist?
+    VertexHashMapConstIter vtx_iter = hpVertexIndices.find(vertex);
+    if (vtx_iter == hpVertexIndices.end())
+    {
+        hpVertexIndices[vertex] = vertex_index = vVertices.size();
+        vVertices.push_back(vertex);
+    }
+    else
+        vertex_index = vtx_iter->second;
+
+    vIndices.push_back(vertex_index);
+}
+
+
+
 /**
 * @brief Builder function
 *
@@ -122,117 +157,50 @@ void ShapeHelper2::buildPlane(std::string&  name,
     vIndices.clear();
     vVertices.clear();
 
-    JU::uint32 vertex_count = 0;		// Vertex counter
     JU::uint32 vertex_index;			// Vertex index
     Vertex vertex;						// Vertex data
-    VertexHashMap vtx_hashmap(8);		// Hash map to keep track of uniqueness of vertices and their indices
+    VertexHashMap hpVertexIndices(8, vertexHash);		// Hash map to keep track of uniqueness of vertices and their indices
     VertexHashMapConstIter vtx_iter;
 
     // Triangle 0
     // ----------
     // V0
-    vertex = (-0.5f, 0.5f, 0.0f, // position
-    		   1.0f, 0.0f, 0.0f, // normal
-    		   0.0f, 1.0f);		 // texture coordinates
-
-    // Does this vertex already exist?
-    vtx_iter = vtx_hashmap.find(vertex);
-    if (vtx_iter == vtx_hashmap.end())
-    {
-    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
-    	vVertices.push_back(vertex);
-    }
-    else
-    	vertex_index = vtx_iter->second;
-
-	vIndices.push_back(vertex_index);
+    vertex = Vertex(-0.5f, 0.5f, 0.0f, // position
+    		         1.0f, 0.0f, 0.0f, // normal
+    		         0.0f, 1.0f);		 // texture coordinates
+    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
 
     // V1
-    vertex = (-0.5f, -0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   0.0f,  0.0f);	  // texture coordinates
-
-    // Does this vertex already exist?
-    vtx_iter = vtx_hashmap.find(vertex);
-    if (vtx_iter == vtx_hashmap.end())
-    {
-    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
-    	vVertices.push_back(vertex);
-    }
-    else
-    	vertex_index = vtx_iter->second;
-
-	vIndices.push_back(vertex_index);
+    vertex = Vertex(-0.5f, -0.5f, 0.0f, // position
+    		         1.0f,  0.0f, 0.0f, // normal
+    		         0.0f,  0.0f);	  // texture coordinates
+    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
 
     // V2
-    vertex = ( 0.5f, -0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   1.0f,  0.0f);	  // texture coordinates
-
-    // Does this vertex already exist?
-    vtx_iter = vtx_hashmap.find(vertex);
-    if (vtx_iter == vtx_hashmap.end())
-    {
-    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
-    	vVertices.push_back(vertex);
-    }
-    else
-    	vertex_index = vtx_iter->second;
-
-	vIndices.push_back(vertex_index);
+    vertex = Vertex( 0.5f, -0.5f, 0.0f, // position
+    		         1.0f,  0.0f, 0.0f, // normal
+    		         1.0f,  0.0f);	  // texture coordinates
+    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
 
     // Triangle 1
     // ----------
     // V0
-    vertex = (-0.5f, 0.5f, 0.0f, // position
-    		   1.0f, 0.0f, 0.0f, // normal
-    		   0.0f, 1.0f);		 // texture coordinates
-
-    // Does this vertex already exist?
-    vtx_iter = vtx_hashmap.find(vertex);
-    if (vtx_iter == vtx_hashmap.end())
-    {
-    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
-    	vVertices.push_back(vertex);
-    }
-    else
-    	vertex_index = vtx_iter->second;
-
-	vIndices.push_back(vertex_index);
+    vertex = Vertex(-0.5f, 0.5f, 0.0f, // position
+    		         1.0f, 0.0f, 0.0f, // normal
+    		         0.0f, 1.0f);		 // texture coordinates
+    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
 
     // V1
-    vertex = ( 0.5f, -0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   1.0f,  0.0f);	  // texture coordinates
-
-    // Does this vertex already exist?
-    vtx_iter = vtx_hashmap.find(vertex);
-    if (vtx_iter == vtx_hashmap.end())
-    {
-    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
-    	vVertices.push_back(vertex);
-    }
-    else
-    	vertex_index = vtx_iter->second;
-
-	vIndices.push_back(vertex_index);
+    vertex = Vertex( 0.5f, -0.5f, 0.0f, // position
+    		         1.0f,  0.0f, 0.0f, // normal
+    		         1.0f,  0.0f);	  // texture coordinates
+    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
 
     // V2
-    vertex = ( 0.5f,  0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   1.0f,  1.0f);	  // texture coordinates
-
-    // Does this vertex already exist?
-    vtx_iter = vtx_hashmap.find(vertex);
-    if (vtx_iter == vtx_hashmap.end())
-    {
-    	vtx_hashmap[vertex] = vertex_index = vertex_count++;
-    	vVertices.push_back(vertex);
-    }
-    else
-    	vertex_index = vtx_iter->second;
-
-	vIndices.push_back(vertex_index);
+    vertex = Vertex( 0.5f,  0.5f, 0.0f, // position
+    		         1.0f,  0.0f, 0.0f, // normal
+    		         1.0f,  1.0f);	  // texture coordinates
+    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
 }
 
 
@@ -241,6 +209,16 @@ void ShapeHelper2::buildCube(std::string&  name,
                              IndexVector&  vIndices,
                              VertexVector& vVertices)
 {
+    name = std::string("Cube");
+    vIndices.clear();
+    vVertices.clear();
+
+    JU::uint32 vertex_count = 0;        // Vertex counter
+    JU::uint32 vertex_index;            // Vertex index
+    Vertex vertex;                      // Vertex data
+    VertexHashMap hpVertexIndices(8, vertexHash);       // Hash map to keep track of uniqueness of vertices and their indices
+    VertexHashMapConstIter vtx_iter;
+
 
 }
 

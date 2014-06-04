@@ -252,6 +252,83 @@ void ShapeHelper2::buildCube(std::string&  name,
     VertexHashMap hpVertexIndices(8, vertexHash);       // Hash map to keep track of uniqueness of vertices and their indices
     VertexHashMapConstIter vtx_iter;
 
+    // Face 0: normal (0, 0, 1)
+    Vertex v0(-0.5f, 0.5f, 0.5f, // position
+               0.0f, 0.0f, 1.0f, // normal
+               0.0f, 1.0f);      // texture coordinates
+    Vertex v1(-0.5f,-0.5f, 0.5f, // position
+               0.0f, 0.0f, 1.0f, // normal
+               0.0f, 0.0f);      // texture coordinates
+    Vertex v2( 0.5f,-0.5f, 0.5f, // position
+               0.0f, 0.0f, 1.0f, // normal
+               1.0f, 0.0f);      // texture coordinates
+    Vertex v3( 0.5f, 0.5f, 0.5f, // position
+               0.0f, 0.0f, 1.0f, // normal
+               1.0f, 1.0f);      // texture coordinates
+    addTriangulatedQuad(v0, v1, v2, v3, hpVertexIndices, vVertices, vIndices);
+
+    // Face 1: normal (0, 0, -1)
+    Vertex v4( 0.5f, 0.5f,-0.5f, // position
+               0.0f, 0.0f,-1.0f, // normal
+               0.0f, 1.0f);      // texture coordinates
+    Vertex v5( 0.5f,-0.5f,-0.5f, // position
+               0.0f, 0.0f,-1.0f, // normal
+               0.0f, 0.0f);      // texture coordinates
+    Vertex v6(-0.5f,-0.5f,-0.5f, // position
+               0.0f, 0.0f,-1.0f, // normal
+               1.0f, 0.0f);      // texture coordinates
+    Vertex v7(-0.5f, 0.5f,-0.5f, // position
+               0.0f, 0.0f,-1.0f, // normal
+               1.0f, 1.0f);      // texture coordinates
+    addTriangulatedQuad(v4, v5, v6, v7, hpVertexIndices, vVertices, vIndices);
+
+    // Face 2: normal (1, 0, 0)
+    Vertex  v8( 0.5f, 0.5f, 0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                0.0f, 1.0f);      // texture coordinates
+    Vertex  v9( 0.5f,-0.5f, 0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                0.0f, 0.0f);      // texture coordinates
+    Vertex v10( 0.5f,-0.5f,-0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                1.0f, 0.0f);      // texture coordinates
+    Vertex v11( 0.5f, 0.5f,-0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                1.0f, 1.0f);      // texture coordinates
+    addTriangulatedQuad(v8, v9, v10, v11, hpVertexIndices, vVertices, vIndices);
+
+    // Face 3: normal (-1, 0, 0)
+    Vertex v12(-0.5f, 0.5f,-0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                0.0f, 1.0f);      // texture coordinates
+    Vertex v13(-0.5f,-0.5f,-0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                0.0f, 0.0f);      // texture coordinates
+    Vertex v14(-0.5f,-0.5f, 0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                1.0f, 0.0f);      // texture coordinates
+    Vertex v15(-0.5f, 0.5f, 0.5f, // position
+                1.0f, 0.0f, 0.0f, // normal
+                1.0f, 1.0f);      // texture coordinates
+    addTriangulatedQuad(v12, v13, v14, v15, hpVertexIndices, vVertices, vIndices);
+
+    // Face 4: normal (0, 1, 0)
+    Vertex v16( 0.5f, 0.5f,-0.5f, // position
+                0.0f, 1.0f, 0.0f, // normal
+                0.0f, 1.0f);      // texture coordinates
+    Vertex v17(-0.5f, 0.5f,-0.5f, // position
+                0.0f, 1.0f, 0.0f, // normal
+                0.0f, 0.0f);      // texture coordinates
+    Vertex v18(-0.5f, 0.5f, 0.5f, // position
+                0.0f, 1.0f, 0.0f, // normal
+                1.0f, 0.0f);      // texture coordinates
+    Vertex v19( 0.5f, 0.5f, 0.5f, // position
+                0.0f, 1.0f, 0.0f, // normal
+                1.0f, 1.0f);      // texture coordinates
+    addTriangulatedQuad(v16, v17, v18, v19, hpVertexIndices, vVertices, vIndices);
+
+    // Face 5
+
 }
 
 

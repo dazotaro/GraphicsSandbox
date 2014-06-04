@@ -165,42 +165,42 @@ void ShapeHelper2::buildPlane(std::string&  name,
     // Triangle 0
     // ----------
     // V0
-    vertex = Vertex(-0.5f, 0.5f, 0.0f, // position
-    		         1.0f, 0.0f, 0.0f, // normal
-    		         0.0f, 1.0f);		 // texture coordinates
-    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
+    Vertex v0(-0.5f, 0.5f, 0.0f, // position
+    		   1.0f, 0.0f, 0.0f, // normal
+    		   0.0f, 1.0f);		 // texture coordinates
+    processVertex(v0, hpVertexIndices, vVertices, vIndices);
 
     // V1
-    vertex = Vertex(-0.5f, -0.5f, 0.0f, // position
-    		         1.0f,  0.0f, 0.0f, // normal
-    		         0.0f,  0.0f);	  // texture coordinates
-    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
+    Vertex v1(-0.5f, -0.5f, 0.0f, // position
+    		   1.0f,  0.0f, 0.0f, // normal
+    		   0.0f,  0.0f);	  // texture coordinates
+    processVertex(v1, hpVertexIndices, vVertices, vIndices);
 
     // V2
-    vertex = Vertex( 0.5f, -0.5f, 0.0f, // position
-    		         1.0f,  0.0f, 0.0f, // normal
-    		         1.0f,  0.0f);	  // texture coordinates
-    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
+    Vertex v2( 0.5f, -0.5f, 0.0f, // position
+    		   1.0f,  0.0f, 0.0f, // normal
+    		   1.0f,  0.0f);	  // texture coordinates
+    processVertex(v2, hpVertexIndices, vVertices, vIndices);
 
     // Triangle 1
     // ----------
     // V0
-    vertex = Vertex(-0.5f, 0.5f, 0.0f, // position
-    		         1.0f, 0.0f, 0.0f, // normal
-    		         0.0f, 1.0f);		 // texture coordinates
-    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
+    Vertex v3(-0.5f, 0.5f, 0.0f, // position
+    		   1.0f, 0.0f, 0.0f, // normal
+    		   0.0f, 1.0f);		 // texture coordinates
+    processVertex(v3, hpVertexIndices, vVertices, vIndices);
 
     // V1
-    vertex = Vertex( 0.5f, -0.5f, 0.0f, // position
-    		         1.0f,  0.0f, 0.0f, // normal
-    		         1.0f,  0.0f);	  // texture coordinates
-    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
+    Vertex v4( 0.5f, -0.5f, 0.0f, // position
+    		   1.0f,  0.0f, 0.0f, // normal
+    		   1.0f,  0.0f);	  // texture coordinates
+    processVertex(v4, hpVertexIndices, vVertices, vIndices);
 
     // V2
-    vertex = Vertex( 0.5f,  0.5f, 0.0f, // position
-    		         1.0f,  0.0f, 0.0f, // normal
-    		         1.0f,  1.0f);	  // texture coordinates
-    processVertex(vertex, hpVertexIndices, vVertices, vIndices);
+    Vertex v5( 0.5f,  0.5f, 0.0f, // position
+    		   1.0f,  0.0f, 0.0f, // normal
+    		   1.0f,  1.0f);	  // texture coordinates
+    processVertex(v5, hpVertexIndices, vVertices, vIndices);
 }
 
 

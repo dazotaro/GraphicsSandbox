@@ -30,14 +30,16 @@ void testCube(void)
     mesh.export2OBJ("cube.obj");
 }
 
-/*
 void testCylinder(void)
 {
     // Create a Mesh
-    Mesh mesh(buildMesh(CYLINDER, 8));
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 8);
+
     mesh.export2OBJ("cylinder_8.obj");
 }
 
+/*
 void testCone(void)
 {
     // Create a Mesh
@@ -125,9 +127,9 @@ void testObject3D(void)
 int main(void)
 {
     // Test
-    testPlane();
-    testCube();
-    //testCylinder();
+    //testPlane();
+    //testCube();
+    testCylinder();
     //testCone();
     //testSphere();
     //testObject3D();

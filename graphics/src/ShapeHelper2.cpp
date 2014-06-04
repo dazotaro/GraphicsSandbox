@@ -34,10 +34,35 @@ size_t vertexIndicesHash(const Mesh2::VertexIndices& vertex)
     		^ std::hash<JU::uint32>()(vertex.tex_));
 }
 
+bool vec3Equal(const glm::vec3& a, const glm::vec3& b)
+{
+	const JU::f32 EPSILON = 0.00001f;
+	bool result = true;
+
+	if (fabsf(a[0] - b[0]) > EPSILON || fabsf(a[1] - b[1]) > EPSILON || fabsf(a[2] - b[2]) > EPSILON)
+		result = false;
+
+	if (a[0] > 0 && b[0] > 0 && a[2] > 0 && b[2] > 0)
+		std::printf("%f %f %f -- %f %f %f = %s\n", a[0], a[1], a[2], b[0], b[1], b[2], result ? "TRUE" : "FALSE");
+
+
+	return true;
+}
+
+bool vec2Equal(const glm::vec2& a, const glm::vec2& b)
+{
+	const JU::f32 EPSILON = 0.00001f;
+
+	if (fabsf(a[0] - b[0]) > EPSILON || fabsf(a[1] - b[1]) > EPSILON)
+		return false;
+
+	return true;
+}
+
 // TYPEDEFS
-typedef std::unordered_map<glm::vec3, int, std::function<decltype(vec3Hash)> > HashMapVec3;
+typedef std::unordered_map<glm::vec3, int, std::function<decltype(vec3Hash)>, std::function<decltype(vec3Equal)> > HashMapVec3;
 typedef HashMapVec3::const_iterator HashMapVec3ConstIter;
-typedef std::unordered_map<glm::vec2, int, std::function<decltype(vec2Hash)> > HashMapVec2;
+typedef std::unordered_map<glm::vec2, int, std::function<decltype(vec2Hash)>, std::function<decltype(vec2Equal)> > HashMapVec2;
 typedef HashMapVec2::const_iterator HashMapVec2ConstIter;
 typedef std::unordered_map<Mesh2::VertexIndices, int, std::function<decltype(vertexIndicesHash)> > HashMapVertexIndices;
 typedef HashMapVertexIndices::const_iterator HashMapVertexIndicesConstIter;
@@ -264,9 +289,9 @@ void ShapeHelper2::buildPlane(std::string&  				name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    HashMapVec3 hpPositions	(8, vec3Hash);
-    HashMapVec3 hpNormals  	(8, vec3Hash);
-    HashMapVec2 hpTexCoords (8, vec2Hash);
+    HashMapVec3 hpPositions	(8, vec3Hash, vec3Equal);
+    HashMapVec3 hpNormals  	(8, vec3Hash, vec3Equal);
+    HashMapVec2 hpTexCoords (8, vec2Hash, vec2Equal);
     HashMapVertexIndices hpVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0(-0.5f,  0.5f, 0.0f, // position
@@ -304,9 +329,9 @@ void ShapeHelper2::buildCube(std::string&  					name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    HashMapVec3 hpPositions	(30, vec3Hash);
-    HashMapVec3 hpNormals  	(30, vec3Hash);
-    HashMapVec2 hpTexCoords (30, vec2Hash);
+    HashMapVec3 hpPositions	(30, vec3Hash, vec3Equal);
+    HashMapVec3 hpNormals  	(30, vec3Hash, vec3Equal);
+    HashMapVec2 hpTexCoords (30, vec2Hash, vec2Equal);
     HashMapVertexIndices hpVertexIndices(30, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
@@ -424,7 +449,115 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
 								 Mesh2::VectorTriangleIndices& 	vTriangleIndices,
                                  unsigned int  					num_slices)
 {
+    // CONSTANTS
+    const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
+    const float Z_OFFSET (0.5f);                        // Distance from the ORIGIN to the top (or bottom)
+    const float RADIUS   (0.5f);                        // RADIUS of the cylinder
+    const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
+    const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
 
+    name = "Cylinder_" + num_slices;
+
+    vPositions.clear();
+    vNormals.clear();
+    vTexCoords.clear();
+    vVertexIndices.clear();
+
+    Vertex vertex;						// Vertex data
+    HashMapVec3 hpPositions	(10 * num_slices, vec3Hash, vec3Equal);
+    HashMapVec3 hpNormals  	(10 * num_slices, vec3Hash, vec3Equal);
+    HashMapVec2 hpTexCoords (10 * num_slices, vec2Hash, vec2Equal);
+    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+
+    Vertex v0, v1, v2, v3;
+
+    // TOP DISK
+    const glm::vec3 center_top (0.0f, 0.0f, Z_OFFSET);
+    const glm::vec3 top_normal (0.0f, 0.0f, 1.0f);
+    float theta = 0.0f;
+    for (unsigned int slice = 0; slice < num_slices; slice++)
+    {
+    	JU::f32 x1 = RADIUS * cos(theta); 				JU::f32 y1 = RADIUS * sin(theta);
+    	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
+        glm::vec3 pos1 (x1, y1, Z_OFFSET);
+        glm::vec3 pos2 (x2, y2, Z_OFFSET);
+
+        v0 = Vertex(center_top, // position
+                    top_normal, // normal
+                    glm::vec2(0.0f, 0.0f));      // texture coordinates
+        v1 = Vertex(pos1, // position
+                    top_normal, // normal
+                    glm::vec2(x1, y1));      // texture coordinates
+        v2 = Vertex(pos2, // position
+                    top_normal, // normal
+                    glm::vec2(x2, y2));      // texture coordinates
+        addTriangle(v0, v1, v2,
+        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+    }
+
+    // BOTTOM DISK
+    const glm::vec3 center_bottom (0.0f, 0.0f, -Z_OFFSET);
+    const glm::vec3 bottom_normal (0.0f, 0.0f, -1.0f);
+    theta = 0.0f;
+    for (unsigned int slice = 0; slice < num_slices; slice++)
+    {
+    	JU::f32 x1 = RADIUS * cos(theta); 				JU::f32 y1 = RADIUS * sin(theta);
+    	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
+        glm::vec3 pos1 (x1, y1, -Z_OFFSET);
+        glm::vec3 pos2 (x2, y2, -Z_OFFSET);
+
+        v0 = Vertex(center_bottom, // position
+                    bottom_normal, // normal
+                    glm::vec2(0.0f, 0.0f));      // texture coordinates
+        v1 = Vertex(pos2, // position
+        			bottom_normal, // normal
+                    glm::vec2(x2, y2));      // texture coordinates
+        v2 = Vertex(pos1, // position
+        			bottom_normal, // normal
+                    glm::vec2(x1, y1));      // texture coordinates
+        addTriangle(v0, v1, v2,
+        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+    }
+
+    // SIDE OF THE CYLINDER
+    theta = 0.0f;
+    float tex_s = 0.0f;
+    for (unsigned int slice = 0; slice < num_slices; slice++)
+    {
+    	JU::f32 x1 = RADIUS * cos(theta); 				JU::f32 y1 = RADIUS * sin(theta);
+    	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
+        glm::vec3 pos1 (x1, y1, +Z_OFFSET);
+        glm::vec3 pos2 (x2, y2, +Z_OFFSET);
+        glm::vec3 norm1 (glm::normalize(pos1 - center_top));
+        glm::vec3 norm2 (glm::normalize(pos2 - center_top));
+        JU::f32 s1 = slice * DELTA_S;
+        JU::f32 s2 = (slice + 1) * DELTA_S;
+
+        v0 = Vertex(glm::vec3(x1, y1, +Z_OFFSET), // position
+                    norm1, // normal
+                    glm::vec2(s1, 1.0f));      // texture coordinates
+        v1 = Vertex(glm::vec3(x1, y1, -Z_OFFSET), // position
+        			norm1, // normal
+                    glm::vec2(s1, 0.0f));      // texture coordinates
+        v2 = Vertex(glm::vec3(x2, y2, -Z_OFFSET), // position
+        			norm2, // normal
+                    glm::vec2(s2, 0.0f));      // texture coordinates
+        v3 = Vertex(glm::vec3(x2, y2, +Z_OFFSET), // position
+        			norm2, // normal
+                    glm::vec2(s2, 1.0f));      // texture coordinates
+        addTriangulatedQuad(v0, v1, v2, v3,
+        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+        tex_s += DELTA_S;
+    }
 }
 
 

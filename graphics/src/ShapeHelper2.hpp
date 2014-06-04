@@ -42,9 +42,15 @@ class ShapeHelper2
 
 			bool operator==(const Vertex& rhs) const
 			{
-				if (position_[0] != rhs.position_[0] || position_[1] != rhs.position_[1] || position_[2] != rhs.position_[2]
-					|| normal_[0] != rhs.normal_[0] || normal_[1] != rhs.normal_[1] || normal_[2] != rhs.normal_[2]
-					|| tex_coords_[0] != rhs.tex_coords_[0] || tex_coords_[1] != rhs.tex_coords_[1])
+				const JU::f32 EPSILON = 0.0001;
+				if (   abs(position_[0] - rhs.position_[0]) > EPSILON
+				    || abs(position_[1] - rhs.position_[1]) > EPSILON
+				    || abs(position_[2] - rhs.position_[2]) > EPSILON
+					|| abs(normal_[0] - rhs.normal_[0]) > EPSILON
+					|| abs(normal_[1] - rhs.normal_[1]) > EPSILON
+					|| abs(normal_[2] - rhs.normal_[2]) > EPSILON
+					|| abs(tex_coords_[0] - rhs.tex_coords_[0]) > EPSILON
+					|| abs(tex_coords_[1] - rhs.tex_coords_[1]) > EPSILON)
 					return false;
 
 				return true;

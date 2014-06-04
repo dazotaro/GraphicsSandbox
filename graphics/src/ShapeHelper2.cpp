@@ -46,7 +46,7 @@ typedef VertexHashMap::const_iterator VertexHashMapConstIter;
 *
 * @return The Mesh
 */
-inline JU::uint32 processVertex(const ShapeHelper2::Vertex& vertex,
+inline void processVertex(const ShapeHelper2::Vertex& vertex,
                                 VertexHashMap& hpVertexIndices,
                                 ShapeHelper2::VertexVector& vVertices,
                                 ShapeHelper2::IndexVector& vIndices)
@@ -64,6 +64,64 @@ inline JU::uint32 processVertex(const ShapeHelper2::Vertex& vertex,
         vertex_index = vtx_iter->second;
 
     vIndices.push_back(vertex_index);
+}
+
+
+
+/**
+* @brief Helper function
+*
+* Helper function to aid the buildShape functions in inserting a triangle
+*
+* @oaram v0                 Vertex of quad
+* @oaram v1                 Vertex of quad
+* @oaram v2                 Vertex of quad
+* @oaram v3                 Vertex of quad
+* @oaram hpVertexIndices    A hash map with all the vertex indices per vertex-key
+* @param vVertices          A vector with all the vertices
+* @param vIndices           A vector with all the indices to the vertices
+*
+* @return The Mesh
+*/
+inline void addTriangle(const ShapeHelper2::Vertex& v0,
+                        const ShapeHelper2::Vertex& v1,
+                        const ShapeHelper2::Vertex& v2,
+                        VertexHashMap& hpVertexIndices,
+                        ShapeHelper2::VertexVector& vVertices,
+                        ShapeHelper2::IndexVector& vIndices)
+{
+    processVertex(v0, hpVertexIndices, vVertices, vIndices);
+    processVertex(v1, hpVertexIndices, vVertices, vIndices);
+    processVertex(v2, hpVertexIndices, vVertices, vIndices);
+}
+
+
+
+/**
+* @brief Helper function
+*
+* Helper function to aid the buildShape functions in inserting a quad
+*
+* @oaram v0                 Vertex of quad
+* @oaram v1                 Vertex of quad
+* @oaram v2                 Vertex of quad
+* @oaram v3                 Vertex of quad
+* @oaram hpVertexIndices    A hash map with all the vertex indices per vertex-key
+* @param vVertices          A vector with all the vertices
+* @param vIndices           A vector with all the indices to the vertices
+*
+* @return The Mesh
+*/
+inline void addTriangulatedQuad(const ShapeHelper2::Vertex& v0,
+                                const ShapeHelper2::Vertex& v1,
+                                const ShapeHelper2::Vertex& v2,
+                                const ShapeHelper2::Vertex& v3,
+                                VertexHashMap& hpVertexIndices,
+                                ShapeHelper2::VertexVector& vVertices,
+                                ShapeHelper2::IndexVector& vIndices)
+{
+    addTriangle(v0, v1, v2, hpVertexIndices, vVertices, vIndices);
+    addTriangle(v0, v2, v3, hpVertexIndices, vVertices, vIndices);
 }
 
 
@@ -162,45 +220,20 @@ void ShapeHelper2::buildPlane(std::string&  name,
     VertexHashMap hpVertexIndices(8, vertexHash);		// Hash map to keep track of uniqueness of vertices and their indices
     VertexHashMapConstIter vtx_iter;
 
-    // Triangle 0
-    // ----------
-    // V0
-    Vertex v0(-0.5f, 0.5f, 0.0f, // position
-    		   1.0f, 0.0f, 0.0f, // normal
-    		   0.0f, 1.0f);		 // texture coordinates
-    processVertex(v0, hpVertexIndices, vVertices, vIndices);
-
-    // V1
+    Vertex v0(-0.5f,  0.5f, 0.0f, // position
+               0.0f,  0.0f, 1.0f, // normal
+               0.0f,  1.0f);      // texture coordinates
     Vertex v1(-0.5f, -0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   0.0f,  0.0f);	  // texture coordinates
-    processVertex(v1, hpVertexIndices, vVertices, vIndices);
-
-    // V2
+               0.0f,  0.0f, 1.0f, // normal
+               0.0f,  0.0f);      // texture coordinates
     Vertex v2( 0.5f, -0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   1.0f,  0.0f);	  // texture coordinates
-    processVertex(v2, hpVertexIndices, vVertices, vIndices);
+               1.0f,  0.0f, 1.0f, // normal
+               1.0f,  0.0f);      // texture coordinates
+    Vertex v3( 0.5f,  0.5f, 0.0f, // position
+               0.0f,  0.0f, 1.0f, // normal
+               1.0f,  1.0f);      // texture coordinates
 
-    // Triangle 1
-    // ----------
-    // V0
-    Vertex v3(-0.5f, 0.5f, 0.0f, // position
-    		   1.0f, 0.0f, 0.0f, // normal
-    		   0.0f, 1.0f);		 // texture coordinates
-    processVertex(v3, hpVertexIndices, vVertices, vIndices);
-
-    // V1
-    Vertex v4( 0.5f, -0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   1.0f,  0.0f);	  // texture coordinates
-    processVertex(v4, hpVertexIndices, vVertices, vIndices);
-
-    // V2
-    Vertex v5( 0.5f,  0.5f, 0.0f, // position
-    		   1.0f,  0.0f, 0.0f, // normal
-    		   1.0f,  1.0f);	  // texture coordinates
-    processVertex(v5, hpVertexIndices, vVertices, vIndices);
+    addTriangulatedQuad(v0, v1, v2, v3, hpVertexIndices, vVertices, vIndices);
 }
 
 
@@ -218,7 +251,6 @@ void ShapeHelper2::buildCube(std::string&  name,
     Vertex vertex;                      // Vertex data
     VertexHashMap hpVertexIndices(8, vertexHash);       // Hash map to keep track of uniqueness of vertices and their indices
     VertexHashMapConstIter vtx_iter;
-
 
 }
 

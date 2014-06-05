@@ -562,7 +562,91 @@ void ShapeHelper2::buildCone(std::string&  					name,
 							 Mesh2::VectorTriangleIndices& 	vTriangleIndices,
 	   	   	   	 	 	 	 unsigned int  					num_slices)
 {
+    // CONSTANTS
+    const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
+    const float Z_OFFSET (0.5f);                        // Distance from the ORIGIN to the top (or bottom)
+    const float RADIUS   (0.5f);                        // RADIUS of the cylinder
+    const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
+    const float DELTA_S(1.0F / num_slices);             // Increment of the s texture coordinate from slice to slice
 
+    name = "Cone_" + num_slices;
+
+    vPositions.clear();
+    vNormals.clear();
+    vTexCoords.clear();
+    vVertexIndices.clear();
+
+    Vertex vertex;                      // Vertex data
+    MapVec3 hpPositions (vec3Compare);
+    MapVec3 hpNormals   (vec3Compare);
+    MapVec2 hpTexCoords (vec2Compare);
+    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);       // Hash map to keep track of uniqueness of vertices and their indices
+
+    Vertex v0, v1, v2, v3;
+
+    // BOTTOM DISK
+    const glm::vec3 center_bottom (0.0f, 0.0f, -Z_OFFSET);
+    const glm::vec3 bottom_normal (0.0f, 0.0f, -1.0f);
+    float theta = 0.0f;
+    for (unsigned int slice = 0; slice < num_slices; slice++)
+    {
+        JU::f32 x1 = RADIUS * cos(theta);               JU::f32 y1 = RADIUS * sin(theta);
+        JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
+        glm::vec3 pos1 (x1, y1, -Z_OFFSET);
+        glm::vec3 pos2 (x2, y2, -Z_OFFSET);
+
+        v0 = Vertex(center_bottom, // position
+                    bottom_normal, // normal
+                    glm::vec2(0.0f, 0.0f));      // texture coordinates
+        v1 = Vertex(pos2, // position
+                    bottom_normal, // normal
+                    glm::vec2(x2, y2));      // texture coordinates
+        v2 = Vertex(pos1, // position
+                    bottom_normal, // normal
+                    glm::vec2(x1, y1));      // texture coordinates
+        addTriangle(v0, v1, v2,
+                    hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+                    vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+    }
+
+    // SIDE OF THE CONE
+    const glm::vec3 appex_position (0.0f, 0.0f, +Z_OFFSET);
+    theta = 0.0f;
+    float tex_s = 0.0f;
+    for (unsigned int slice = 0; slice < num_slices; slice++)
+    {
+        JU::f32 x1 = RADIUS * cos(theta);               JU::f32 y1 = RADIUS * sin(theta);
+        JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
+        glm::vec3 pos1 (x1, y1, -Z_OFFSET);
+        glm::vec3 pos2 (x2, y2, -Z_OFFSET);
+        glm::vec3 norm1 (glm::normalize(pos1 - center_bottom));
+        norm1[2] = 0.5f;
+        norm1 = glm::normalize(norm1);
+        glm::vec3 norm2 (glm::normalize(pos2 - center_bottom));
+        norm2[2] = 0.5f;
+        norm2 = glm::normalize(norm2);
+        glm::vec3 appex_norm = glm::normalize(0.5f * (norm1 + norm2));
+        JU::f32 s1 = slice * DELTA_S;
+        JU::f32 s2 = (slice + 1) * DELTA_S;
+
+        v0 = Vertex(appex_position, // position
+                    appex_norm, // normal
+                    glm::vec2((s1 + s2) * 0.5f, 1.0f));      // texture coordinates
+        v1 = Vertex(pos1, // position
+                    norm1, // normal
+                    glm::vec2(s1, 0.0f));      // texture coordinates
+        v2 = Vertex(pos2, // position
+                    norm2, // normal
+                    glm::vec2(s2, 0.0f));      // texture coordinates
+        addTriangle(v0, v1, v2,
+                    hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+                    vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+        tex_s += DELTA_S;
+    }
 }
 
 

@@ -11,59 +11,51 @@
 
 // Global includes
 #include <unordered_map>    // std::unordered_map
+#include <map>              // std::map
 #include <functional>       // std::function
 
 
-// Custom hash function
-size_t vec2Hash(const glm::vec2& vec)
+bool vec3Compare(const glm::vec3& a, const glm::vec3& b)
 {
-    return (std::hash<float>()(vec[0]) ^ std::hash<float>()(vec[1]));
+	const JU::f32 EPSILON = 0.00001f;
+
+	if (fabsf(a[0] - b[0]) > EPSILON)
+		return a[0] < b[0];
+
+    if (fabsf(a[1] - b[1]) > EPSILON)
+        return a[1] < b[1];
+
+    if (fabsf(a[2] - b[2]) > EPSILON)
+        return a[2] < b[2];
+
+	return false;
 }
 
-// Custom hash function
-size_t vec3Hash(const glm::vec3& vec)
+bool vec2Compare(const glm::vec2& a, const glm::vec2& b)
 {
-    return (std::hash<float>()(vec[0]) ^ std::hash<float>()(vec[1]) ^ std::hash<float>()(vec[2]));
+    const JU::f32 EPSILON = 0.00001f;
+
+    if (fabsf(a[0] - b[0]) > EPSILON)
+        return a[0] < b[0];
+
+    if (fabsf(a[1] - b[1]) > EPSILON)
+        return a[1] < b[1];
+
+    return false;
 }
 
 // Custom hash function
 size_t vertexIndicesHash(const Mesh2::VertexIndices& vertex)
 {
     return (  std::hash<JU::uint32>()(vertex.position_)
-    		^ std::hash<JU::uint32>()(vertex.normal_)
-    		^ std::hash<JU::uint32>()(vertex.tex_));
+            ^ std::hash<JU::uint32>()(vertex.normal_)
+            ^ std::hash<JU::uint32>()(vertex.tex_));
 }
-
-bool vec3Equal(const glm::vec3& a, const glm::vec3& b)
-{
-	const JU::f32 EPSILON = 0.00001f;
-	bool result = true;
-
-	if (fabsf(a[0] - b[0]) > EPSILON || fabsf(a[1] - b[1]) > EPSILON || fabsf(a[2] - b[2]) > EPSILON)
-		result = false;
-
-	if (a[0] > 0 && b[0] > 0 && a[2] > 0 && b[2] > 0)
-		std::printf("%f %f %f -- %f %f %f = %s\n", a[0], a[1], a[2], b[0], b[1], b[2], result ? "TRUE" : "FALSE");
-
-
-	return true;
-}
-
-bool vec2Equal(const glm::vec2& a, const glm::vec2& b)
-{
-	const JU::f32 EPSILON = 0.00001f;
-
-	if (fabsf(a[0] - b[0]) > EPSILON || fabsf(a[1] - b[1]) > EPSILON)
-		return false;
-
-	return true;
-}
-
 // TYPEDEFS
-typedef std::unordered_map<glm::vec3, int, std::function<decltype(vec3Hash)>, std::function<decltype(vec3Equal)> > HashMapVec3;
-typedef HashMapVec3::const_iterator HashMapVec3ConstIter;
-typedef std::unordered_map<glm::vec2, int, std::function<decltype(vec2Hash)>, std::function<decltype(vec2Equal)> > HashMapVec2;
-typedef HashMapVec2::const_iterator HashMapVec2ConstIter;
+typedef std::map<glm::vec3, int, std::function<decltype(vec3Compare)> > MapVec3;
+typedef MapVec3::const_iterator MapVec3ConstIter;
+typedef std::map<glm::vec2, int, std::function<decltype(vec2Compare)> > MapVec2;
+typedef MapVec2::const_iterator MapVec2ConstIter;
 typedef std::unordered_map<Mesh2::VertexIndices, int, std::function<decltype(vertexIndicesHash)> > HashMapVertexIndices;
 typedef HashMapVertexIndices::const_iterator HashMapVertexIndicesConstIter;
 
@@ -87,9 +79,9 @@ typedef HashMapVertexIndices::const_iterator HashMapVertexIndicesConstIter;
 * @return The index to retrieve this vector from the vector of vertex indices (vVertexIndices)
 */
 inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
-						  	  	  	  	HashMapVec3& hpPositions,
-						  	  	  	  	HashMapVec3& hpNormals,
-						  	  	  	  	HashMapVec2& hpTexCoords,
+						  	  	  	  	MapVec3& hpPositions,
+						  	  	  	  	MapVec3& hpNormals,
+						  	  	  	  	MapVec2& hpTexCoords,
 						  	  	  	  	HashMapVertexIndices& hpVertexIndices,
 						  	  	  	  	Mesh2::VectorPositions& vPositions,
 						  	  	  	  	Mesh2::VectorNormals& vNormals,
@@ -101,7 +93,7 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
     // POSITION
     //---------
     JU::uint32 pos_index;
-    HashMapVec3ConstIter pos_iter = hpPositions.find(vertex.position_);
+    MapVec3ConstIter pos_iter = hpPositions.find(vertex.position_);
     if (pos_iter == hpPositions.end())
     {
     	hpPositions[vertex.position_] = pos_index = vPositions.size();
@@ -113,7 +105,7 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
     // NORMAL
     //---------
     JU::uint32 normal_index;
-    HashMapVec3ConstIter normal_iter = hpNormals.find(vertex.normal_);
+    MapVec3ConstIter normal_iter = hpNormals.find(vertex.normal_);
     if (normal_iter == hpNormals.end())
     {
     	hpNormals[vertex.normal_] = normal_index = vNormals.size();
@@ -125,7 +117,7 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
     // TEXTURE COORDINATE
     //---------
     JU::uint32 tex_index;
-    HashMapVec2ConstIter tex_iter = hpTexCoords.find(vertex.tex_coords_);
+    MapVec2ConstIter tex_iter = hpTexCoords.find(vertex.tex_coords_);
     if (tex_iter == hpTexCoords.end())
     {
     	hpTexCoords[vertex.tex_coords_] = tex_index = vTexCoords.size();
@@ -169,9 +161,9 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
 inline void addTriangle(const ShapeHelper2::Vertex& 	v0,
                         const ShapeHelper2::Vertex& 	v1,
                         const ShapeHelper2::Vertex& 	v2,
-                        HashMapVec3& 					hpPositions,
-						HashMapVec3& 					hpNormals,
-						HashMapVec2& 					hpTexCoords,
+                        MapVec3& 					    hpPositions,
+						MapVec3& 					    hpNormals,
+						MapVec2& 					    hpTexCoords,
 						HashMapVertexIndices& 			hpVertexIndices,
 						Mesh2::VectorPositions& 		vPositions,
 						Mesh2::VectorNormals& 			vNormals,
@@ -207,9 +199,9 @@ inline void addTriangulatedQuad(const ShapeHelper2::Vertex& v0,
                                 const ShapeHelper2::Vertex& v1,
                                 const ShapeHelper2::Vertex& v2,
                                 const ShapeHelper2::Vertex& v3,
-                                HashMapVec3& 				hpPositions,
-                                HashMapVec3& 				hpNormals,
-                                HashMapVec2& 				hpTexCoords,
+                                MapVec3& 				    hpPositions,
+                                MapVec3& 				    hpNormals,
+                                MapVec2& 				    hpTexCoords,
                                 HashMapVertexIndices& 		hpVertexIndices,
                                 Mesh2::VectorPositions& 	vPositions,
                                 Mesh2::VectorNormals& 		vNormals,
@@ -289,9 +281,9 @@ void ShapeHelper2::buildPlane(std::string&  				name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    HashMapVec3 hpPositions	(8, vec3Hash, vec3Equal);
-    HashMapVec3 hpNormals  	(8, vec3Hash, vec3Equal);
-    HashMapVec2 hpTexCoords (8, vec2Hash, vec2Equal);
+    MapVec3 hpPositions	(vec3Compare);
+    MapVec3 hpNormals  	(vec3Compare);
+    MapVec2 hpTexCoords (vec2Compare);
     HashMapVertexIndices hpVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0(-0.5f,  0.5f, 0.0f, // position
@@ -329,9 +321,9 @@ void ShapeHelper2::buildCube(std::string&  					name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    HashMapVec3 hpPositions	(30, vec3Hash, vec3Equal);
-    HashMapVec3 hpNormals  	(30, vec3Hash, vec3Equal);
-    HashMapVec2 hpTexCoords (30, vec2Hash, vec2Equal);
+    MapVec3 hpPositions	(vec3Compare);
+    MapVec3 hpNormals  	(vec3Compare);
+    MapVec2 hpTexCoords (vec2Compare);
     HashMapVertexIndices hpVertexIndices(30, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
@@ -464,9 +456,9 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    HashMapVec3 hpPositions	(10 * num_slices, vec3Hash, vec3Equal);
-    HashMapVec3 hpNormals  	(10 * num_slices, vec3Hash, vec3Equal);
-    HashMapVec2 hpTexCoords (10 * num_slices, vec2Hash, vec2Equal);
+    MapVec3 hpPositions	(vec3Compare);
+    MapVec3 hpNormals  	(vec3Compare);
+    MapVec2 hpTexCoords (vec2Compare);
     HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;

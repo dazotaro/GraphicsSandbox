@@ -20,7 +20,7 @@ class Mesh2
 {
 	public:
 
-		typedef JU::uint32 VertexIndex;
+		typedef JU::uint16 VertexIndex;
 
 		struct VertexIndices
 		{

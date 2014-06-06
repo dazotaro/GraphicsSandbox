@@ -14,7 +14,7 @@
 #include "CameraInterface.hpp"      // camera_Interface
 #include "CameraFirstPerson.hpp"    // CameraFirstPerson
 #include "CameraThirdPerson.hpp"    // CameraThirdPerson
-#include "ShapeHelper.hpp"          // build Mesh helper funtions
+#include "ShapeHelper2.hpp"          // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
 
 
@@ -67,7 +67,9 @@ void GLSceneLighting::init(void)
     // SPHERE
     // ------
     // Create Mesh
-    gl_sphere_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE, 64, 32));
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
+    gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
@@ -84,7 +86,8 @@ void GLSceneLighting::init(void)
     // PLANE
     // ------
     // Create Mesh
-    gl_plane_ = new GLMesh(Graphics::buildMesh(Graphics::PLANE));
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    gl_plane_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)

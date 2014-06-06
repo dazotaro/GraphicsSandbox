@@ -1,5 +1,5 @@
 /*
- * GLMesh2.hpp
+ * GLMesh.hpp
  *
  *  Created on: May 7, 2013
  *      Author: jusabiaga
@@ -17,22 +17,22 @@
  * @details    This should be a 'Flyweight' pattern, so models only exist once. It needs to:
  *              + Load the Mesh2 into GL's VBOs (Vertex Buffer Object) and VAO (Vertex Array Object)
  *              + It needs to draw the Mesh2 in OpenGL
- *              There should only be a GLMesh2 per Mesh2 object; if we want to have two instances of the same model,
- *              this is accomplish by creating to GLMesh2Instance objects, both sharing the same GLMesh2 under the hood.
+ *              There should only be a GLMesh per Mesh2 object; if we want to have two instances of the same model,
+ *              this is accomplish by creating to GLMeshInstance objects, both sharing the same GLMesh under the hood.
  *
  * \todo Turn into 'flyweight'
  */
-class GLMesh2 : public Mesh2
+class GLMesh : public Mesh2
 {
     public:
-        explicit GLMesh2(const Mesh2 &mesh);
-        GLMesh2(const std::string&				name,
+        explicit GLMesh(const Mesh2 &mesh);
+        GLMesh(const std::string&				name,
         		const VectorPositions&			vPositions,
         		const VectorNormals&			vNormals,
         		const VectorTexCoords&			vTexCoords,
         		const VectorVertexIndices&		vVertexIndices,
         		const VectorTriangleIndices& 	vTriangleIndices);
-        virtual ~GLMesh2();
+        virtual ~GLMesh();
 
         virtual void draw(void) const;
         bool init(void);

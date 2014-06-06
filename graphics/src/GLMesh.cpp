@@ -1,11 +1,11 @@
 /*
- * GLMesh2.cpp
+ * GLMesh.cpp
  *
  *  Created on: May 7, 2013
  *      Author: jusabiaga
  */
 
-#include "GLMesh2.hpp"
+#include "GLMesh.hpp"
 #include <iostream>     // std::cout, std::endl
 #include "DebugGlm.hpp" // overloaded 'operator<<' for GLM classes
 /**
@@ -13,7 +13,7 @@
 *
 * @param mesh Mesh2 object containing the data for this object
 */
-GLMesh2::GLMesh2(const Mesh2 &mesh) : Mesh2(mesh)
+GLMesh::GLMesh(const Mesh2 &mesh) : Mesh2(mesh)
 {
     vao_handle_  = 0;
     vbo_handles_ = 0;	// NULL
@@ -29,7 +29,7 @@ GLMesh2::GLMesh2(const Mesh2 &mesh) : Mesh2(mesh)
 * @param tex_coords Vector with all vertex colors
 * @param faces Vector with all info about the faces of the Mesh2
 */
-GLMesh2::GLMesh2(const std::string&				name,
+GLMesh::GLMesh(const std::string&				name,
 				 const VectorPositions&			vPositions,
 				 const VectorNormals&			vNormals,
 				 const VectorTexCoords&			vTexCoords,
@@ -43,7 +43,7 @@ GLMesh2::GLMesh2(const std::string&				name,
 /**
 * @brief Destructor
 */
-GLMesh2::~GLMesh2()
+GLMesh::~GLMesh()
 {
 	// Delete the buffers
     glDeleteBuffers(4, vbo_handles_);
@@ -63,7 +63,7 @@ GLMesh2::~GLMesh2()
 * \todo Avoid duplicity of data by not duplicating vertices
 * \todo Warning, this assumes each face is a triangle
 */
-bool GLMesh2::init(void)
+bool GLMesh::init(void)
 {
     return initVBOs();
 }
@@ -79,7 +79,7 @@ bool GLMesh2::init(void)
 * \todo Avoid duplicity of data by not duplicating vertices
 * \todo Warning, this assumes each face is a triangle
 */
-bool GLMesh2::initVBOs(void)
+bool GLMesh::initVBOs(void)
 {
 	// Attribute data sizes
 	const JU::uint8 POSITION_VECTOR_SIZE = 3;
@@ -104,16 +104,16 @@ bool GLMesh2::initVBOs(void)
     //
     for (JU::uint32 index = 0; index < num_vertices; ++index)
     {
-		aPositions[index * POSITION_VECTOR_SIZE + 0] = vPositions[index].x;
-		aPositions[index * POSITION_VECTOR_SIZE + 1] = vPositions[index].y;
-		aPositions[index * POSITION_VECTOR_SIZE + 2] = vPositions[index].z;
+		aPositions[index * POSITION_VECTOR_SIZE + 0] = vPositions[vVertexIndices[index].position_].x;
+		aPositions[index * POSITION_VECTOR_SIZE + 1] = vPositions[vVertexIndices[index].position_].y;
+		aPositions[index * POSITION_VECTOR_SIZE + 2] = vPositions[vVertexIndices[index].position_].z;
 
-		aNormals[index * NORMAL_VECTOR_SIZE + 0] = vNormals[index].x;
-		aNormals[index * NORMAL_VECTOR_SIZE + 1] = vNormals[index].y;
-		aNormals[index * NORMAL_VECTOR_SIZE + 2] = vNormals[index].z;
+		aNormals[index * NORMAL_VECTOR_SIZE + 0] = vNormals[vVertexIndices[index].normal_].x;
+		aNormals[index * NORMAL_VECTOR_SIZE + 1] = vNormals[vVertexIndices[index].normal_].y;
+		aNormals[index * NORMAL_VECTOR_SIZE + 2] = vNormals[vVertexIndices[index].normal_].z;
 
-		aTexCoords[index * TEX_VECTOR_SIZE + 0] = vTexCoords[index].s;
-		aTexCoords[index * TEX_VECTOR_SIZE + 1] = vTexCoords[index].t;
+		aTexCoords[index * TEX_VECTOR_SIZE + 0] = vTexCoords[vVertexIndices[index].tex_].s;
+		aTexCoords[index * TEX_VECTOR_SIZE + 1] = vTexCoords[vVertexIndices[index].tex_].t;
     }
 
     // Create and bind VAO
@@ -126,25 +126,25 @@ bool GLMesh2::initVBOs(void)
 
     // Position VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[0]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertices * POSITION_VECTOR_SIZE * sizeof(aPositions[0]), &aPositions[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(aPositions), aPositions, GL_STATIC_DRAW);
     glVertexAttribPointer(0, POSITION_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(0);   // Vertex positions
 
     // Texture Coordinates VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[1]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertices * TEX_VECTOR_SIZE * sizeof(aTexCoords[0]), &aTexCoords[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(aTexCoords), aTexCoords, GL_STATIC_DRAW);
     glVertexAttribPointer(1, TEX_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(1);   // Vertex texture coordinates
 
     // Normal VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[2]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertices * NORMAL_VECTOR_SIZE * sizeof(aNormals[0]), &aNormals[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(aNormals), aNormals, GL_STATIC_DRAW);
     glVertexAttribPointer(2, NORMAL_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(2);   // Vertex normals
 
     // Load the INDICES
     JU::uint32 num_triangles = vTriangleIndices.size();
-    JU::uint16 aIndices = new JU::uint32[num_triangles * 3];
+    JU::uint16* aIndices = new JU::uint16[num_triangles * 3];
 
     for (JU::uint32 triangle = 0; triangle < num_triangles; ++triangle)
     {
@@ -172,7 +172,7 @@ bool GLMesh2::initVBOs(void)
 /**
 * @brief    Draw using OpenGL API
 *
-* @detail   + Bind the VAO for this GLMesh2.
+* @detail   + Bind the VAO for this GLMesh.
 *           + Draw.
 *           + Unbind
 *
@@ -180,12 +180,13 @@ bool GLMesh2::initVBOs(void)
 * @param    view View matrix
 * @param    projection Projection matrix
 */
-void GLMesh2::draw(void) const
+void GLMesh::draw(void) const
 {
 	const VectorTriangleIndices& vTriangleIndices = getTriangleIndices();
 
     glBindVertexArray(vao_handle_);
-    glDrawElements(GL_TRIANGLES, 0, 3 * vTriangleIndices.size(), GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles_[3]);
+    glDrawElements(GL_TRIANGLES, 3 * vTriangleIndices.size(), GL_UNSIGNED_SHORT, 0);
     //glDrawArrays(GL_LINE_LOOP, 0, 3 * faces.size());
 }
 

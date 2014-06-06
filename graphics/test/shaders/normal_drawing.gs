@@ -41,6 +41,7 @@ void main()
         EndPrimitive();
     }
     
+    /*
     // Draw the Wireframe
     gl_Position = position[0];
     Color = vertex[0].color;
@@ -71,5 +72,5 @@ void main()
     EmitVertex();
     
     EndPrimitive();
-
+    */
 }

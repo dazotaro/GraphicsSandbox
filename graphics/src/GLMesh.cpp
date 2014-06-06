@@ -114,6 +114,17 @@ bool GLMesh::initVBOs(void)
 
 		aTexCoords[index * TEX_VECTOR_SIZE + 0] = vTexCoords[vVertexIndices[index].tex_].s;
 		aTexCoords[index * TEX_VECTOR_SIZE + 1] = vTexCoords[vVertexIndices[index].tex_].t;
+
+		std::printf("Vertex %.2i - Position: (%f, %f, %f) - Normal: (%f, %f, %f) - Tex: (%f, %f)\n",
+						index,
+						aPositions[index * POSITION_VECTOR_SIZE + 0],
+						aPositions[index * POSITION_VECTOR_SIZE + 1],
+						aPositions[index * POSITION_VECTOR_SIZE + 2],
+						aNormals[index * NORMAL_VECTOR_SIZE + 0],
+						aNormals[index * NORMAL_VECTOR_SIZE + 1],
+						aNormals[index * NORMAL_VECTOR_SIZE + 2],
+						aTexCoords[index * TEX_VECTOR_SIZE + 0],
+						aTexCoords[index * TEX_VECTOR_SIZE + 1]);
     }
 
     // Create and bind VAO
@@ -126,19 +137,19 @@ bool GLMesh::initVBOs(void)
 
     // Position VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(aPositions), aPositions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * POSITION_VECTOR_SIZE * sizeof(aPositions[0]), aPositions, GL_STATIC_DRAW);
     glVertexAttribPointer(0, POSITION_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(0);   // Vertex positions
 
     // Texture Coordinates VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(aTexCoords), aTexCoords, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * TEX_VECTOR_SIZE * sizeof(aTexCoords[0]), aTexCoords, GL_STATIC_DRAW);
     glVertexAttribPointer(1, TEX_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(1);   // Vertex texture coordinates
 
     // Normal VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(aNormals), aNormals, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * NORMAL_VECTOR_SIZE * sizeof(aNormals[0]), aNormals, GL_STATIC_DRAW);
     glVertexAttribPointer(2, NORMAL_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(2);   // Vertex normals
 
@@ -151,12 +162,17 @@ bool GLMesh::initVBOs(void)
     	aIndices[triangle * 3 + 0] = vTriangleIndices[triangle].v0_;
     	aIndices[triangle * 3 + 1] = vTriangleIndices[triangle].v1_;
     	aIndices[triangle * 3 + 2] = vTriangleIndices[triangle].v2_;
+
+		std::printf("Triangle %.2i - (%.2i, %.2i, %.2i)\n",
+						triangle,
+						aIndices[triangle * 3 + 0],
+						aIndices[triangle * 3 + 1],
+						aIndices[triangle * 3 + 2]);
     }
 
     // Allocate and initialize VBO for vertex indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles_[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(aIndices), aIndices, GL_STATIC_DRAW);
-
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_triangles * 3 * sizeof(aIndices[0]), aIndices, GL_STATIC_DRAW);
 
     // Clean up
     delete [] aPositions;
@@ -187,6 +203,5 @@ void GLMesh::draw(void) const
     glBindVertexArray(vao_handle_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles_[3]);
     glDrawElements(GL_TRIANGLES, 3 * vTriangleIndices.size(), GL_UNSIGNED_SHORT, 0);
-    //glDrawArrays(GL_LINE_LOOP, 0, 3 * faces.size());
 }
 

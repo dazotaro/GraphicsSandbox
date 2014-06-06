@@ -128,9 +128,9 @@ void testObject3D(void)
 int main(void)
 {
     // Test
-    //testPlane();
-    //testCube();
-    //testCylinder();
+    testPlane();
+    testCube();
+    testCylinder();
     testCone();
     testSphere();
     //testObject3D();

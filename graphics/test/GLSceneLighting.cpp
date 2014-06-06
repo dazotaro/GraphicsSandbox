@@ -49,6 +49,9 @@ void GLSceneLighting::init(void)
     glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
                                                                "shaders/normal_drawing.gs",
                                                                "shaders/simple.frag");
+    glsl_program_map_["wireframe"] = compileAndLinkShader("shaders/wireframe.vs",
+                                                               "shaders/wireframe.gs",
+                                                               "shaders/simple.frag");
 
     current_program_iter_ = glsl_program_map_.find("perfragment");
     
@@ -68,7 +71,7 @@ void GLSceneLighting::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 64, 32);
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
@@ -228,10 +231,12 @@ void GLSceneLighting::render(void)
     (current_program_iter_->second).setUniform("Kd", 0.2f, 0.2f, 0.2f);
     plane_node_->draw(current_program_iter_->second, M, V, P);
 
+    /*
     current_program_iter_ = glsl_program_map_.find("normal_drawing");
     current_program_iter_->second.use();
     sphere_node_->draw(current_program_iter_->second, M, V, P);
     plane_node_->draw(current_program_iter_->second, M, V, P);
+    */
 }
 
 

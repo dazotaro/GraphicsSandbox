@@ -1,19 +1,19 @@
 /*
- * GLMesh.cpp
+ * GLMesh2.cpp
  *
  *  Created on: May 7, 2013
  *      Author: jusabiaga
  */
 
-#include "GLMesh.hpp"
+#include "GLMesh2.hpp"
 #include <iostream>     // std::cout, std::endl
 #include "DebugGlm.hpp" // overloaded 'operator<<' for GLM classes
 /**
 * @brief Non-Default Constructor
 *
-* @param mesh Mesh object containing the data for this object
+* @param mesh Mesh2 object containing the data for this object
 */
-GLMesh::GLMesh(const Mesh &mesh) : Mesh(mesh)
+GLMesh2::GLMesh2(const Mesh2 &mesh) : Mesh2(mesh)
 {
     vao_handle_  = 0;
     vbo_handles_ = 0;	// NULL
@@ -22,21 +22,20 @@ GLMesh::GLMesh(const Mesh &mesh) : Mesh(mesh)
 /**
 * @brief Non-Default Constructor
 *
-* @param name Id of the Mesh
+* @param name Id of the Mesh2
 * @param positions Vector with all vertex positions
 * @param normals Vector with all vertex normals
 * @param colors Vector with all vertex colors
 * @param tex_coords Vector with all vertex colors
-* @param faces Vector with all info about the faces of the Mesh
+* @param faces Vector with all info about the faces of the Mesh2
 */
-GLMesh::GLMesh(const std::string  &name,
-               const PositionList &positions,
-               const NormalList   &normals,
-               const TangentList  &tangents,
-               const ColorList    &colors,
-               const TexCoordList &tex_coords,
-               const FaceList     &faces)
-		: Mesh(name, positions, normals, tangents, colors, tex_coords, faces), vao_handle_(0), vbo_handles_(0)
+GLMesh2::GLMesh2(const std::string&				name,
+				 const VectorPositions&			vPositions,
+				 const VectorNormals&			vNormals,
+				 const VectorTexCoords&			vTexCoords,
+				 const VectorVertexIndices&		vVertexIndices,
+				 const VectorTriangleIndices& 	vTriangleIndices)
+		: Mesh2(name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices), vao_handle_(0), vbo_handles_(0)
 {
     vao_handle_ = 0;
 }
@@ -44,10 +43,10 @@ GLMesh::GLMesh(const std::string  &name,
 /**
 * @brief Destructor
 */
-GLMesh::~GLMesh()
+GLMesh2::~GLMesh2()
 {
 	// Delete the buffers
-    glDeleteBuffers(5, vbo_handles_);
+    glDeleteBuffers(4, vbo_handles_);
     // Delete the vertex array
     glDeleteVertexArrays(1, &vao_handle_);
     // Release the handles
@@ -64,7 +63,7 @@ GLMesh::~GLMesh()
 * \todo Avoid duplicity of data by not duplicating vertices
 * \todo Warning, this assumes each face is a triangle
 */
-bool GLMesh::init(void)
+bool GLMesh2::init(void)
 {
     return initVBOs();
 }
@@ -80,97 +79,41 @@ bool GLMesh::init(void)
 * \todo Avoid duplicity of data by not duplicating vertices
 * \todo Warning, this assumes each face is a triangle
 */
-bool GLMesh::initVBOs(void)
+bool GLMesh2::initVBOs(void)
 {
-    // Retrieve the data from the Mesh object
-    const Mesh::FaceList     &faces      = getFaces();
-    const Mesh::PositionList &positions  = getPositions();
-    const Mesh::NormalList   &normals    = getNormals();
-    const Mesh::TangentList  &tangents   = getTangents();
-    const Mesh::ColorList    &colors     = getColors();
-    const Mesh::TexCoordList &tex_coords = getTexCoords();
+	// Attribute data sizes
+	const JU::uint8 POSITION_VECTOR_SIZE = 3;
+	const JU::uint8 NORMAL_VECTOR_SIZE 	 = 3;
+	const JU::uint8 TEX_VECTOR_SIZE      = 2;
 
-    const unsigned int num_faces = faces.size();
+    // Retrieve the data from the Mesh2 object
+	const std::string& 			 name			  = getName();
+	const VectorPositions& 		 vPositions		  = getPositions();
+	const VectorNormals& 		 vNormals		  = getNormals();
+	const VectorTexCoords& 		 vTexCoords		  = getTexCoords();
+	const VectorVertexIndices&   vVertexIndices   = getVertexIndices();
+	const VectorTriangleIndices& vTriangleIndices = getTriangleIndices();
 
-    // WARNING! Assuming that each face is a triangle, we have three vertices per face
-    const unsigned int num_vertex_data = 3 * num_faces;
+    // The size of the VBOs must be equal to the number of unique vertices
+	JU::uint32 num_vertices = vVertexIndices.size();
 
-    float *positions_per_vertex    = new float [num_vertex_data * Mesh::POSITION_VECTOR_SIZE];
-    float *normals_per_vertex      = new float [num_vertex_data * Mesh::NORMAL_VECTOR_SIZE];
-    float *tangents_per_vertex     = new float [num_vertex_data * Mesh::TANGENT_VECTOR_SIZE];
-    float *colors_per_vertex       = new float [num_vertex_data * Mesh::COLOR_VECTOR_SIZE];
-    float *tex_coords_per_vertex   = new float [num_vertex_data * Mesh::TEX_COORDS_VECTOR_SIZE];
+    float *aPositions	= new float [num_vertices * POSITION_VECTOR_SIZE];
+    float *aNormals     = new float [num_vertices * NORMAL_VECTOR_SIZE];
+    float *aTexCoords   = new float [num_vertices * TEX_VECTOR_SIZE];
 
     //
-    for (unsigned int index = 0; index < num_faces; ++index)
+    for (JU::uint32 index = 0; index < num_vertices; ++index)
     {
-        Mesh::IndexList index_list;
+		aPositions[index * POSITION_VECTOR_SIZE + 0] = vPositions[index].x;
+		aPositions[index * POSITION_VECTOR_SIZE + 1] = vPositions[index].y;
+		aPositions[index * POSITION_VECTOR_SIZE + 2] = vPositions[index].z;
 
-        // Offsets to the three vertices of the face
+		aNormals[index * NORMAL_VECTOR_SIZE + 0] = vNormals[index].x;
+		aNormals[index * NORMAL_VECTOR_SIZE + 1] = vNormals[index].y;
+		aNormals[index * NORMAL_VECTOR_SIZE + 2] = vNormals[index].z;
 
-        const unsigned int vertex_offset[3] = {(index*3) + 0, (index*3) + 1, (index*3) + 2};
-
-        // Filled the arrays
-        // Positions
-        faces[index].getIndices(Mesh::Face::VERTEX_INDEX, index_list);
-        assert(index_list.size() == 3);                                     // Is this a triangle?
-        positions_per_vertex[vertex_offset[0]*Mesh::POSITION_VECTOR_SIZE + 0] = positions[index_list[0]].x;
-        positions_per_vertex[vertex_offset[0]*Mesh::POSITION_VECTOR_SIZE + 1] = positions[index_list[0]].y;
-        positions_per_vertex[vertex_offset[0]*Mesh::POSITION_VECTOR_SIZE + 2] = positions[index_list[0]].z;
-        positions_per_vertex[vertex_offset[1]*Mesh::POSITION_VECTOR_SIZE + 0] = positions[index_list[1]].x;
-        positions_per_vertex[vertex_offset[1]*Mesh::POSITION_VECTOR_SIZE + 1] = positions[index_list[1]].y;
-        positions_per_vertex[vertex_offset[1]*Mesh::POSITION_VECTOR_SIZE + 2] = positions[index_list[1]].z;
-        positions_per_vertex[vertex_offset[2]*Mesh::POSITION_VECTOR_SIZE + 0] = positions[index_list[2]].x;
-        positions_per_vertex[vertex_offset[2]*Mesh::POSITION_VECTOR_SIZE + 1] = positions[index_list[2]].y;
-        positions_per_vertex[vertex_offset[2]*Mesh::POSITION_VECTOR_SIZE + 2] = positions[index_list[2]].z;
-
-        // Normals
-        normals_per_vertex[vertex_offset[0]*Mesh::NORMAL_VECTOR_SIZE + 0] = normals[index_list[0]].x;
-        normals_per_vertex[vertex_offset[0]*Mesh::NORMAL_VECTOR_SIZE + 1] = normals[index_list[0]].y;
-        normals_per_vertex[vertex_offset[0]*Mesh::NORMAL_VECTOR_SIZE + 2] = normals[index_list[0]].z;
-        normals_per_vertex[vertex_offset[1]*Mesh::NORMAL_VECTOR_SIZE + 0] = normals[index_list[1]].x;
-        normals_per_vertex[vertex_offset[1]*Mesh::NORMAL_VECTOR_SIZE + 1] = normals[index_list[1]].y;
-        normals_per_vertex[vertex_offset[1]*Mesh::NORMAL_VECTOR_SIZE + 2] = normals[index_list[1]].z;
-        normals_per_vertex[vertex_offset[2]*Mesh::NORMAL_VECTOR_SIZE + 0] = normals[index_list[2]].x;
-        normals_per_vertex[vertex_offset[2]*Mesh::NORMAL_VECTOR_SIZE + 1] = normals[index_list[2]].y;
-        normals_per_vertex[vertex_offset[2]*Mesh::NORMAL_VECTOR_SIZE + 2] = normals[index_list[2]].z;
-
-        // Normals
-        tangents_per_vertex[vertex_offset[0]*Mesh::TANGENT_VECTOR_SIZE + 0] = tangents[index_list[0]].x;
-        tangents_per_vertex[vertex_offset[0]*Mesh::TANGENT_VECTOR_SIZE + 1] = tangents[index_list[0]].y;
-        tangents_per_vertex[vertex_offset[0]*Mesh::TANGENT_VECTOR_SIZE + 2] = tangents[index_list[0]].z;
-        tangents_per_vertex[vertex_offset[1]*Mesh::TANGENT_VECTOR_SIZE + 0] = tangents[index_list[1]].x;
-        tangents_per_vertex[vertex_offset[1]*Mesh::TANGENT_VECTOR_SIZE + 1] = tangents[index_list[1]].y;
-        tangents_per_vertex[vertex_offset[1]*Mesh::TANGENT_VECTOR_SIZE + 2] = tangents[index_list[1]].z;
-        tangents_per_vertex[vertex_offset[2]*Mesh::TANGENT_VECTOR_SIZE + 0] = tangents[index_list[2]].x;
-        tangents_per_vertex[vertex_offset[2]*Mesh::TANGENT_VECTOR_SIZE + 1] = tangents[index_list[2]].y;
-        tangents_per_vertex[vertex_offset[2]*Mesh::TANGENT_VECTOR_SIZE + 2] = tangents[index_list[2]].z;
-
-        // Colors
-        faces[index].getIndices(Mesh::Face::COLOR_INDEX, index_list);
-        assert(index_list.size() == 3);                                     // Is this a triangle?
-        colors_per_vertex[vertex_offset[0]*Mesh::COLOR_VECTOR_SIZE + 0] = colors[index_list[0]].r;
-        colors_per_vertex[vertex_offset[0]*Mesh::COLOR_VECTOR_SIZE + 1] = colors[index_list[0]].g;
-        colors_per_vertex[vertex_offset[0]*Mesh::COLOR_VECTOR_SIZE + 2] = colors[index_list[0]].b;
-        colors_per_vertex[vertex_offset[0]*Mesh::COLOR_VECTOR_SIZE + 3] = colors[index_list[0]].a;
-        colors_per_vertex[vertex_offset[1]*Mesh::COLOR_VECTOR_SIZE + 0] = colors[index_list[1]].r;
-        colors_per_vertex[vertex_offset[1]*Mesh::COLOR_VECTOR_SIZE + 1] = colors[index_list[1]].g;
-        colors_per_vertex[vertex_offset[1]*Mesh::COLOR_VECTOR_SIZE + 2] = colors[index_list[1]].b;
-        colors_per_vertex[vertex_offset[1]*Mesh::COLOR_VECTOR_SIZE + 3] = colors[index_list[1]].a;
-        colors_per_vertex[vertex_offset[2]*Mesh::COLOR_VECTOR_SIZE + 0] = colors[index_list[2]].r;
-        colors_per_vertex[vertex_offset[2]*Mesh::COLOR_VECTOR_SIZE + 1] = colors[index_list[2]].g;
-        colors_per_vertex[vertex_offset[2]*Mesh::COLOR_VECTOR_SIZE + 2] = colors[index_list[2]].b;
-        colors_per_vertex[vertex_offset[2]*Mesh::COLOR_VECTOR_SIZE + 3] = colors[index_list[2]].a;
-
-        // Texture Coordinates
-        faces[index].getIndices(Mesh::Face::TEXTURE_INDEX, index_list);
-        assert(index_list.size() == 3);                                     // Is this a triangle?
-        tex_coords_per_vertex[vertex_offset[0]*Mesh::TEX_COORDS_VECTOR_SIZE + 0] = tex_coords[index_list[0]].s;
-        tex_coords_per_vertex[vertex_offset[0]*Mesh::TEX_COORDS_VECTOR_SIZE + 1] = tex_coords[index_list[0]].t;
-        tex_coords_per_vertex[vertex_offset[1]*Mesh::TEX_COORDS_VECTOR_SIZE + 0] = tex_coords[index_list[1]].s;
-        tex_coords_per_vertex[vertex_offset[1]*Mesh::TEX_COORDS_VECTOR_SIZE + 1] = tex_coords[index_list[1]].t;
-        tex_coords_per_vertex[vertex_offset[2]*Mesh::TEX_COORDS_VECTOR_SIZE + 0] = tex_coords[index_list[2]].s;
-        tex_coords_per_vertex[vertex_offset[2]*Mesh::TEX_COORDS_VECTOR_SIZE + 1] = tex_coords[index_list[2]].t;
+		aTexCoords[index * TEX_VECTOR_SIZE + 0] = vTexCoords[index].s;
+		aTexCoords[index * TEX_VECTOR_SIZE + 1] = vTexCoords[index].t;
     }
 
     // Create and bind VAO
@@ -178,45 +121,48 @@ bool GLMesh::initVBOs(void)
     glBindVertexArray(vao_handle_);
 
     // Create Buffers
-    vbo_handles_ = new GLuint[5];
-    glGenBuffers(5, vbo_handles_);
+    vbo_handles_ = new GLuint[4];
+    glGenBuffers(4, vbo_handles_);
 
     // Position VBO
     glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[0]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertex_data * Mesh::POSITION_VECTOR_SIZE * sizeof(positions_per_vertex[0]), &positions_per_vertex[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(0, Mesh::POSITION_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * POSITION_VECTOR_SIZE * sizeof(aPositions[0]), &aPositions[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(0, POSITION_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
     glEnableVertexAttribArray(0);   // Vertex positions
 
-    // Color VBO
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[1]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertex_data * Mesh::COLOR_VECTOR_SIZE * sizeof(colors_per_vertex[0]), &colors_per_vertex[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(1, Mesh::COLOR_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
-    glEnableVertexAttribArray(1);   // Vertex colors
-
     // Texture Coordinates VBO
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[2]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertex_data * Mesh::TEX_COORDS_VECTOR_SIZE * sizeof(tex_coords_per_vertex[0]), &tex_coords_per_vertex[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(2, Mesh::TEX_COORDS_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
-    glEnableVertexAttribArray(2);   // Vertex texture coordinates
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[1]);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * TEX_VECTOR_SIZE * sizeof(aTexCoords[0]), &aTexCoords[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(1, TEX_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
+    glEnableVertexAttribArray(1);   // Vertex texture coordinates
 
     // Normal VBO
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[3]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertex_data * Mesh::NORMAL_VECTOR_SIZE * sizeof(normals_per_vertex[0]), &normals_per_vertex[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(3, Mesh::NORMAL_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
-    glEnableVertexAttribArray(3);   // Vertex normals
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[2]);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices * NORMAL_VECTOR_SIZE * sizeof(aNormals[0]), &aNormals[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(2, NORMAL_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
+    glEnableVertexAttribArray(2);   // Vertex normals
 
-    // Tangent VBO
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[4]);
-    glBufferData(GL_ARRAY_BUFFER, num_vertex_data * Mesh::TANGENT_VECTOR_SIZE * sizeof(tangents_per_vertex[0]), &tangents_per_vertex[0], GL_STATIC_DRAW);
-    glVertexAttribPointer(4, Mesh::TANGENT_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
-    glEnableVertexAttribArray(4);   // Vertex tangents
+    // Load the INDICES
+    JU::uint32 num_triangles = vTriangleIndices.size();
+    JU::uint16 aIndices = new JU::uint32[num_triangles * 3];
+
+    for (JU::uint32 triangle = 0; triangle < num_triangles; ++triangle)
+    {
+    	aIndices[triangle * 3 + 0] = vTriangleIndices[triangle].v0_;
+    	aIndices[triangle * 3 + 1] = vTriangleIndices[triangle].v1_;
+    	aIndices[triangle * 3 + 2] = vTriangleIndices[triangle].v2_;
+    }
+
+    // Allocate and initialize VBO for vertex indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_handles_[3]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(aIndices), aIndices, GL_STATIC_DRAW);
+
 
     // Clean up
-    delete [] positions_per_vertex;
-    delete [] normals_per_vertex;
-    delete [] tangents_per_vertex;
-    delete [] colors_per_vertex;
-    delete [] tex_coords_per_vertex;
+    delete [] aPositions;
+    delete [] aNormals;
+    delete [] aTexCoords;
+    delete [] aIndices;
 
     return true;
 }
@@ -226,7 +172,7 @@ bool GLMesh::initVBOs(void)
 /**
 * @brief    Draw using OpenGL API
 *
-* @detail   + Bind the VAO for this GLMesh.
+* @detail   + Bind the VAO for this GLMesh2.
 *           + Draw.
 *           + Unbind
 *
@@ -234,12 +180,12 @@ bool GLMesh::initVBOs(void)
 * @param    view View matrix
 * @param    projection Projection matrix
 */
-void GLMesh::draw(void) const
+void GLMesh2::draw(void) const
 {
-    const Mesh::FaceList &faces = getFaces();
+	const VectorTriangleIndices& vTriangleIndices = getTriangleIndices();
 
     glBindVertexArray(vao_handle_);
-    glDrawArrays(GL_TRIANGLES, 0, 3 * faces.size());
+    glDrawElements(GL_TRIANGLES, 0, 3 * vTriangleIndices.size(), GL_UNSIGNED_SHORT, 0);
     //glDrawArrays(GL_LINE_LOOP, 0, 3 * faces.size());
 }
 

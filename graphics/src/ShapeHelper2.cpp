@@ -660,6 +660,153 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
 	   	   	   	 	 	 	   unsigned int  				 num_slices,
                                unsigned int  				 num_stacks)
 {
+    // CONSTANTS
+    const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
+    const float Z_OFFSET (0.5f);                        // Distance from the ORIGIN to the top (or bottom)
+    const float RADIUS   (0.5f);                        // RADIUS of the cylinder
+    const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
+    const float DELTA_PHI (M_PI / num_stacks);          // Angle increments for each stack
+    const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
+    const float DELTA_T(1.0F / num_stacks);				// Increment of the s texture coordinate from slice to slice
 
+    name = "sphere_" + num_slices + num_stacks;
+
+    vPositions.clear();
+    vNormals.clear();
+    vTexCoords.clear();
+    vVertexIndices.clear();
+
+    Vertex vertex;						// Vertex data
+    MapVec3 hpPositions	(vec3Compare);
+    MapVec3 hpNormals  	(vec3Compare);
+    MapVec2 hpTexCoords (vec2Compare);
+    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+
+    Vertex v0, v1, v2, v3;
+
+    // TOP DISK
+    const glm::vec3 center_top (0.0f, 0.0f, Z_OFFSET);
+    const glm::vec3 top_normal (0.0f, 0.0f, 1.0f);
+    float theta = 0.0f;
+    float phi = DELTA_PHI;
+    float sin_phi = sin(phi);
+    float z = RADIUS * cos(phi);
+    JU::f32 t = 1.0f - DELTA_T;
+    for (JU::uint16 slice = 0; slice < num_slices; slice++)
+    {
+    	JU::f32 x1 = RADIUS * cos(theta) * sin_phi; 				JU::f32 y1 = RADIUS * sin(theta) * sin_phi;
+    	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA) * sin_phi; 	JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA) * sin_phi;
+        glm::vec3 pos1 (x1, y1, z);
+        glm::vec3 pos2 (x2, y2, z);
+        glm::vec3 norm1 (pos1 - ORIGIN);
+        glm::vec3 norm2 (pos2 - ORIGIN);
+        JU::f32 s1 = slice * DELTA_S;
+        JU::f32 s2 = (slice + 1) * DELTA_S;
+
+
+        v0 = Vertex(center_top, // position
+                    top_normal, // normal
+                    glm::vec2(0.5f * (s1 + s2), 1.0f));      // texture coordinates
+        v1 = Vertex(pos1, // position
+                    norm1, // normal
+                    glm::vec2(s1, t));      // texture coordinates
+        v2 = Vertex(pos2, // position
+                    norm2, // normal
+                    glm::vec2(s2, t));      // texture coordinates
+        addTriangle(v0, v1, v2,
+        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+    }
+
+    // BOTTOM DISK
+    const glm::vec3 center_bottom (0.0f, 0.0f, -Z_OFFSET);
+    const glm::vec3 bottom_normal (0.0f, 0.0f, -1.0f);
+    theta = 0.0f;
+    phi = M_PI - DELTA_PHI;
+    sin_phi = sin(phi);
+    z = RADIUS * cos(phi);
+    t = DELTA_T;
+    for (JU::uint16 slice = 0; slice < num_slices; slice++)
+    {
+    	JU::f32 x1 = RADIUS * cos(theta) * sin_phi; 				JU::f32 y1 = RADIUS * sin(theta) * sin_phi;
+    	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA) * sin_phi; 	JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA) * sin_phi;
+        glm::vec3 pos1 (x1, y1, z);
+        glm::vec3 pos2 (x2, y2, z);
+        glm::vec3 norm1 (pos1 - ORIGIN);
+        glm::vec3 norm2 (pos2 - ORIGIN);
+        JU::f32 s1 = slice * DELTA_S;
+        JU::f32 s2 = (slice + 1) * DELTA_S;
+
+
+        v0 = Vertex(pos2, // position
+                    norm2, // normal
+                    glm::vec2(s2, t));      // texture coordinates
+        v1 = Vertex(pos1, // position
+                    norm1, // normal
+                    glm::vec2(s1, t));      // texture coordinates
+        v2 = Vertex(center_bottom, // position
+                    bottom_normal, // normal
+                    glm::vec2(0.5f * (s1 + s2), 0.0f));      // texture coordinates
+        addTriangle(v0, v1, v2,
+        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+        theta += DELTA_THETA;
+    }
+
+    // EVERYTHING BUT TOP AND BOTTOM DISKS
+    for (JU::uint16 stack = 1; stack < (num_stacks - 1); ++stack)
+    {
+    	JU::f32 phi1 	 = stack * DELTA_PHI;
+    	JU::f32 phi2 	 = (stack + 1) * DELTA_PHI;
+    	JU::f32 sin_phi1 = sin(phi1);
+    	JU::f32 sin_phi2 = sin(phi2);
+		JU::f32 z1 		 = RADIUS * cos(phi1);
+		JU::f32 z2 		 = RADIUS * cos(phi2);
+		JU::f32 t1		 = 1.0f - (stack * DELTA_T);
+		JU::f32 t2		 = 1.0f - ((stack + 1) * DELTA_T);
+
+        for (JU::uint16 slice = 0; slice < num_slices; slice++)
+        {
+        	JU::f32 theta1 = slice * DELTA_THETA;
+        	JU::f32 theta2 = (slice + 1) * DELTA_THETA;
+        	JU::f32 cos_theta1 = cos(theta1);
+        	JU::f32 cos_theta2 = cos(theta2);
+        	JU::f32 sin_theta1 = sin(theta1);
+        	JU::f32 sin_theta2 = sin(theta2);
+        	JU::f32 x0 = RADIUS * cos_theta1 * sin_phi1; 	JU::f32 y0 = RADIUS * sin_theta1 * sin_phi1;
+        	JU::f32 x1 = RADIUS * cos_theta1 * sin_phi2; 	JU::f32 y1 = RADIUS * sin_theta1 * sin_phi2;
+        	JU::f32 x2 = RADIUS * cos_theta2 * sin_phi2; 	JU::f32 y2 = RADIUS * sin_theta2 * sin_phi2;
+        	JU::f32 x3 = RADIUS * cos_theta2 * sin_phi1; 	JU::f32 y3 = RADIUS * sin_theta2 * sin_phi1;
+        	glm::vec3 pos0 (x0, y0, z1);
+        	glm::vec3 pos1 (x1, y1, z2);
+        	glm::vec3 pos2 (x2, y2, z2);
+        	glm::vec3 pos3 (x3, y3, z1);
+        	glm::vec3 norm0 (glm::normalize(pos0 - ORIGIN));
+        	glm::vec3 norm1 (glm::normalize(pos1 - ORIGIN));
+        	glm::vec3 norm2 (glm::normalize(pos2 - ORIGIN));
+        	glm::vec3 norm3 (glm::normalize(pos3 - ORIGIN));
+    		JU::f32 s1 = slice * DELTA_S;
+    		JU::f32 s2 = (slice + 1) * DELTA_S;
+
+            v0 = Vertex(pos0, // position
+                        norm0, // normal
+                        glm::vec2(s1, t1));      // texture coordinates
+            v1 = Vertex(pos1, // position
+            			norm1, // normal
+                        glm::vec2(s1, t2));      // texture coordinates
+            v2 = Vertex(pos2, // position
+            			norm2, // normal
+                        glm::vec2(s2, t2));      // texture coordinates
+            v3 = Vertex(pos3, // position
+            			norm3, // normal
+                        glm::vec2(s2, t1));      // texture coordinates
+            addTriangulatedQuad(v0, v1, v2, v3,
+            			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+            			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+        }
+    }
 }
 

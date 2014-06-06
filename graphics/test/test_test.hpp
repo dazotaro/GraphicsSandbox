@@ -46,15 +46,16 @@ void testCone(void)
     mesh.export2OBJ("cone_8.obj");
 }
 
-/*
 void testSphere(void)
 {
-    // Create a Mesh
-    Mesh mesh(buildMesh(SPHERE, 8, 4));
-    mesh.export2OBJ("sphere_8_4.obj");
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 16, 8);
+
+    mesh.export2OBJ("sphere_16_8.obj");
 }
 
-void testGLMeshInstance(void)
+/*
+ * void testGLMeshInstance(void)
 {
     // Create Mesh
     GLMesh *gl_mesh01 = new GLMesh(buildMesh(CUBE));
@@ -131,7 +132,7 @@ int main(void)
     //testCube();
     //testCylinder();
     testCone();
-    //testSphere();
+    testSphere();
     //testObject3D();
     //testGLMeshInstance();
     //testGLM();

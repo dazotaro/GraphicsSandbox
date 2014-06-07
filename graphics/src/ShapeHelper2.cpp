@@ -227,7 +227,7 @@ inline void addTriangulatedQuad(const ShapeHelper2::Vertex& v0,
 *
 * @return The Mesh
 */
-void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, unsigned int num_slices, unsigned int num_stacks)
+void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, JU::uint32 num_slices, JU::uint32 num_stacks, JU::f32 radius)
 {
     std::string  				 shape_name;
 	Mesh2::VectorPositions		 vPositions;    	//!< Vector of vertex coordinates
@@ -256,6 +256,10 @@ void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, unsigned int num
 
         case SPHERE:
             ShapeHelper2::buildSphere(shape_name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices, num_slices, num_stacks);
+            break;
+
+        case TORUS:
+            ShapeHelper2::buildTorus(shape_name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices, num_slices, num_stacks, radius);
             break;
 
         default:
@@ -311,7 +315,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
 		   	   	   	   	     Mesh2::VectorNormals& 			vNormals,
 		   	   	   	   	     Mesh2::VectorTexCoords&		vTexCoords,
 		   	   	   	   	     Mesh2::VectorVertexIndices& 	vVertexIndices,
-							  Mesh2::VectorTriangleIndices& vTriangleIndices)
+							 Mesh2::VectorTriangleIndices&  vTriangleIndices)
 {
     name = std::string("Cube");
 
@@ -439,7 +443,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
 		   	   	   	   	   	   	 Mesh2::VectorTexCoords&		vTexCoords,
 		   	   	   	   	   	   	 Mesh2::VectorVertexIndices& 	vVertexIndices,
 								 Mesh2::VectorTriangleIndices& 	vTriangleIndices,
-                                 unsigned int  					num_slices)
+                                 JU::uint32  					num_slices)
 {
     // CONSTANTS
     const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
@@ -467,7 +471,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     const glm::vec3 center_top (0.0f, 0.0f, Z_OFFSET);
     const glm::vec3 top_normal (0.0f, 0.0f, 1.0f);
     float theta = 0.0f;
-    for (unsigned int slice = 0; slice < num_slices; slice++)
+    for (JU::uint32 slice = 0; slice < num_slices; slice++)
     {
     	JU::f32 x1 = RADIUS * cos(theta); 				JU::f32 y1 = RADIUS * sin(theta);
     	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
@@ -494,7 +498,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     const glm::vec3 center_bottom (0.0f, 0.0f, -Z_OFFSET);
     const glm::vec3 bottom_normal (0.0f, 0.0f, -1.0f);
     theta = 0.0f;
-    for (unsigned int slice = 0; slice < num_slices; slice++)
+    for (JU::uint32 slice = 0; slice < num_slices; slice++)
     {
     	JU::f32 x1 = RADIUS * cos(theta); 				JU::f32 y1 = RADIUS * sin(theta);
     	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
@@ -520,7 +524,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     // SIDE OF THE CYLINDER
     theta = 0.0f;
     float tex_s = 0.0f;
-    for (unsigned int slice = 0; slice < num_slices; slice++)
+    for (JU::uint32 slice = 0; slice < num_slices; slice++)
     {
     	JU::f32 x1 = RADIUS * cos(theta); 				JU::f32 y1 = RADIUS * sin(theta);
     	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
@@ -560,7 +564,7 @@ void ShapeHelper2::buildCone(std::string&  					name,
 	   	   	   	 	 	 	 Mesh2::VectorTexCoords&		vTexCoords,
 	   	   	   	 	 	 	 Mesh2::VectorVertexIndices& 	vVertexIndices,
 							 Mesh2::VectorTriangleIndices& 	vTriangleIndices,
-	   	   	   	 	 	 	 unsigned int  					num_slices)
+	   	   	   	 	 	 	 JU::uint32  					num_slices)
 {
     // CONSTANTS
     const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
@@ -588,7 +592,7 @@ void ShapeHelper2::buildCone(std::string&  					name,
     const glm::vec3 center_bottom (0.0f, 0.0f, -Z_OFFSET);
     const glm::vec3 bottom_normal (0.0f, 0.0f, -1.0f);
     float theta = 0.0f;
-    for (unsigned int slice = 0; slice < num_slices; slice++)
+    for (JU::uint32 slice = 0; slice < num_slices; slice++)
     {
         JU::f32 x1 = RADIUS * cos(theta);               JU::f32 y1 = RADIUS * sin(theta);
         JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
@@ -615,7 +619,7 @@ void ShapeHelper2::buildCone(std::string&  					name,
     const glm::vec3 appex_position (0.0f, 0.0f, +Z_OFFSET);
     theta = 0.0f;
     float tex_s = 0.0f;
-    for (unsigned int slice = 0; slice < num_slices; slice++)
+    for (JU::uint32 slice = 0; slice < num_slices; slice++)
     {
         JU::f32 x1 = RADIUS * cos(theta);               JU::f32 y1 = RADIUS * sin(theta);
         JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA); JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA);
@@ -657,8 +661,8 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
 	   	   	   	 	 	 	   Mesh2::VectorTexCoords&		 vTexCoords,
 	   	   	   	 	 	 	   Mesh2::VectorVertexIndices& 	 vVertexIndices,
 	   	   	   	 	 	 	   Mesh2::VectorTriangleIndices& vTriangleIndices,
-	   	   	   	 	 	 	   unsigned int  				 num_slices,
-                               unsigned int  				 num_stacks)
+	   	   	   	 	 	 	   JU::uint32  				 	 num_slices,
+                               JU::uint32  				 	 num_stacks)
 {
     // CONSTANTS
     const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
@@ -757,7 +761,7 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     }
 
     // EVERYTHING BUT TOP AND BOTTOM DISKS
-    for (JU::uint16 stack = 1; stack < (num_stacks - 1); ++stack)
+    for (JU::uint32 stack = 1; stack < (num_stacks - 1); ++stack)
     {
     	JU::f32 phi1 	 = stack * DELTA_PHI;
     	JU::f32 phi2 	 = (stack + 1) * DELTA_PHI;
@@ -768,7 +772,7 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
 		JU::f32 t1		 = 1.0f - (stack * DELTA_T);
 		JU::f32 t2		 = 1.0f - ((stack + 1) * DELTA_T);
 
-        for (JU::uint16 slice = 0; slice < num_slices; slice++)
+        for (JU::uint32 slice = 0; slice < num_slices; slice++)
         {
         	JU::f32 theta1 = slice * DELTA_THETA;
         	JU::f32 theta2 = (slice + 1) * DELTA_THETA;
@@ -810,3 +814,53 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     }
 }
 
+
+void ShapeHelper2::buildTorus(std::string&  				 name,
+	   	   	   	 	 	 	   Mesh2::VectorPositions&  	 vPositions,
+	   	   	   	 	 	 	   Mesh2::VectorNormals& 		 vNormals,
+	   	   	   	 	 	 	   Mesh2::VectorTexCoords&		 vTexCoords,
+	   	   	   	 	 	 	   Mesh2::VectorVertexIndices& 	 vVertexIndices,
+	   	   	   	 	 	 	   Mesh2::VectorTriangleIndices& vTriangleIndices,
+	   	   	   	 	 	 	   JU::uint32  				 	 num_slices1,
+                               JU::uint32  				 	 num_slices2,
+                               JU::f32						 radius)
+{
+	/*
+    // CONSTANTS
+    const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
+    const float Z_OFFSET (0.5f);                        // Distance from the ORIGIN to the top (or bottom)
+    const float RADIUS   (0.5f);                        // RADIUS of the cylinder
+    const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
+    const float DELTA_PHI (M_PI / num_stacks);          // Angle increments for each stack
+    const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
+    const float DELTA_T(1.0F / num_stacks);				// Increment of the s texture coordinate from slice to slice
+
+    name = "torus_" + num_slices1 + num_slices2;
+
+    vPositions.clear();
+    vNormals.clear();
+    vTexCoords.clear();
+    vVertexIndices.clear();
+
+    Vertex vertex;						// Vertex data
+    MapVec3 hpPositions	(vec3Compare);
+    MapVec3 hpNormals  	(vec3Compare);
+    MapVec2 hpTexCoords (vec2Compare);
+    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+
+    Vertex v0, v1, v2, v3;
+
+    // TOP DISK
+    const glm::vec3 center_top (0.0f, 0.0f, Z_OFFSET);
+    const glm::vec3 top_normal (0.0f, 0.0f, 1.0f);
+    float theta = 0.0f;
+    float phi = DELTA_PHI;
+    float sin_phi = sin(phi);
+    float z = RADIUS * cos(phi);
+    JU::f32 t = 1.0f - DELTA_T;
+    for (JU::uint16 slice = 0; slice < num_slices; slice++)
+    {
+    }
+    */
+
+}

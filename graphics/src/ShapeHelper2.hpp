@@ -64,7 +64,7 @@ class ShapeHelper2
 			CYLINDER,
 			CONE,
 			SPHERE,
-			//TORUS
+			TORUS
 		};
 
 		// TYPEDEFS and ENUMs
@@ -76,7 +76,10 @@ class ShapeHelper2
 	public:
 		// BUILDER FUNCTIONS: they build the desired shape
 		//-------------------------------------------------
-		static void buildMesh(Mesh2& mesh, ShapeType shape_type, unsigned int num_slices = 10, unsigned int num_stacks = 10);
+		static void buildMesh(Mesh2& mesh, ShapeType shape_type,
+							  JU::uint32 num_slices = 10,
+							  JU::uint32 num_stacks = 10,
+							  JU::f32 radius = 0.3f);
 
 		static void buildPlane(std::string&  				 name,
 							   Mesh2::VectorPositions&  	 vPositions,
@@ -98,7 +101,7 @@ class ShapeHelper2
 				   	   	   	   	  Mesh2::VectorTexCoords&		vTexCoords,
 				   	   	   	   	  Mesh2::VectorVertexIndices& 	vVertexIndices,
 								  Mesh2::VectorTriangleIndices& vTriangleIndices,
-								  unsigned int  				num_slices);
+								  JU::uint32  					num_slices);
 
 		static void buildCone(std::string&  				name,
 				   	   	   	  Mesh2::VectorPositions&  		vPositions,
@@ -106,7 +109,7 @@ class ShapeHelper2
 				   	   	   	  Mesh2::VectorTexCoords&		vTexCoords,
 				   	   	   	  Mesh2::VectorVertexIndices& 	vVertexIndices,
 							  Mesh2::VectorTriangleIndices& vTriangleIndices,
-							  unsigned int  				num_slices);
+							  JU::uint32  					num_slices);
 
 		static void buildSphere(std::string&  					name,
 				   	   	   	    Mesh2::VectorPositions&  		vPositions,
@@ -114,8 +117,18 @@ class ShapeHelper2
 				   	   	   	    Mesh2::VectorTexCoords&			vTexCoords,
 				   	   	   	    Mesh2::VectorVertexIndices& 	vVertexIndices,
 								Mesh2::VectorTriangleIndices& 	vTriangleIndices,
-								unsigned int  					num_slices,
-								unsigned int  					num_stacks);
+								JU::uint32  					num_slices,
+								JU::uint32  					num_stacks);
+
+		static void buildTorus(std::string&  					name,
+				   	   	   	   Mesh2::VectorPositions&  		vPositions,
+				   	   	   	   Mesh2::VectorNormals& 			vNormals,
+				   	   	   	   Mesh2::VectorTexCoords&			vTexCoords,
+				   	   	   	   Mesh2::VectorVertexIndices& 		vVertexIndices,
+							   Mesh2::VectorTriangleIndices& 	vTriangleIndices,
+							   JU::uint32  						num_slices1,
+							   JU::uint32  						num_slices2,
+							   JU::f32							radius);
 };
 
 

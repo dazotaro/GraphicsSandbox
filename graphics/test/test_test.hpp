@@ -44,7 +44,7 @@ void testCylinder(void)
 void testCone(void)
 {
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 8);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 32);
 
     std::string filename (mesh.getName() + ".obj");
     mesh.export2OBJ(filename.c_str());

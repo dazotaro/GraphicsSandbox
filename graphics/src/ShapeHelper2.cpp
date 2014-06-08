@@ -482,13 +482,13 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
 
         v0 = Vertex(center_top, // position
                     top_normal, // normal
-                    glm::vec2(0.0f, 0.0f));      // texture coordinates
+                    glm::vec2(0.0f + 0.5f,  0.0f + 0.5f));      // texture coordinates
         v1 = Vertex(pos1, // position
                     top_normal, // normal
-                    glm::vec2(x1, y1));      // texture coordinates
+                    glm::vec2(x1 + 0.5f, y1 + 0.5f));      // texture coordinates
         v2 = Vertex(pos2, // position
                     top_normal, // normal
-                    glm::vec2(x2, y2));      // texture coordinates
+                    glm::vec2(x2 + 0.5f, y2 + 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
         			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
@@ -509,13 +509,13 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
 
         v0 = Vertex(center_bottom, // position
                     bottom_normal, // normal
-                    glm::vec2(0.0f, 0.0f));      // texture coordinates
+                    glm::vec2(0.0f + 0.5f, 0.0f - 0.5f));      // texture coordinates
         v1 = Vertex(pos2, // position
         			bottom_normal, // normal
-                    glm::vec2(x2, y2));      // texture coordinates
+                    glm::vec2(x2 + 0.5f, y2 - 0.5f));      // texture coordinates
         v2 = Vertex(pos1, // position
         			bottom_normal, // normal
-                    glm::vec2(x1, y1));      // texture coordinates
+                    glm::vec2(x1 + 0.5f, y1 - 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
         			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
@@ -605,13 +605,13 @@ void ShapeHelper2::buildCone(std::string&  					name,
 
         v0 = Vertex(center_bottom, // position
                     bottom_normal, // normal
-                    glm::vec2(0.0f, 0.0f));      // texture coordinates
+                    glm::vec2(0.0f + 0.5f, 0.0f - 0.5f));      // texture coordinates
         v1 = Vertex(pos2, // position
                     bottom_normal, // normal
-                    glm::vec2(x2, y2));      // texture coordinates
+                    glm::vec2(x2 + 0.5f, y2 - 0.5f));      // texture coordinates
         v2 = Vertex(pos1, // position
                     bottom_normal, // normal
-                    glm::vec2(x1, y1));      // texture coordinates
+                    glm::vec2(x1 + 0.5f, y1 - 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
                     hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
                     vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);

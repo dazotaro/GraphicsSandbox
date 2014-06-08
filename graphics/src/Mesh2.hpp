@@ -61,6 +61,8 @@ class Mesh2
 		typedef VectorVertexIndices::const_iterator VectorVertexIndicesConstIter;
 		typedef std::vector<TriangleIndices> VectorTriangleIndices;
 		typedef VectorTriangleIndices::const_iterator VectorTriangleIndicesConstIter;
+		typedef std::vector<glm::vec4> VectorTangents;
+		typedef VectorTangents::const_iterator VectorTangentsConstIter;
 
 		Mesh2();
 		Mesh2(const std::string&			name,
@@ -72,6 +74,9 @@ class Mesh2
 
 		virtual ~Mesh2();
 
+		// UTILITY FUNCTIONS
+		void computeTangents();
+
 		// GETTERS
 		const VectorVertexIndices& 		getVertexIndices() const;
 		const VectorTriangleIndices& 	getTriangleIndices() const;
@@ -79,6 +84,7 @@ class Mesh2
 		const VectorNormals& 			getNormals() const;
 		const VectorPositions& 			getPositions() const;
 		const VectorTexCoords& 			getTexCoords() const;
+		const VectorTangents&			getTangents() const;
 
 		// EXPORT AND OUTPUT FUNCTIONS
 		void exportOBJ(void) const;
@@ -91,6 +97,7 @@ class Mesh2
 		VectorPositions		  vPositions_;    	//!< Vector of vertex coordinates
 		VectorNormals      	  vNormals_;      	//!< Vector of vertex normals
 		VectorTexCoords    	  vTexCoords_;    	//!< Vector of vertex texture coordinates
+		VectorTangents		  vTangents_;		//!< Vector of vertex tangents
 		VectorVertexIndices   vVertexIndices_;  //!< Vector of face indices
 		VectorTriangleIndices vTriangleIndices_;//!< Vector of triangle indices
 };

@@ -141,3 +141,66 @@ void Mesh2::export2OBJ(const char *filename) const
     fclose(file);
 }
 
+void Mesh2::computeTangents()
+{
+	JU::uint32 num_vertices (vVertexIndices_.size());
+	vTangents_.resize(num_vertices);
+
+    // Per-Vertex vectors
+    std::vector<glm::vec3> tan (num_vertices, glm::vec3(0.0f, 0.0f, 0.0f));
+    std::vector<glm::vec3> bit (num_vertices, glm::vec3(0.0f, 0.0f, 0.0f));
+
+    // PER-FACE: compute tangent and bitangent and accumulate them
+	for (VectorTriangleIndicesConstIter triangle_iter = vTriangleIndices_.begin(); triangle_iter != vTriangleIndices_.end(); ++triangle_iter)
+	{
+		JU::uint32& p0 (vVertexIndices_[triangle_iter->v0_].position_);
+		JU::uint32& p1 (vVertexIndices_[triangle_iter->v1_].position_);
+		JU::uint32& p2 (vVertexIndices_[triangle_iter->v2_].position_);
+
+		JU::uint32& t0 (vVertexIndices_[triangle_iter->v0_].tex_);
+		JU::uint32& t1 (vVertexIndices_[triangle_iter->v1_].tex_);
+		JU::uint32& t2 (vVertexIndices_[triangle_iter->v2_].tex_);
+
+		// Compute the normal of the face
+        glm::vec3 vec1 (glm::normalize(vPositions_[p1] - vPositions_[p0]));
+        glm::vec3 vec2 (glm::normalize(vPositions_[p2] - vPositions_[p0]));
+
+        glm::vec2 tex1 (vTexCoords_[t1] -vTexCoords_[t0]);
+        glm::vec2 tex2 (vTexCoords_[t2] -vTexCoords_[t0]);
+
+        float factor = 1 / (tex1.s*tex2.t - tex2.s*tex1.t);
+
+        /* REDO these next two lines. The program is crashing when the factor is inf/nan */
+        if (std::isinf(factor) || std::isnan(factor))
+        {
+        	std::printf("nan or inf value return in Mesh2::computeTangents\n");
+        	exit(EXIT_FAILURE);
+        }
+
+        glm::vec3 tmp_tan (factor * ( tex2.t * vec1.x - tex1.t * vec2.x),
+                           factor * ( tex2.t * vec1.y - tex1.t * vec2.y),
+                           factor * ( tex2.t * vec1.z - tex1.t * vec2.z));
+        glm::vec3 tmp_bit (factor * (-tex2.s * vec1.x + tex1.s * vec2.x),
+                           factor * (-tex2.s * vec1.y + tex1.s * vec2.y),
+                           factor * (-tex2.s * vec1.z + tex1.s * vec2.z));
+
+		tan[triangle_iter->v0_] += tmp_tan;
+        tan[triangle_iter->v1_] += tmp_tan;
+        tan[triangle_iter->v2_] += tmp_tan;
+        bit[triangle_iter->v0_] += tmp_bit;
+        bit[triangle_iter->v1_] += tmp_bit;
+        bit[triangle_iter->v2_] += tmp_bit;
+	}
+
+	// PER-VERTEX
+	for (JU::uint32 index = 0; index < num_vertices; ++index)
+	{
+		glm::vec3& normal = vNormals_[vVertexIndices_[index].normal_];
+
+		// Gram-Schmidt orthogonalize
+        glm::vec3 tangent (glm::normalize(tan[index] - (glm::dot(normal, tan[index]) * normal)));
+
+        // Calculate handedness}
+        float w = (glm::dot(glm::cross(normal, tan[index]), bit[index])) < 0.0f ? -1.0f : 1.0f;        vTangents_[index] = glm::vec4(tangent, w);
+	}
+}

@@ -452,6 +452,12 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
     const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
 
+    if (num_slices < 3)
+    {
+    	std::printf("ShapeHelper2::buildCylinder: minimum number of slices is 3 (%i requested)\n", num_slices);
+    	exit(EXIT_FAILURE);
+    }
+
     char buffer[100];
     sprintf(buffer, "cylinder_%i\0", num_slices);
     name = std::string(buffer);
@@ -509,13 +515,13 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
 
         v0 = Vertex(center_bottom, // position
                     bottom_normal, // normal
-                    glm::vec2(0.0f + 0.5f, 0.0f - 0.5f));      // texture coordinates
+                    glm::vec2(0.0f + 0.5f, 0.0f + 0.5f));      // texture coordinates
         v1 = Vertex(pos2, // position
         			bottom_normal, // normal
-                    glm::vec2(x2 + 0.5f, y2 - 0.5f));      // texture coordinates
+                    glm::vec2(-x2 + 0.5f, y2 + 0.5f));      // texture coordinates
         v2 = Vertex(pos1, // position
         			bottom_normal, // normal
-                    glm::vec2(x1 + 0.5f, y1 - 0.5f));      // texture coordinates
+                    glm::vec2(-x1 + 0.5f, y1 + 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
         			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
@@ -575,6 +581,12 @@ void ShapeHelper2::buildCone(std::string&  					name,
     const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
     const float DELTA_S(1.0F / num_slices);             // Increment of the s texture coordinate from slice to slice
 
+    if (num_slices < 3)
+    {
+    	std::printf("ShapeHelper2::buildCone: minimum number of slices is 3 (%i requested)\n", num_slices);
+    	exit(EXIT_FAILURE);
+    }
+
     char buffer[100];
     sprintf(buffer, "cone_%i\0", num_slices);
     name = std::string(buffer);
@@ -605,13 +617,13 @@ void ShapeHelper2::buildCone(std::string&  					name,
 
         v0 = Vertex(center_bottom, // position
                     bottom_normal, // normal
-                    glm::vec2(0.0f + 0.5f, 0.0f - 0.5f));      // texture coordinates
+                    glm::vec2(0.0f + 0.5f, 0.0f + 0.5f));      // texture coordinates
         v1 = Vertex(pos2, // position
                     bottom_normal, // normal
-                    glm::vec2(x2 + 0.5f, y2 - 0.5f));      // texture coordinates
+                    glm::vec2(-x2 + 0.5f, y2 + 0.5f));      // texture coordinates
         v2 = Vertex(pos1, // position
                     bottom_normal, // normal
-                    glm::vec2(x1 + 0.5f, y1 - 0.5f));      // texture coordinates
+                    glm::vec2(-x1 + 0.5f, y1 + 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
                     hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
                     vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
@@ -676,6 +688,12 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     const float DELTA_PHI (M_PI / num_stacks);          // Angle increments for each stack
     const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
     const float DELTA_T(1.0F / num_stacks);				// Increment of the s texture coordinate from slice to slice
+
+    if (num_slices < 3)
+    {
+    	std::printf("ShapeHelper2::buildSphere: minimum number of slices/stacks is 3 (%i/%i requested)\n", num_slices, num_stacks);
+    	exit(EXIT_FAILURE);
+    }
 
     char buffer[100];
     sprintf(buffer, "sphere_%i_%i\0", num_slices, num_stacks);
@@ -840,6 +858,18 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
     const float DELTA_PHI 		(2 * M_PI / num_slices2);      	// Increment of the angle within a slice
     const float DELTA_S			(1.0F / num_slices1);		// Increment of the s texture coordinate
     const float DELTA_T			(1.0F / num_slices2);		// Increment of the s texture coordinate
+
+    if (num_slices1 < 3 || num_slices2 < 3)
+    {
+    	std::printf("ShapeHelper2::buildTorus: minimum number of slices/stacks is 3 (%i/%i requested)\n", num_slices1, num_slices2);
+    	exit(EXIT_FAILURE);
+    }
+
+    if (radius > 0.5f)
+    {
+    	std::printf("ShapeHelper2::buildTorus: max tube radius is 0.5f (%f requested)\n", radius);
+    	exit(EXIT_FAILURE);
+    }
 
     char buffer[100];
     sprintf(buffer, "torus_%i_%i_%.2f\0", num_slices1, num_slices2, radius);

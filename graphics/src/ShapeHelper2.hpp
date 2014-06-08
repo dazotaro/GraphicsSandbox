@@ -79,7 +79,7 @@ class ShapeHelper2
 		static void buildMesh(Mesh2& mesh, ShapeType shape_type,
 							  JU::uint32 num_slices = 10,
 							  JU::uint32 num_stacks = 10,
-							  JU::f32 radius = 0.3f);
+							  JU::f32 radius = 0.2f);
 
 		static void buildPlane(std::string&  				 name,
 							   Mesh2::VectorPositions&  	 vPositions,

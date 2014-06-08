@@ -277,7 +277,7 @@ void ShapeHelper2::buildPlane(std::string&  				name,
 		   	   	   	   	   	  Mesh2::VectorVertexIndices& 	vVertexIndices,
 							  Mesh2::VectorTriangleIndices& vTriangleIndices)
 {
-    name = std::string("Plane");
+    name = std::string("plane");
 
     vPositions.clear();
     vNormals.clear();
@@ -317,7 +317,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
 		   	   	   	   	     Mesh2::VectorVertexIndices& 	vVertexIndices,
 							 Mesh2::VectorTriangleIndices&  vTriangleIndices)
 {
-    name = std::string("Cube");
+    name = std::string("cube");
 
     vPositions.clear();
     vNormals.clear();
@@ -452,7 +452,9 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
     const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
 
-    name = "Cylinder_" + num_slices;
+    char buffer[100];
+    sprintf(buffer, "cylinder_%i\0", num_slices);
+    name = std::string(buffer);
 
     vPositions.clear();
     vNormals.clear();
@@ -573,7 +575,9 @@ void ShapeHelper2::buildCone(std::string&  					name,
     const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
     const float DELTA_S(1.0F / num_slices);             // Increment of the s texture coordinate from slice to slice
 
-    name = "Cone_" + num_slices;
+    char buffer[100];
+    sprintf(buffer, "cone_%i\0", num_slices);
+    name = std::string(buffer);
 
     vPositions.clear();
     vNormals.clear();
@@ -673,7 +677,9 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
     const float DELTA_T(1.0F / num_stacks);				// Increment of the s texture coordinate from slice to slice
 
-    name = "sphere_" + num_slices + num_stacks;
+    char buffer[100];
+    sprintf(buffer, "sphere_%i_%i\0", num_slices, num_stacks);
+    name = std::string(buffer);
 
     vPositions.clear();
     vNormals.clear();
@@ -702,8 +708,8 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA) * sin_phi; 	JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA) * sin_phi;
         glm::vec3 pos1 (x1, y1, z);
         glm::vec3 pos2 (x2, y2, z);
-        glm::vec3 norm1 (pos1 - ORIGIN);
-        glm::vec3 norm2 (pos2 - ORIGIN);
+        glm::vec3 norm1 (glm::normalize(pos1 - ORIGIN));
+        glm::vec3 norm2 (glm::normalize(pos2 - ORIGIN));
         JU::f32 s1 = slice * DELTA_S;
         JU::f32 s2 = (slice + 1) * DELTA_S;
 
@@ -738,8 +744,8 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     	JU::f32 x2 = RADIUS * cos(theta + DELTA_THETA) * sin_phi; 	JU::f32 y2 = RADIUS * sin(theta + DELTA_THETA) * sin_phi;
         glm::vec3 pos1 (x1, y1, z);
         glm::vec3 pos2 (x2, y2, z);
-        glm::vec3 norm1 (pos1 - ORIGIN);
-        glm::vec3 norm2 (pos2 - ORIGIN);
+        glm::vec3 norm1 (glm::normalize(pos1 - ORIGIN));
+        glm::vec3 norm2 (glm::normalize(pos2 - ORIGIN));
         JU::f32 s1 = slice * DELTA_S;
         JU::f32 s2 = (slice + 1) * DELTA_S;
 
@@ -825,17 +831,19 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
                                JU::uint32  				 	 num_slices2,
                                JU::f32						 radius)
 {
-	/*
     // CONSTANTS
-    const glm::vec3 ORIGIN (0.0f, 0.0f, 0.0f);          // ORIGIN of the Mesh in Model Coordinates
-    const float Z_OFFSET (0.5f);                        // Distance from the ORIGIN to the top (or bottom)
-    const float RADIUS   (0.5f);                        // RADIUS of the cylinder
-    const float DELTA_THETA (2 * M_PI / num_slices);    // Increment of the angle from slice to slice
-    const float DELTA_PHI (M_PI / num_stacks);          // Angle increments for each stack
-    const float DELTA_S(1.0F / num_slices);				// Increment of the s texture coordinate from slice to slice
-    const float DELTA_T(1.0F / num_stacks);				// Increment of the s texture coordinate from slice to slice
+    const glm::vec3 ORIGIN 		(0.0f, 0.0f, 0.0f);         // ORIGIN of the Mesh in Model Coordinates
+    const float Z_OFFSET 		(0.5f);                     // Distance from the ORIGIN to the top (or bottom)
+    const float TUBE_RADIUS		(radius);					// Radius of the tube
+    const float TORUS_RADIUS  	(0.5f - TUBE_RADIUS);       // Distance from the origin (center of the torus) to the center of a section
+    const float DELTA_THETA 	(2 * M_PI / num_slices1);  	// Increment of the angle from slice to slice
+    const float DELTA_PHI 		(2 * M_PI / num_slices2);      	// Increment of the angle within a slice
+    const float DELTA_S			(1.0F / num_slices1);		// Increment of the s texture coordinate
+    const float DELTA_T			(1.0F / num_slices2);		// Increment of the s texture coordinate
 
-    name = "torus_" + num_slices1 + num_slices2;
+    char buffer[100];
+    sprintf(buffer, "torus_%i_%i_%.2f\0", num_slices1, num_slices2, radius);
+    name = std::string(buffer);
 
     vPositions.clear();
     vNormals.clear();
@@ -846,21 +854,62 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
     MapVec3 hpPositions	(vec3Compare);
     MapVec3 hpNormals  	(vec3Compare);
     MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+    HashMapVertexIndices hpVertexIndices(10 * num_slices1 * num_slices2, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
 
-    // TOP DISK
-    const glm::vec3 center_top (0.0f, 0.0f, Z_OFFSET);
-    const glm::vec3 top_normal (0.0f, 0.0f, 1.0f);
-    float theta = 0.0f;
-    float phi = DELTA_PHI;
-    float sin_phi = sin(phi);
-    float z = RADIUS * cos(phi);
-    JU::f32 t = 1.0f - DELTA_T;
-    for (JU::uint16 slice = 0; slice < num_slices; slice++)
+    // For each SLICE of the TORUS
+    for (JU::uint32 slice1 = 0; slice1 < num_slices1; ++slice1)
     {
-    }
-    */
+    	float theta1 = DELTA_THETA * slice1;
+    	float theta2 = DELTA_THETA * (slice1 + 1);
+    	float cos_theta1 = cos(theta1);
+    	float cos_theta2 = cos(theta2);
+    	float sin_theta1 = sin(theta1);
+    	float sin_theta2 = sin(theta2);
+    	glm::vec3 tube_center (TORUS_RADIUS * cos_theta1, TORUS_RADIUS * sin_theta1, 0.0f);
 
+    	// For each slice of the TUBE
+    	for (JU::uint32 slice2 = 0; slice2 < num_slices2; ++slice2)
+    	{
+    		float phi1 = DELTA_PHI * (slice2 + 1);
+    		float phi2 = DELTA_PHI * slice2;
+        	float term_phi1 = TORUS_RADIUS + TUBE_RADIUS * cos(phi1);
+        	float term_phi2 = TORUS_RADIUS + TUBE_RADIUS * cos(phi2);
+        	float sin_phi1 = sin(phi1);
+        	float sin_phi2 = sin(phi2);
+
+        	// POSITIONS
+        	glm::vec3 pos0 (term_phi1 * cos_theta1, term_phi1 * sin_theta1, TUBE_RADIUS * sin_phi1);
+        	glm::vec3 pos1 (term_phi2 * cos_theta1, term_phi2 * sin_theta1, TUBE_RADIUS * sin_phi2);
+        	glm::vec3 pos2 (term_phi2 * cos_theta2, term_phi2 * sin_theta2, TUBE_RADIUS * sin_phi2);
+        	glm::vec3 pos3 (term_phi1 * cos_theta2, term_phi1 * sin_theta2, TUBE_RADIUS * sin_phi1);
+        	// NORMALS
+        	glm::vec3 norm0 (glm::normalize(pos0 - tube_center));
+        	glm::vec3 norm1 (glm::normalize(pos1 - tube_center));
+        	glm::vec3 norm2 (glm::normalize(pos2 - tube_center));
+        	glm::vec3 norm3 (glm::normalize(pos3 - tube_center));
+        	// TEXTURE COORDINATES
+        	float s1 = DELTA_S * slice1;
+        	float s2 = DELTA_S * (slice1 + 1);
+			float t1 = DELTA_T * (slice2 + 1);
+			float t2 = DELTA_T * slice2;
+
+            v0 = Vertex(pos0, // position
+                        norm0, // normal
+                        glm::vec2(s1, t1));      // texture coordinates
+            v1 = Vertex(pos1, // position
+            			norm1, // normal
+                        glm::vec2(s1, t2));      // texture coordinates
+            v2 = Vertex(pos2, // position
+            			norm2, // normal
+                        glm::vec2(s2, t2));      // texture coordinates
+            v3 = Vertex(pos3, // position
+            			norm3, // normal
+                        glm::vec2(s2, t1));      // texture coordinates
+            addTriangulatedQuad(v0, v1, v2, v3,
+            			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+            			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+    	}
+    }
 }

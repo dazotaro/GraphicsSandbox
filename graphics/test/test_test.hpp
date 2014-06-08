@@ -19,7 +19,8 @@ void testPlane(void)
     Mesh2 mesh;
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
 
-    mesh.export2OBJ("plane.obj");
+    std::string filename (mesh.getName() + ".obj");
+    mesh.export2OBJ(filename.c_str());
 }
 
 void testCube(void)
@@ -27,7 +28,8 @@ void testCube(void)
     Mesh2 mesh;
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE);
 
-    mesh.export2OBJ("cube.obj");
+    std::string filename (mesh.getName() + ".obj");
+    mesh.export2OBJ(filename.c_str());
 }
 
 void testCylinder(void)
@@ -35,7 +37,8 @@ void testCylinder(void)
     Mesh2 mesh;
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 8);
 
-    mesh.export2OBJ("cylinder_8.obj");
+    std::string filename (mesh.getName() + ".obj");
+    mesh.export2OBJ(filename.c_str());
 }
 
 void testCone(void)
@@ -43,7 +46,8 @@ void testCone(void)
     Mesh2 mesh;
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 8);
 
-    mesh.export2OBJ("cone_8.obj");
+    std::string filename (mesh.getName() + ".obj");
+    mesh.export2OBJ(filename.c_str());
 }
 
 void testSphere(void)
@@ -51,7 +55,17 @@ void testSphere(void)
     Mesh2 mesh;
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 16, 8);
 
-    mesh.export2OBJ("sphere_16_8.obj");
+    std::string filename (mesh.getName() + ".obj");
+    mesh.export2OBJ(filename.c_str());
+}
+
+void testTorus(void)
+{
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 32, 16);
+
+    std::string filename (mesh.getName() + ".obj");
+    mesh.export2OBJ(filename.c_str());
 }
 
 /*
@@ -133,6 +147,7 @@ int main(void)
     testCylinder();
     testCone();
     testSphere();
+    testTorus();
     //testObject3D();
     //testGLMeshInstance();
     //testGLM();

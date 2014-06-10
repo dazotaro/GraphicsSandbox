@@ -71,7 +71,8 @@ void GLSceneLighting::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 12, 6);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 12, 6);
+    mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();

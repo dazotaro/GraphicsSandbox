@@ -57,12 +57,12 @@ class Mesh2
 		typedef VectorNormals::const_iterator VectorNormalsConstIter;
 		typedef std::vector<glm::vec2> VectorTexCoords;
 		typedef VectorTexCoords::const_iterator VectorTexCoordsConstIter;
+		typedef std::vector<glm::vec4> VectorTangents;
+		typedef VectorTangents::const_iterator VectorTangentsConstIter;
 		typedef std::vector<VertexIndices> VectorVertexIndices;
 		typedef VectorVertexIndices::const_iterator VectorVertexIndicesConstIter;
 		typedef std::vector<TriangleIndices> VectorTriangleIndices;
 		typedef VectorTriangleIndices::const_iterator VectorTriangleIndicesConstIter;
-		typedef std::vector<glm::vec4> VectorTangents;
-		typedef VectorTangents::const_iterator VectorTangentsConstIter;
 
 		Mesh2();
 		Mesh2(const std::string&			name,

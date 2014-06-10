@@ -181,16 +181,17 @@ bool GLMesh::initVBOs(void)
 
         for (JU::uint32 index = 0; index < num_vertices; ++index)
         {
-    		aTangents[index * TANGENT_VECTOR_SIZE + 0] = vTangents[vVertexIndices[index].tex_].x;
-    		aTangents[index * TANGENT_VECTOR_SIZE + 1] = vTangents[vVertexIndices[index].tex_].y;
-    		aTangents[index * TANGENT_VECTOR_SIZE + 2] = vTangents[vVertexIndices[index].tex_].z;
+    		aTangents[index * TANGENT_VECTOR_SIZE + 0] = vTangents[index].x;
+    		aTangents[index * TANGENT_VECTOR_SIZE + 1] = vTangents[index].y;
+    		aTangents[index * TANGENT_VECTOR_SIZE + 2] = vTangents[index].z;
+    		aTangents[index * TANGENT_VECTOR_SIZE + 3] = vTangents[index].w;
         }
 
         // Normal VBO
         glBindBuffer(GL_ARRAY_BUFFER, vbo_handles_[vbo_index]);
         glBufferData(GL_ARRAY_BUFFER, num_vertices * TANGENT_VECTOR_SIZE * sizeof(aTangents[0]), aTangents, GL_STATIC_DRAW);
-        glVertexAttribPointer(vbo_index, NORMAL_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
-        glEnableVertexAttribArray(vbo_index);   // Vertex normals
+        glVertexAttribPointer(vbo_index, TANGENT_VECTOR_SIZE, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL);
+        glEnableVertexAttribArray(vbo_index);   // Vertex tangents
 
         delete [] aTangents;
 

@@ -38,6 +38,8 @@ bool GLSLProgram::compileShaderFromFile(const char * fileName, GLSLShader::GLSLS
         }
     }
 
+    std::printf("Compiling file %s\n", fileName);
+
     std::ifstream inFile( fileName, std::ios::in );
     if (!inFile)
     {

@@ -71,7 +71,7 @@ void GLSceneLighting::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 64, 32);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 12, 6);
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
@@ -123,7 +123,7 @@ void GLSceneLighting::init(void)
     */
 
     // LIGHTS
-    lights_positional_.push_back(LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f)));
+    lights_positional_.push_back(LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.8f, 0.8f)));
 
 }
 
@@ -231,12 +231,10 @@ void GLSceneLighting::render(void)
     (current_program_iter_->second).setUniform("Kd", 0.2f, 0.2f, 0.2f);
     plane_node_->draw(current_program_iter_->second, M, V, P);
 
-    /*
     current_program_iter_ = glsl_program_map_.find("normal_drawing");
     current_program_iter_->second.use();
     sphere_node_->draw(current_program_iter_->second, M, V, P);
     plane_node_->draw(current_program_iter_->second, M, V, P);
-    */
 }
 
 

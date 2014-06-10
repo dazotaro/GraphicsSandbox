@@ -41,6 +41,7 @@ class GLMesh : public Mesh2
     private:
         GLuint vao_handle_;         //!< Handle to VAO
         GLuint *vbo_handles_;
+        JU::uint8 num_buffers_;
 };
 
 #endif /* GLMESH2_HPP_ */

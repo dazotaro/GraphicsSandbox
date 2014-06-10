@@ -80,6 +80,11 @@ const Mesh2::VectorTexCoords& Mesh2::getTexCoords() const
     return vTexCoords_;
 }
 
+const Mesh2::VectorTangents& Mesh2::getTangents() const
+{
+    return vTangents_;
+}
+
 void Mesh2::export2OBJ(const char *filename) const
 {
     FILE *file = fopen(filename, "w");
@@ -184,23 +189,27 @@ void Mesh2::computeTangents()
                            factor * (-tex2.s * vec1.y + tex1.s * vec2.y),
                            factor * (-tex2.s * vec1.z + tex1.s * vec2.z));
 
-		tan[triangle_iter->v0_] += tmp_tan;
-        tan[triangle_iter->v1_] += tmp_tan;
-        tan[triangle_iter->v2_] += tmp_tan;
-        bit[triangle_iter->v0_] += tmp_bit;
-        bit[triangle_iter->v1_] += tmp_bit;
-        bit[triangle_iter->v2_] += tmp_bit;
+        // Tangents and bitangents are given the same indices as texture coordinates
+		tan[t0] += tmp_tan;
+        tan[t1] += tmp_tan;
+        tan[t2] += tmp_tan;
+        bit[t0] += tmp_bit;
+        bit[t1] += tmp_bit;
+        bit[t2] += tmp_bit;
 	}
 
 	// PER-VERTEX
 	for (JU::uint32 index = 0; index < num_vertices; ++index)
 	{
-		glm::vec3& normal = vNormals_[vVertexIndices_[index].normal_];
+		JU::uint32 normal_index (vVertexIndices_[index].normal_);
+		JU::uint32 tan_index 	(vVertexIndices_[index].tex_);		// Same as texture coordinates
+
+		glm::vec3& normal = vNormals_[normal_index];
 
 		// Gram-Schmidt orthogonalize
-        glm::vec3 tangent (glm::normalize(tan[index] - (glm::dot(normal, tan[index]) * normal)));
+        glm::vec3 tangent (glm::normalize(tan[tan_index] - (glm::dot(normal, tan[tan_index]) * normal)));
 
         // Calculate handedness}
-        float w = (glm::dot(glm::cross(normal, tan[index]), bit[index])) < 0.0f ? -1.0f : 1.0f;        vTangents_[index] = glm::vec4(tangent, w);
+        float w = (glm::dot(glm::cross(normal, tan[tan_index]), bit[tan_index])) < 0.0f ? -1.0f : 1.0f;        vTangents_[tan_index] = glm::vec4(tangent, w);
 	}
 }

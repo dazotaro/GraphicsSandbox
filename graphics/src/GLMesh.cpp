@@ -129,17 +129,6 @@ bool GLMesh::initVBOs(void)
 
 		aTexCoords[index * TEX_VECTOR_SIZE + 0] = vTexCoords[vVertexIndices[index].tex_].s;
 		aTexCoords[index * TEX_VECTOR_SIZE + 1] = vTexCoords[vVertexIndices[index].tex_].t;
-
-		std::printf("Vertex %.2i - Position: (%f, %f, %f) - Normal: (%f, %f, %f) - Tex: (%f, %f)\n",
-						index,
-						aPositions[index * POSITION_VECTOR_SIZE + 0],
-						aPositions[index * POSITION_VECTOR_SIZE + 1],
-						aPositions[index * POSITION_VECTOR_SIZE + 2],
-						aNormals[index * NORMAL_VECTOR_SIZE + 0],
-						aNormals[index * NORMAL_VECTOR_SIZE + 1],
-						aNormals[index * NORMAL_VECTOR_SIZE + 2],
-						aTexCoords[index * TEX_VECTOR_SIZE + 0],
-						aTexCoords[index * TEX_VECTOR_SIZE + 1]);
     }
 
     // Create and bind VAO
@@ -207,12 +196,6 @@ bool GLMesh::initVBOs(void)
     	aIndices[triangle * 3 + 0] = vTriangleIndices[triangle].v0_;
     	aIndices[triangle * 3 + 1] = vTriangleIndices[triangle].v1_;
     	aIndices[triangle * 3 + 2] = vTriangleIndices[triangle].v2_;
-
-		std::printf("Triangle %.2i - (%.2i, %.2i, %.2i)\n",
-						triangle,
-						aIndices[triangle * 3 + 0],
-						aIndices[triangle * 3 + 1],
-						aIndices[triangle * 3 + 2]);
     }
 
     // Allocate and initialize VBO for vertex indices

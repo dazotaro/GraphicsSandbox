@@ -62,7 +62,7 @@ void testSphere(void)
 void testTorus(void)
 {
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 32, 16);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 4, 4);
 
     std::string filename (mesh.getName() + ".obj");
     mesh.export2OBJ(filename.c_str());
@@ -142,11 +142,11 @@ void testObject3D(void)
 int main(void)
 {
     // Test
-    testPlane();
-    testCube();
-    testCylinder();
-    testCone();
-    testSphere();
+    //testPlane();
+    //testCube();
+    //testCylinder();
+    //testCone();
+    //testSphere();
     testTorus();
     //testObject3D();
     //testGLMeshInstance();

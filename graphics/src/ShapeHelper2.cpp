@@ -897,7 +897,8 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
     	float cos_theta2 = cos(theta2);
     	float sin_theta1 = sin(theta1);
     	float sin_theta2 = sin(theta2);
-    	glm::vec3 tube_center (TORUS_RADIUS * cos_theta1, TORUS_RADIUS * sin_theta1, 0.0f);
+    	glm::vec3 tube_center1 (TORUS_RADIUS * cos_theta1, TORUS_RADIUS * sin_theta1, 0.0f);
+    	glm::vec3 tube_center2 (TORUS_RADIUS * cos_theta2, TORUS_RADIUS * sin_theta2, 0.0f);
 
     	// For each slice of the TUBE
     	for (JU::uint32 slice2 = 0; slice2 < num_slices2; ++slice2)
@@ -915,10 +916,10 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
         	glm::vec3 pos2 (term_phi2 * cos_theta2, term_phi2 * sin_theta2, TUBE_RADIUS * sin_phi2);
         	glm::vec3 pos3 (term_phi1 * cos_theta2, term_phi1 * sin_theta2, TUBE_RADIUS * sin_phi1);
         	// NORMALS
-        	glm::vec3 norm0 (glm::normalize(pos0 - tube_center));
-        	glm::vec3 norm1 (glm::normalize(pos1 - tube_center));
-        	glm::vec3 norm2 (glm::normalize(pos2 - tube_center));
-        	glm::vec3 norm3 (glm::normalize(pos3 - tube_center));
+        	glm::vec3 norm0 (glm::normalize(pos0 - tube_center1));
+        	glm::vec3 norm1 (glm::normalize(pos1 - tube_center1));
+        	glm::vec3 norm2 (glm::normalize(pos2 - tube_center2));
+        	glm::vec3 norm3 (glm::normalize(pos3 - tube_center2));
         	// TEXTURE COORDINATES
         	float s1 = DELTA_S * slice1;
         	float s2 = DELTA_S * (slice1 + 1);

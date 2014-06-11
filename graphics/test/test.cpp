@@ -11,8 +11,8 @@
 
 //#include "test_test_gl.hpp"     // Test triangle-drawing code from Cookbook
 //#include "test_glew.hpp"        // Test my GL code
-//#include "test_scene.hpp"         // Test the GL code within a GLScene object
-#include "test_test.hpp"        // Test individual parts
+#include "test_scene.hpp"         // Test the GL code within a GLScene object
+//#include "test_test.hpp"        // Test individual parts
 
 
 /* This file is here just to choose among the three different drivers.

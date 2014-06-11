@@ -196,7 +196,6 @@ void GLSceneLighting::update(float time)
 	                   radius_delta,
 	                   inclination_delta,
 	                   azimuth_delta);
-
 }
 
 

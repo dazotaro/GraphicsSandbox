@@ -941,28 +941,6 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
             addTriangulatedQuad(v0, v1, v2, v3,
             			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
             			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
-
-            std::printf("V0:\n");
-            std::printf("\tPos  = (%f, %f, %f)\n", pos0.x,   pos0.y,  pos0.z);
-            std::printf("\tNorm = (%f, %f, %f)\n", norm0.x, norm0.y, norm0.z);
-            std::printf("\tTex  = (%f, %f)\n", s1, t1);
-
-            std::printf("V1:\n");
-            std::printf("\tPos  = (%f, %f, %f)\n", pos1.x,   pos1.y,  pos1.z);
-            std::printf("\tNorm = (%f, %f, %f)\n", norm1.x, norm1.y, norm1.z);
-            std::printf("\tTex  = (%f, %f)\n", s1, t2);
-
-            std::printf("V2:\n");
-            std::printf("\tPos  = (%f, %f, %f)\n", pos2.x,   pos2.y,  pos2.z);
-            std::printf("\tNorm = (%f, %f, %f)\n", norm2.x, norm2.y, norm2.z);
-            std::printf("\tTex  = (%f, %f)\n", s2, t2);
-
-            std::printf("V3:\n");
-            std::printf("\tPos  = (%f, %f, %f)\n", pos3.x,   pos3.y,  pos3.z);
-            std::printf("\tNorm = (%f, %f, %f)\n", norm3.x, norm3.y, norm3.z);
-            std::printf("\tTex  = (%f, %f)\n", s2, t1);
-
-            std::printf("-----------------------------------\n");
     	}
     }
 }

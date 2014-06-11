@@ -72,7 +72,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneShadow.cpp|test/GLSceneParticles.cpp|test/GLSceneNormal.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneShadow.cpp|test/GLSceneParticles.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

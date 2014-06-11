@@ -5,36 +5,38 @@
  *      Author: jusabiaga
  */
 
-#include "GLSceneNormal.hpp"      // GLSceneNormal
+// Local includes
+#include "GLSceneNormal.hpp"      	// GLSceneNormal
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
 #include "Object3D.hpp"             // Object3D
 #include "CameraInterface.hpp"      // CameraInterface
 #include "CameraFirstPerson.hpp"    // CameraFirstPerson
-#include "CameraThirdPerson.hpp"    // CameraFirstPerson
-#include "ShapeHelper.hpp"          // build Mesh helper funtions
-#include <SOIL.h>                   // SOIL_load_image
-#include "NormalMapHelper.hpp"      // convertHeightMapToNormalMap()
-#include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
-#include "TextureManager.hpp"       // TextureManager static class
-#include "DebugGlm.hpp"				// operator<<
+#include "CameraThirdPerson.hpp"    // CameraThirdPerson
+#include "ShapeHelper2.hpp"         // build Mesh helper funtions
+#include "TextureManager.hpp"       // loadTexture()
+
+// Global includes
+#include <glm/gtx/transform.hpp>	// glm::rotate
 
 GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
-								 gl_cube_(0),
-                                 gl_cube_instance_(0),
-                                 camera_gps_(0),
-                                 tp_camera_(0),
-                                 camera_(0),
-                                 gl_sphere_(0),
-                                 gl_sphere_instance_(0)
+									 gl_sphere_(0), gl_sphere_instance_(0),
+                                     gl_plane_(0), gl_plane_instance_(0),
+                                     sphere_node_(0), plane_node_(0),
+                                     camera_gps_(0), camera_(0),
+                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.2f)
 {
 }
+
+
 
 GLSceneNormal::~GLSceneNormal()
 {
     // TODO Auto-generated destructor stub
 }
+
+
 
 /**
 * @brief Initialized the Scene
@@ -66,37 +68,61 @@ void GLSceneNormal::init(void)
 
     // OBJECT LOADING
     // --------------
-    // 1- CUBE
-    // Create Cube Mesh
-    gl_cube_ = new GLMesh(Graphics::buildMesh(Graphics::CYLINDER, 100, 100));
-    // and LOAD the Mesh into VBO and VAO
-    gl_cube_->init();
-    // Create instance of GLMesh (there could be more than one)
-    gl_cube_instance_ = new GLMeshInstance(gl_cube_, 10.0f, 15.0f, 10.0f);
+    // SPHERE
+    // ------
+    // Create Mesh
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 96, 48);
+    mesh.computeTangents();
+    gl_sphere_ = new GLMesh(mesh);
+    // Load the Mesh into VBO and VAO
+    gl_sphere_->init();
+    // Create instance of GLMEsh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
+    gl_sphere_instance_->addColorTexture("test");
+    gl_sphere_instance_->addNormalTexture("normal_map");
+    // Give the sphere a position and a orientation
+    Object3D sphere(glm::vec3(0.0f, 10.0f, 0.0f), // Model's position
+                     glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                     glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                     glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    NodePointerList no_children;
+    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
 
-    gl_cube_instance_->addColorTexture("test");
-    gl_cube_instance_->addNormalTexture("normal_map");
+	node_map_["sphere"] = sphere_node;
 
-    // Give the cube a position and orientation
-    Object3D root_cube(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position respect to the parent
-                       glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
-                       glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
-                       glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
-    NodePointerList children;
-    Node3D *cubes = new Node3D(root_cube, gl_cube_instance_, children, true);
+    // PLANE
+    // ------
+    // Create Mesh
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    gl_plane_ = new GLMesh(mesh);
+    // Load the Mesh into VBO and VAO
+    gl_plane_->init();
+    // Create instance of GLMEsh (there could be more than one)
+    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);
+    gl_plane_instance_->addColorTexture("test");
+    gl_plane_instance_->addNormalTexture("normal_map");
+    // Give the plane a position and a orientation
+    Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
+                   glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
+                   glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
+                   glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
+    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, no_children, true);
 
-    node_map_["cubes"] = cubes;
+	node_map_["plane"] = plane_node;
 
-    // Create the Camera
-    camera_gps_ = new Object3D(glm::vec3(0.0f, 0.0f, 5.0f), // Camera's position (eye's coordinates)
-                               glm::vec3(1.0f, 0.0f, 0.0f), // Camera's X axis
-                               glm::vec3(0.0f, 1.0f, 0.0f), // Camera's Y axis
-                               glm::vec3(0.0f, 0.0f, 1.0f));// VIEWING AXIS (the camera is looking into its NEGATIVE Z axis)
-    CameraFirstPerson *fp_camera = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    camera_ = dynamic_cast<CameraInterface *>(fp_camera);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f),
-                                                         dynamic_cast<Object3D &>(*cubes),
-                                                         10.0f, 0.0f);
+    // Create the Camera    // Create the camera_
+    glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 camera_z = glm::normalize(camera_position);
+    glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
+    glm::vec3 camera_y = glm::normalize(glm::cross(camera_z, camera_x));
+    camera_gps_ = new Object3D(camera_position, // camera_'s position (eye's coordinates)
+                               camera_x, // camera_'s X axis
+                               camera_y, // camera_'s Y axis
+                               camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
+    //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), static_cast<Object3D>(*sphere_node_));
+    camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     /*
     prog.setUniform("Kd", 0.9f, 0.5f, 0.3f);
@@ -106,27 +132,8 @@ void GLSceneNormal::init(void)
 
     // LIGHTS
     //---------
-    glm::vec3 light_position (0.0f, 0.0f, 10.0f);
-    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
-    // Create Cube Mesh
-    gl_sphere_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE));
-    // Load the Mesh into VBO and VAO
-    gl_sphere_->init();
-    // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
-    // Color texture for light object
-    gl_sphere_instance_->addColorTexture("light");
-
-    Object3D root_sphere(light_position,
-                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
-    NodePointerList light_children;
-    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
-
-    node_map_["light"] = light_node;
-
-    lights_positional_.push_back(LightPositional(light_position, light_intensity));
+    // LIGHTS
+    lights_positional_.push_back(LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.8f, 0.8f)));
 }
 
 void GLSceneNormal::loadMaterial(void) const
@@ -179,10 +186,15 @@ void GLSceneNormal::loadLights(void) const
 */
 void GLSceneNormal::update(float time)
 {
-    // CAMERA: update position and orientation
-    ///camera_->update(*camera_gps_);
-    tp_camera_->update(dynamic_cast<Object3D &>(*(node_map_["cubes"])));
-    // LIGHTS: update position
+	float radius_delta, inclination_delta, azimuth_delta;
+	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+
+	tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
+	                   radius_delta,
+	                   inclination_delta,
+	                   azimuth_delta);
+
+	// LIGHTS: update position
     static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -197,12 +209,14 @@ void GLSceneNormal::update(float time)
     }
 }
 
+
+
 /**
 * @brief Render all the renderable objects in the scene
 */
 void GLSceneNormal::render(void)
 {
-    glClearColor(0.0f, 0.1f, 0.1f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -229,6 +243,8 @@ void GLSceneNormal::render(void)
     }
 }
 
+
+
 /**
 * @brief Resize the scene
 *
@@ -240,6 +256,7 @@ void GLSceneNormal::resize(int width, int height)
     GLScene::resize(width, height);
     camera_->setAspectRatio(static_cast<float>(width)/height);
 }
+
 
 
 /**
@@ -334,19 +351,22 @@ void GLSceneNormal::keyboard(unsigned char key, int x, int y)
     }
 }
 
+
+
 void GLSceneNormal::mouseClick(int button, int state, int x, int y)
 {
-    //tp_camera_->mouse(button, state, x, y);
+	camera_controller_.mouseClick(button, state, x, y);
 }
 
 void GLSceneNormal::mouseMotion(int x, int y)
 {
+	camera_controller_.mouseMotion(x, y);
 }
 
 void GLSceneNormal::cleanup(void)
 {
-    delete gl_cube_instance_;
-    delete gl_cube_;
+    delete gl_plane_instance_;
+    delete gl_plane_;
     delete camera_gps_;
     delete camera_;
     delete gl_sphere_instance_;

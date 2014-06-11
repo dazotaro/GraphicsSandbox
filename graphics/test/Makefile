@@ -4,7 +4,7 @@ LIB_NAME =
 
 OPTS = -O2 -g -Wall -fmessage-length=0 -std=c++11
 
-OBJS = test.o GLSceneLighting.o #GLSceneNormal.o GLSceneShadow.o GLSceneSprite.o GLSceneParticles.o GLSceneCometTail.o
+OBJS = test.o GLSceneLighting.o GLSceneNormal.o #GLSceneShadow.o GLSceneSprite.o GLSceneParticles.o GLSceneCometTail.o
 
 INC = -iquote../src/
 

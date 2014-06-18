@@ -71,7 +71,7 @@ void GLSceneNormal::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
@@ -132,7 +132,7 @@ void GLSceneNormal::init(void)
 
     // LIGHTS
     //---------
-    glm::vec3 light_position (0.0f, 0.0f, 10.0f);
+    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
@@ -242,8 +242,8 @@ void GLSceneNormal::render(void)
     // LOAD LIGHTS
     loadLights();
     
-    TextureManager::bindTexture(current_program_iter_->second, "normal_map", "NormalMapTex");
-    TextureManager::bindTexture(current_program_iter_->second, "test", "ColorTex0");
+    //TextureManager::bindTexture(current_program_iter_->second, "normal_map", "NormalMapTex");
+    //TextureManager::bindTexture(current_program_iter_->second, "test", "ColorTex0");
 
     // Model Matrix
     glm::mat4 M(1.0f);
@@ -256,6 +256,8 @@ void GLSceneNormal::render(void)
     {
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
+
+    TextureManager::unbindAllTextures();
 }
 
 

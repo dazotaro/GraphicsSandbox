@@ -92,7 +92,6 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
     program.setUniform("MVP", projection * mv);
 
     // Bind all COLOR TEXTURES
-	/*
     for (int index = 0; index < color_texture_name_list_.size(); ++index)
     {
         std::ostringstream oss;;
@@ -102,7 +101,6 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
 
     // Bind NORMAL TEXTURE
     TextureManager::bindTexture(program, normal_map_texture_name_,GLSLProgram::NORMAL_MAP_TEX_PREFIX);
-	*/
     mesh_->draw();
 
     TextureManager::unbindAllTextures();

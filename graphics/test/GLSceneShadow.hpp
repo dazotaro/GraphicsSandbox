@@ -19,6 +19,7 @@ class Node3D;
 class Object3D;
 class CameraInterface;
 class CameraFirstPerson;
+class CameraThirdPerson;
 
 /*
  * @brief Scene class
@@ -29,6 +30,10 @@ class GLSceneShadow : public GLScene
 {
     public:
         static const int MAX_LIGHTS = 8;
+
+        // TYPEDEFS
+        typedef std::map<std::string, Node3D *> NodeMap;
+        typedef NodeMap::const_iterator NodeMapIterator;
 
     public:
         GLSceneShadow(int width, int height);
@@ -46,7 +51,7 @@ class GLSceneShadow : public GLScene
     private:
         void renderPerfragmentLighting(void) const;
         void renderShadow(void) const;
-        void drawScene(const CameraFirstPerson *camera) const;
+        void drawScene(const CameraInterface *camera) const;
         void cleanup(void);
         void loadMaterial(void) const;
         void loadLights(void) const;
@@ -57,12 +62,12 @@ class GLSceneShadow : public GLScene
         GLMeshInstance*  gl_sphere_instance_;
         GLMesh*          gl_plane_;
         GLMeshInstance*  gl_plane_instance_;
-        Node3D*          sphere_node_;
-        Node3D*          plane_node_;
         Object3D*        camera_gps_;
         CameraFirstPerson *fp_camera_;
         CameraFirstPerson *light_frustum_;
-        CameraFirstPerson *camera_;
+        CameraThirdPerson *tp_camera_;
+        CameraInterface* camera_;
+        NodeMap			node_map_;
         int shadow_map_width_;
         int shadow_map_height_;
         bool pcf_enabled_;

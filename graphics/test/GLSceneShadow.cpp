@@ -14,7 +14,8 @@
 #include "Object3D.hpp"             // Object3D
 #include "CameraInterface.hpp"      // camera_Interface
 #include "CameraFirstPerson.hpp"    // camera_FirstPerson
-#include "ShapeHelper.hpp"          // build Mesh helper funtions
+#include "CameraThirdPerson.hpp"    // camera_FirstPerson
+#include "ShapeHelper2.hpp"          // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
 #include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
 #include "DebugGlm.hpp"				// operator<<
@@ -22,7 +23,7 @@
 
 GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0), gl_plane_(0), gl_plane_instance_(0),
-                                     sphere_node_(0), plane_node_(0), camera_gps_(0), camera_(0),
+                                     camera_gps_(0), camera_(0),
                                      shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
                                      shadowFBO_(0), depthTex_(0),
                                      camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 10.0f)
@@ -62,24 +63,30 @@ void GLSceneShadow::init(void)
     // SPHERE
     // ------
     // Create Mesh
-    gl_sphere_ = new GLMesh(Graphics::buildMesh(Graphics::SPHERE, 64, 32));
+    Mesh2 mesh;
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 48, 48);
+    mesh.computeTangents();
+    gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
     gl_sphere_instance_->addColorTexture("test");
     // Give the sphere a position and a orientation
-    Object3D sphere(glm::vec3(0.0f, 10.0f, 0.0f), // Model's position
-                     glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                     glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                     glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
+                    glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
+                    glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
+                    glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
     NodePointerList no_children;
-    sphere_node_ = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+
+	node_map_["sphere"] = sphere_node;
 
     // PLANE
     // ------
     // Create Mesh
-    gl_plane_ = new GLMesh(Graphics::buildMesh(Graphics::PLANE));
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    gl_plane_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
@@ -90,9 +97,12 @@ void GLSceneShadow::init(void)
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    plane_node_ = new Node3D(plane, gl_plane_instance_, no_children, true);
+    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, no_children, true);
 
-    // Create the camera_
+	node_map_["plane"] = plane_node;
+
+
+    // Create the Camera    // Create the camera_
     glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
     glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
@@ -101,26 +111,42 @@ void GLSceneShadow::init(void)
                                camera_x, // camera_'s X axis
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
-    fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    //camera_ = new camera_ThirdPerson(camera_Intrinsic(90.f, WIDTH/(float)HEIGHT, 1.f, 1000.f), dynamic_cast<Object3D *>(sphere_node_));
+    //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f),
+    								   static_cast<Object3D>(*sphere_node),
+    								   10.0f, 0.0f, M_PI / 4.0f);
+    camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
 
     // LIGHT FRUSTUM
-    glm::vec3 light_position (10.0f, 30.0f, 0.0f);
-    glm::vec3 light_z = glm::normalize(light_position);
-    glm::vec3 light_x = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), light_z));
-    glm::vec3 light_y = glm::normalize(glm::cross(light_z, light_x));
+    glm::vec3 frustum_position (10.0f, 30.0f, 0.0f);
+    glm::vec3 frustum_z = glm::normalize(frustum_position);
+    glm::vec3 frustum_x = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), frustum_z));
+    glm::vec3 frustum_y = glm::normalize(glm::cross(frustum_z, frustum_x));
 
-    Object3D light_Frustum_3d (light_position, // camera_'s position (eye's coordinates)
-                               light_x, // camera_'s X axis
-                               light_y, // camera_'s Y axis
-                               light_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
+    Object3D light_Frustum_3d (frustum_position, // camera_'s position (eye's coordinates)
+                               frustum_x, // camera_'s X axis
+                               frustum_y, // camera_'s Y axis
+                               frustum_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     light_frustum_= new CameraFirstPerson(CameraIntrinsic(90.f, (float)shadow_map_width_/shadow_map_height_, 1.f, 100.f), light_Frustum_3d);
 
-    camera_ = fp_camera_;
-
     // LIGHTS
-    lights_positional_.push_back(LightPositional(light_position, glm::vec3(0.8f, 0.8f, 0.8f)));
+    //---------
+    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
+    // Create instance of GLMEsh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
+    // Color texture for light object
+    gl_sphere_instance_->addColorTexture("light");
+
+    Object3D root_sphere(light_position,
+                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    NodePointerList light_children;
+    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
+
+    node_map_["light"] = light_node;
 
     setupFBO();
 
@@ -228,6 +254,14 @@ void GLSceneShadow::loadLights(void) const
 */
 void GLSceneShadow::update(float time)
 {
+	float radius_delta, inclination_delta, azimuth_delta;
+	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+
+	tp_camera_->update(static_cast<const Object3D&>(*(node_map_["sphere"])),
+	                   radius_delta,
+	                   inclination_delta,
+	                   azimuth_delta);
+
 	static float delta_theta = M_PI * 0.05f;
 	glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), delta_theta * time, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -241,19 +275,12 @@ void GLSceneShadow::update(float time)
 	light_frustum_->setXAxis(light_x);
 	light_frustum_->setYAxis(light_y);
 	light_frustum_->setZAxis(light_z);
-
-	// camera_: update position and orientation
-    //camera_->update(*camera_gps_);
-    // LIGHTS: update position
-
-	float radius, inclination, azimuth;
-	camera_controller_.update(radius, inclination, azimuth);
 }
 
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneShadow::drawScene(const CameraFirstPerson *camera) const
+void GLSceneShadow::drawScene(const CameraInterface *camera) const
 {
 	static glm::mat4 bias (0.5f, 0.0f, 0.0f, 0.0f,
 						   0.0f, 0.5f, 0.0f, 0.0f,
@@ -271,11 +298,14 @@ void GLSceneShadow::drawScene(const CameraFirstPerson *camera) const
     // Draw
     current_program_iter_->second.setUniform("ShadowMatrix", shadow_matrix);
 
-    (current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
-    sphere_node_->draw(current_program_iter_->second, M, V, P);
+    // Draw each object
+    for (NodeMapIterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
+    {
+        (current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
+        (iter->second)->draw(current_program_iter_->second, M, V, P);
+    }
 
-    (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
-    plane_node_->draw(current_program_iter_->second, M, V, P);
+    TextureManager::unbindAllTextures();
 }
 
 /**
@@ -424,32 +454,32 @@ void GLSceneShadow::keyboard(unsigned char key, int x, int y)
 
         case 'a':
         case 'A':
-            sphere_node_->rotateX(-1.0f);
+            node_map_["sphere"]->rotateX(-1.0f);
             break;
 
         case 'd':
         case 'D':
-            sphere_node_->rotateX(1.0f);
+            node_map_["sphere"]->rotateX(1.0f);
             break;
 
         case 'q':
         case 'Q':
-            sphere_node_->rotateY(1.0f);
+            node_map_["sphere"]->rotateY(1.0f);
             break;
 
         case 'e':
         case 'E':
-            sphere_node_->rotateY(-1.0f);
+            node_map_["sphere"]->rotateY(-1.0f);
             break;
 
         case 'w':
         case 'W':
-            sphere_node_->rotateZ(-1.0f);
+            node_map_["sphere"]->rotateZ(-1.0f);
             break;
 
         case 's':
         case 'S':
-            sphere_node_->rotateZ(1.0f);
+            node_map_["sphere"]->rotateZ(1.0f);
             break;
 
         case 'k':
@@ -524,8 +554,6 @@ void GLSceneShadow::cleanup(void)
     delete gl_sphere_instance_;
     delete gl_plane_;
     delete gl_plane_instance_;
-    delete sphere_node_;
-    delete plane_node_;
     delete camera_gps_;
     delete fp_camera_;
     delete light_frustum_;

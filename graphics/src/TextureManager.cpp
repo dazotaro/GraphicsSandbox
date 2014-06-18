@@ -120,8 +120,6 @@ void TextureManager::bindTexture(const GLSLProgram &program, const std::string &
 
     program.setUniform(uniform_name.c_str(), num_tex_bound_);
 
-    std::printf("%s  = %i\n", texture_name.c_str(), num_tex_bound_);
-
     num_tex_bound_++;
 }
 

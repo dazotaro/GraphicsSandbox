@@ -57,8 +57,6 @@ class GLSceneNormal : public GLScene
         GLMeshInstance* gl_sphere_instance_;
         GLMesh*         gl_plane_;
         GLMeshInstance* gl_plane_instance_;
-        Node3D*         sphere_node_;
-        Node3D*         plane_node_;
         Object3D*       camera_gps_;
         NodeMap			node_map_;
         //CameraFirstPerson *fp_camera_;

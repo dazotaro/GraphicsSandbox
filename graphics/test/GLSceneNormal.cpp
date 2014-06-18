@@ -23,7 +23,6 @@
 GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
-                                     sphere_node_(0), plane_node_(0),
                                      camera_gps_(0), camera_(0),
                                      camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.2f)
 {
@@ -72,7 +71,7 @@ void GLSceneNormal::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 96, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
@@ -111,6 +110,7 @@ void GLSceneNormal::init(void)
 
 	node_map_["plane"] = plane_node;
 
+
     // Create the Camera    // Create the camera_
     glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
@@ -121,7 +121,7 @@ void GLSceneNormal::init(void)
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), static_cast<Object3D>(*sphere_node_));
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), static_cast<Object3D>(*sphere_node));
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     /*
@@ -132,8 +132,23 @@ void GLSceneNormal::init(void)
 
     // LIGHTS
     //---------
-    // LIGHTS
-    lights_positional_.push_back(LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.8f, 0.8f)));
+    glm::vec3 light_position (0.0f, 0.0f, 10.0f);
+    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
+    // Create instance of GLMEsh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
+    // Color texture for light object
+    gl_sphere_instance_->addColorTexture("light");
+
+    Object3D root_sphere(light_position,
+                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    NodePointerList light_children;
+    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
+
+    node_map_["light"] = light_node;
+
+    lights_positional_.push_back(LightPositional(light_position, light_intensity));
 }
 
 void GLSceneNormal::loadMaterial(void) const
@@ -189,7 +204,7 @@ void GLSceneNormal::update(float time)
 	float radius_delta, inclination_delta, azimuth_delta;
 	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
 
-	tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
+	tp_camera_->update(static_cast<const Object3D&>(*(node_map_["sphere"])),
 	                   radius_delta,
 	                   inclination_delta,
 	                   azimuth_delta);

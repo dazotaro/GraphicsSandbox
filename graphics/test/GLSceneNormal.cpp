@@ -71,7 +71,7 @@ void GLSceneNormal::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
@@ -81,10 +81,10 @@ void GLSceneNormal::init(void)
     gl_sphere_instance_->addColorTexture("test");
     gl_sphere_instance_->addNormalTexture("normal_map");
     // Give the sphere a position and a orientation
-    Object3D sphere(glm::vec3(0.0f, 10.0f, 0.0f), // Model's position
-                     glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                     glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                     glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
+                    glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
+                    glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
+                    glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
     NodePointerList no_children;
     Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
 
@@ -121,7 +121,9 @@ void GLSceneNormal::init(void)
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), static_cast<Object3D>(*sphere_node));
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f),
+    								   static_cast<Object3D>(*sphere_node),
+    								   10.0f, 0.0f, M_PI / 4.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     /*

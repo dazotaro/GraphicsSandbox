@@ -16,7 +16,7 @@ uniform LightInfo Light;
 uniform vec3 Kd;            // Diffuse reflectivity
 uniform vec3 Ka;            // Ambient reflectivity
 uniform vec3 Ks;            // Specular reflectivity
-uniform float Shininess;    // Specular shininess factor
+uniform float shininess;    // Specular shininess factor
 
 uniform sampler2D ColorTex0;
 
@@ -30,7 +30,7 @@ vec3 ads(vec4 position, vec3 normal, out vec3 ambAndDiff, out vec3 spec)
     vec3 I = Light.Intensity;
 
 	ambAndDiff = I * (Ka + Kd * max(dot(s, normal), 0.0));
-	spec = I * (Ks * pow(max(dot(r,v), 0.0), Shininess));
+	spec = I * (Ks * pow(max(dot(r,v), 0.0), shininess));
 	
 	return ambAndDiff + spec;
 }

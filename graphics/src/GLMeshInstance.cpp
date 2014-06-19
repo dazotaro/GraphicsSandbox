@@ -5,15 +5,19 @@
  *      Author: jusabiaga
  */
 
-#include "GLMeshInstance.hpp"
-#include "GLMesh.hpp"                       // GLMesh
-#include "GLSLProgram.hpp"                  // GLSLProgram
+// Global Includes
 #include <glm/gtc/matrix_transform.hpp>     // glm::scale
 #include <glm/gtx/transform2.hpp>           // glm::scale
 #include <iostream>                         // std::cout, std::endl
-#include "DebugGlm.hpp"                     // overloaded operator<< for glm types
 #include <sstream>                          // ostringstream
+
+// Local Includes
+#include "GLMeshInstance.hpp"
+#include "GLMesh.hpp"                       // GLMesh
+#include "GLSLProgram.hpp"                  // GLSLProgram
+#include "DebugGlm.hpp"                     // overloaded operator<< for glm types
 #include "TextureManager.hpp"               // bindTexture
+#include "Material.hpp"						// Material
 
 
 /**
@@ -27,9 +31,12 @@
 GLMeshInstance::GLMeshInstance(const GLMesh *mesh,
                                float scaleX,
                                float scaleY,
-                               float scaleZ) :
+                               float scaleZ,
+                               const Material* material) :
         mesh_(mesh), scaleX_(scaleX), scaleY_(scaleY), scaleZ_(scaleZ)
 {
+	if (material)
+		material_ = new Material(material);
 }
 
 
@@ -56,10 +63,27 @@ void GLMeshInstance::addNormalTexture(const std::string &texture_name)
 
 
 /**
+* @brief Set the material coefficients
+*
+* @param texture_name Name of texture (as stored by TextureManager)
+*/
+void GLMeshInstance::addMaterial(const Material* material)
+{
+	if(material_)
+		delete material_;
+
+	material_ = new Material(material);
+}
+
+
+
+/**
 * @brief Destructor
 */
 GLMeshInstance::~GLMeshInstance()
 {
+	if (material_)
+		delete material_;
 }
 
 
@@ -91,6 +115,14 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
     program.setUniform("NormalMatrix", glm::mat3(glm::vec3(mv[0]), glm::vec3(mv[1]), glm::vec3(mv[2])));
     program.setUniform("MVP", projection * mv);
 
+    if (material_)
+    {
+    	program.setUniform("Ka", material_->ka_);
+    	program.setUniform("Kd", material_->kd_);
+    	program.setUniform("Ks", material_->ks_);
+    	program.setUniform("shininess", material_->shininess_);
+    }
+
     // Bind all COLOR TEXTURES
     for (int index = 0; index < color_texture_name_list_.size(); ++index)
     {
@@ -101,6 +133,7 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
 
     // Bind NORMAL TEXTURE
     TextureManager::bindTexture(program, normal_map_texture_name_,GLSLProgram::NORMAL_MAP_TEX_PREFIX);
+
     mesh_->draw();
 
     TextureManager::unbindAllTextures();

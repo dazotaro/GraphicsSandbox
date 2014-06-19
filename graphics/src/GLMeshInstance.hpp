@@ -16,6 +16,7 @@
 // Forward Declarations
 class GLSLProgram;
 class GLMesh;
+class Material;
 
 /**
  * @brief It contains a given instance of a GLMesh.
@@ -31,11 +32,13 @@ class GLMeshInstance : public DrawInterface
         explicit GLMeshInstance(const GLMesh *mesh,
                                 float scaleX = 1.0f,
                                 float scaleY = 1.0f,
-                                float scaleZ = 1.0f);
+                                float scaleZ = 1.0f,
+                                const Material* material = 0);
         ~GLMeshInstance();
 
         void addColorTexture(const std::string &texture_name);
         void addNormalTexture(const std::string &texture_name);
+        void addMaterial(const Material* material);
 
         void draw(const GLSLProgram &program,
         		  const glm::mat4 & model,
@@ -47,6 +50,7 @@ class GLMeshInstance : public DrawInterface
         float scaleX_;                      //!< Scale factor in the X axis
         float scaleY_;                      //!< Scale factor in the Y axis
         float scaleZ_;                      //!< Scale factor in the Z axis
+        Material* material_;					//!< Material coefficients
         std::vector<std::string> color_texture_name_list_;
         std::string normal_map_texture_name_;
 

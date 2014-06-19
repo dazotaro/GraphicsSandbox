@@ -299,11 +299,21 @@ void GLSceneShadow::drawScene(const CameraInterface *camera) const
     current_program_iter_->second.setUniform("ShadowMatrix", shadow_matrix);
 
     // Draw each object
+    /*
     for (NodeMapIterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
     {
         (current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
+    */
+
+    NodeMapIterator iter = node_map_.find("sphere");
+    (current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
+    (iter->second)->draw(current_program_iter_->second, M, V, P);
+
+    iter = node_map_.find("plane");
+    (current_program_iter_->second).setUniform("Ka", 0.6f, 0.6f, 0.6f);
+    (iter->second)->draw(current_program_iter_->second, M, V, P);
 
     TextureManager::unbindAllTextures();
 }

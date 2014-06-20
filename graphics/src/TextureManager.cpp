@@ -13,11 +13,15 @@
 #include <SOIL.h>                   // SOIL_load_image
 #include <iostream>                 // cout, endl
 
-// STATIC VARIABLES
+// STATIC MMEMBER VARIABLES
+// ------------------------
 std::map<std::string, GLuint> TextureManager::texture_map_;  //!< Handle to the texture
 int TextureManager::num_tex_bound_ = 0;
 
-// FUNCTIONS
+
+
+// STATIC MEMBER FUNCTIONS
+// -----------------------
 
 bool TextureManager::loadTexture(const std::string &texture_name, const std::string &filename)
 {

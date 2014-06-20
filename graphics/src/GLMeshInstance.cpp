@@ -124,7 +124,7 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
     }
 
     // Bind all COLOR TEXTURES
-    for (int index = 0; index < color_texture_name_list_.size(); ++index)
+    for (JU::uint32 index = 0; index < color_texture_name_list_.size(); ++index)
     {
         std::ostringstream oss;;
         oss << GLSLProgram::COLOR_TEX_PREFIX << index;

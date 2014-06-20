@@ -20,13 +20,14 @@
 #include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
 #include "DebugGlm.hpp"				// operator<<
 #include <SOIL.h>                   // SOIL_save_image
+#include "Material.hpp"				// MaterialManager
 
 GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0), gl_plane_(0), gl_plane_instance_(0),
                                      camera_gps_(0), camera_(0),
                                      shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
                                      shadowFBO_(0), depthTex_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 10.0f)
+                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 2.0f)
 {
 }
 
@@ -60,6 +61,21 @@ void GLSceneShadow::init(void)
     // --------
     //TextureManager::loadTexture("test", "texture/test.tga");
 
+    // MATERIALS
+    // ---------
+    MaterialManager::init();
+    Material mat_sphere;
+    if (!MaterialManager::getMaterial("ruby", mat_sphere))
+    	exit(EXIT_FAILURE);
+    Material mat_plane;
+    if (!MaterialManager::getMaterial("emerald", mat_plane))
+    	exit(EXIT_FAILURE);
+
+    std::printf("Pearl\n");
+    mat_sphere.print();
+    std::printf("Emerald\n");
+    mat_plane.print();
+
     // SPHERE
     // ------
     // Create Mesh
@@ -70,7 +86,7 @@ void GLSceneShadow::init(void)
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
     gl_sphere_instance_->addColorTexture("test");
     // Give the sphere a position and a orientation
     Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
@@ -90,7 +106,7 @@ void GLSceneShadow::init(void)
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);
+    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
     gl_plane_instance_->addColorTexture("test");
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
@@ -103,7 +119,8 @@ void GLSceneShadow::init(void)
 
 
     // Create the Camera    // Create the camera_
-    glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
+    /*
+	glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
     glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
     glm::vec3 camera_y = glm::normalize(glm::cross(camera_z, camera_x));
@@ -111,6 +128,7 @@ void GLSceneShadow::init(void)
                                camera_x, // camera_'s X axis
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
+   */
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
     tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f),
     								   static_cast<Object3D>(*sphere_node),
@@ -308,11 +326,11 @@ void GLSceneShadow::drawScene(const CameraInterface *camera) const
     */
 
     NodeMapIterator iter = node_map_.find("sphere");
-    (current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
+    //(current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
     (iter->second)->draw(current_program_iter_->second, M, V, P);
 
     iter = node_map_.find("plane");
-    (current_program_iter_->second).setUniform("Ka", 0.6f, 0.6f, 0.6f);
+    //(current_program_iter_->second).setUniform("Ka", 0.6f, 0.6f, 0.6f);
     (iter->second)->draw(current_program_iter_->second, M, V, P);
 
     TextureManager::unbindAllTextures();

@@ -12,12 +12,14 @@
 #include <glm/glm.hpp>		// glm::vec3
 #include <JU/Defs.hpp>		// JU::f32
 #include <unordered_map>	// std::unordered_map
+#include <string>			// std::string
+#include <unordered_map>	// std::unordered_map
 
 struct Material
 {
-	Material(JU::f32 ka_r, JU::f32 ka_g, JU::f32 ka_b,
-			 JU::f32 kd_r, JU::f32 kd_g, JU::f32 kd_b,
-			 JU::f32 ks_r, JU::f32 ks_g, JU::f32 ks_b, JU::f32 shininess)
+	Material(JU::f32 ka_r = 0.0f, JU::f32 ka_g = 0.0f, JU::f32 ka_b = 0.0f,
+			 JU::f32 kd_r = 0.0f, JU::f32 kd_g = 0.0f, JU::f32 kd_b = 0.0f,
+			 JU::f32 ks_r = 0.0f, JU::f32 ks_g = 0.0f, JU::f32 ks_b = 0.0f, JU::f32 shininess = 0.0f)
 		: ka_(glm::vec3(ka_r, ka_g, ka_b)),
 		  kd_(glm::vec3(kd_r, kd_g, kd_b)),
 		  ks_(glm::vec3(ks_r, ks_g, ks_b)), shininess_(shininess) {}
@@ -27,6 +29,9 @@ struct Material
 
 	Material(const Material* material)
 		: ka_(material->ka_), kd_(material->kd_), ks_(material->ks_), shininess_(material->shininess_) {}
+
+	void print() const;
+
 
 	glm::vec3 ka_;
 	glm::vec3 kd_;
@@ -38,14 +43,14 @@ class MaterialManager
 {
 	public:
 		static void init();
-		static Material getMaterial();
+		static bool getMaterial(const std::string& material_name, Material& material);
 
 	private:
-		typedef std::vector<std::string, Material> HashMapMaterial;
+		typedef std::unordered_map<std::string, Material> HashMapMaterial;
 		typedef HashMapMaterial::const_iterator HashMapMaterialConstIter;
 
 	private:
-		static bool initialized_ = false;
+		static bool initialized_;
 		static HashMapMaterial hpMaterials_;
 };
 

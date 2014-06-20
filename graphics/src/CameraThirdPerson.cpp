@@ -12,8 +12,10 @@
 #include "CoordinateHelper.hpp"             // spherical2cartesian()
 
 // Global includes
+#include <JU/Defs.hpp>						// JU::f32
 #include <glm/gtc/matrix_transform.hpp>     // glm:lookAt
 #include <iostream>                         // std::cout, std::endl
+#include <cmath>							// std::fabsf
 
 
 
@@ -82,17 +84,32 @@ void CameraThirdPerson::setFrameSpherical(const Object3D &target)
     glm::vec3 point_on_sphere;      // given the spherical coordinates compute the cartesian ones for that point on the sphere
     CoordinateHelper::spherical2cartesian(distance_to_target_, inclination_, azimuth_, point_on_sphere[0], point_on_sphere[1], point_on_sphere[2]);
 
+    /*
+	static float old_inc = 0.0f;
+    static float old_azi = 0.0f;
+
+    if (fabs(old_inc - inclination_) > 0.0f || fabs(old_azi - azimuth_) > 0.0f)
+    {
+    	std::printf("theta = %.4f; phi = %.4f; point_sphere = (%.4f, %.4f, %.4f)\n",
+    				glm::degrees(azimuth_), glm::degrees(inclination_),
+    				point_on_sphere.x, point_on_sphere.y, point_on_sphere.z);
+
+    	old_azi = azimuth_;
+    	old_inc = inclination_;
+    }
+	*/
+
     // For testing purposes (clarity)
     glm::vec3& cop  = position_;
     glm::vec3& u    = x_axis_;
     glm::vec3& up   = y_axis_;
     glm::vec3& view = z_axis_;
 
-
     cop  = point_on_sphere + target.getPosition();
     view = glm::normalize(cop - target.getPosition());
-    u    = glm::normalize(glm::cross(target.getYAxis(), view));
+    u    = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), view));
     up   = glm::normalize(glm::cross(view, u));
+    //u    = glm::normalize(glm::cross(target.getYAxis(), view));
 }
 
 /**

@@ -27,7 +27,7 @@ GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
                                      camera_gps_(0), camera_(0),
                                      shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
                                      shadowFBO_(0), depthTex_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 2.0f)
+                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.5f)
 {
 }
 
@@ -47,7 +47,7 @@ void GLSceneShadow::init(void)
     //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
     //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
 
-    current_program_iter_ = glsl_program_map_.find("shadow_mapping");
+    current_program_iter_ = glsl_program_map_.find("perfragment");
     
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
@@ -65,10 +65,10 @@ void GLSceneShadow::init(void)
     // ---------
     MaterialManager::init();
     Material mat_sphere;
-    if (!MaterialManager::getMaterial("ruby", mat_sphere))
+    if (!MaterialManager::getMaterial("chrome", mat_sphere))
     	exit(EXIT_FAILURE);
     Material mat_plane;
-    if (!MaterialManager::getMaterial("emerald", mat_plane))
+    if (!MaterialManager::getMaterial("red_rubber", mat_plane))
     	exit(EXIT_FAILURE);
 
     std::printf("Pearl\n");
@@ -80,7 +80,7 @@ void GLSceneShadow::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO

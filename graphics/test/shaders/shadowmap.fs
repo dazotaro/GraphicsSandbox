@@ -10,7 +10,7 @@ uniform LightInfo Light;
 uniform vec3 Kd;            // Diffuse reflectivity
 uniform vec3 Ka;            // Ambient reflectivity
 uniform vec3 Ks;            // Specular reflectivity
-uniform float Shininess;    // Specular shininess factor
+uniform float shininess;    // Specular shininess factor
 
 uniform sampler2DShadow ShadowMap;
 
@@ -32,7 +32,7 @@ vec3 phongModelDiffAndSpec()
     vec3 spec = vec3(0.0);
     if( sDotN > 0.0 )
         spec = Light.Intensity * Ks *
-            pow( max( dot(r,v), 0.0 ), Shininess );
+            pow( max( dot(r,v), 0.0 ), shininess );
 
     return diffuse + spec;
 }

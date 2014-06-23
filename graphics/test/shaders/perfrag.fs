@@ -13,7 +13,7 @@ uniform LightInfo Light;
 uniform vec3 Kd;            // Diffuse reflectivity
 uniform vec3 Ka;            // Ambient reflectivity
 uniform vec3 Ks;            // Specular reflectivity
-uniform float Shininess;    // Specular shininess factor
+uniform float shininess;    // Specular shininess factor
 
 layout( location = 0 ) out vec4 FragColor;
 
@@ -30,7 +30,7 @@ vec3 ads(vec4 position, vec3 norm)
     vec3 diffuse = I * Kd * max(sDotN, 0.0);
     
     float rDotV = dot(r, v);
-    vec3 specular = I * Ks * pow(max(rDotV, 0.0), Shininess);
+    vec3 specular = I * Ks * pow(max(rDotV, 0.0), shininess);
 
     //return I * (Ka + Kd * max(dot(s, norm), 0.0) + Ks * pow(max(dot(r,v), 0.0), Shininess));
     return ambient + diffuse + specular;

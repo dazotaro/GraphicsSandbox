@@ -18,20 +18,19 @@ out vec4 Color;
 void main()
 {
     float normal_length = 0.02f;
-    vec4 position[3];
+    vec3 position[3];
 
-    position[0] = gl_in[0].gl_Position;
-    position[1] = gl_in[1].gl_Position;
-    position[2] = gl_in[2].gl_Position;
+    position[0] = gl_in[0].gl_Position.xyz;
+    position[1] = gl_in[1].gl_Position.xyz;
+    position[2] = gl_in[2].gl_Position.xyz;
 
-    vec3 v1 = (position[1] - position[0]).xyz;
-    vec3 v2 = (position[2] - position[0]).xyz;
+    vec3 v1 = (position[1] - position[0]);
+    vec3 v2 = (position[2] - position[0]);
     
     vec3 normal = normalize(cross(v1,v2));
 
     // start point
-    vec4 P = (position[0] + position[1] + position[2]) / 3.0f;
-    P.w = 1.0f;
+    vec4 P = vec4((position[0] + position[1] + position[2]) / 3.0f, 1.0f);
     gl_Position = MVP * P;
     Color = vColor[0];
     EmitVertex();

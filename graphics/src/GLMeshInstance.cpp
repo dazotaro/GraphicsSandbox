@@ -37,6 +37,8 @@ GLMeshInstance::GLMeshInstance(const GLMesh *mesh,
 {
 	if (material)
 		material_ = new Material(material);
+	else
+	    material_ = 0;
 }
 
 

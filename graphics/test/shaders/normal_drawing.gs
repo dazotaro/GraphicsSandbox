@@ -9,12 +9,9 @@ layout(line_strip, max_vertices=18) out;
 
 uniform mat4 MVP;
 
-in Vertex
-{
-    vec3 normal;
-    vec4 tangent;
-    vec4 color;
-} vertex[];
+in vec3 vNormal[];
+in vec4 vTangent[];
+in vec4 vColor[];
 
 out vec4 Color;
 
@@ -33,9 +30,9 @@ void main()
     for(i=0; i<gl_in.length(); i++)
     {
         vec4 P = gl_in[i].gl_Position;
-        vec4 N = vec4(vertex[i].normal, 0.0f);
-        vec4 T = vec4(vertex[i].tangent.xyz, 0.0f);
-        vec4 B = vec4(normalize( cross(vertex[i].normal, vertex[i].tangent.xyz) ) * vertex[i].tangent.w, 0.0f);
+        vec4 N = vec4(vNormal[i], 0.0f);
+        vec4 T = vec4(vTangent[i].xyz, 0.0f);
+        vec4 B = vec4(normalize( cross(vNormal[i], vTangent[i].xyz) ) * vTangent[i].w, 0.0f);
 
         // Normal
         position[i] = MVP * P;

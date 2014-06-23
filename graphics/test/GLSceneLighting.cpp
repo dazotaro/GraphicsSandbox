@@ -14,8 +14,9 @@
 #include "CameraInterface.hpp"      // camera_Interface
 #include "CameraFirstPerson.hpp"    // CameraFirstPerson
 #include "CameraThirdPerson.hpp"    // CameraThirdPerson
-#include "ShapeHelper2.hpp"          // build Mesh helper funtions
+#include "ShapeHelper2.hpp"         // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
+#include "Material.hpp"             // MaterialManager
 
 
 
@@ -49,9 +50,14 @@ void GLSceneLighting::init(void)
     glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
                                                                "shaders/normal_drawing.gs",
                                                                "shaders/simple.frag");
+
+    glsl_program_map_["normal_drawing_face"] = compileAndLinkShader("shaders/normal_drawing.vs",
+                                                                    "shaders/normal_drawing_face.gs",
+                                                                    "shaders/simple.frag");
+
     glsl_program_map_["wireframe"] = compileAndLinkShader("shaders/wireframe.vs",
-                                                               "shaders/wireframe.gs",
-                                                               "shaders/simple.frag");
+                                                          "shaders/wireframe.gs",
+                                                          "shaders/simple.frag");
 
     current_program_iter_ = glsl_program_map_.find("perfragment");
     
@@ -67,17 +73,32 @@ void GLSceneLighting::init(void)
     // --------
     //TextureManager::loadTexture("test", "texture/test.tga");
 
+    // MATERIALS
+    // ---------
+    MaterialManager::init();
+    Material mat_sphere;
+    if (!MaterialManager::getMaterial("ruby", mat_sphere))
+        exit(EXIT_FAILURE);
+    Material mat_plane;
+    if (!MaterialManager::getMaterial("green_rubber", mat_plane))
+        exit(EXIT_FAILURE);
+
+    std::printf("Ruby\n");
+    mat_sphere.print();
+    std::printf("Emerald\n");
+    mat_plane.print();
+
     // SPHERE
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 16, 16);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
-    // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
+    // Create instance of GLMesh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
     gl_sphere_instance_->addColorTexture("test");
     // Give the sphere a position and a orientation
     Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
@@ -95,7 +116,7 @@ void GLSceneLighting::init(void)
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);
+    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
     gl_plane_instance_->addColorTexture("test");
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
@@ -211,29 +232,45 @@ void GLSceneLighting::render(void)
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    current_program_iter_ = glsl_program_map_.find("perfragment");
-    current_program_iter_->second.use();
-
-    // LOAD MATERIAL
-    loadMaterial();
-    // LOAD LIGHTS
-    loadLights();
-    
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
     glm::mat4 V(tp_camera_->getViewMatrix());
     // Perspective Matrix
     glm::mat4 P(tp_camera_->getPerspectiveMatrix());
-    // Draw each object
-    (current_program_iter_->second).setUniform("Ka", 0.0f, 0.1f, 0.1f);
-    (current_program_iter_->second).setUniform("Kd", 0.0f, 1.0f, 0.1f);
+
+    // SOLID
+    current_program_iter_ = glsl_program_map_.find("perfragment");
+    if (current_program_iter_ == glsl_program_map_.end())
+        exit(EXIT_FAILURE);
+    current_program_iter_->second.use();
+    // LOAD MATERIAL
+    loadMaterial();
+    // LOAD LIGHTS
+    loadLights();
     sphere_node_->draw(current_program_iter_->second, M, V, P);
-    (current_program_iter_->second).setUniform("Ka", 0.2f, 0.2f, 0.2f);
-    (current_program_iter_->second).setUniform("Kd", 0.2f, 0.2f, 0.2f);
     plane_node_->draw(current_program_iter_->second, M, V, P);
 
+    // PER-VERTEX NORMAL
     current_program_iter_ = glsl_program_map_.find("normal_drawing");
+    if (current_program_iter_ == glsl_program_map_.end())
+        exit(EXIT_FAILURE);
+    current_program_iter_->second.use();
+    sphere_node_->draw(current_program_iter_->second, M, V, P);
+    plane_node_->draw(current_program_iter_->second, M, V, P);
+
+    // PER-FACE NORMAL
+    current_program_iter_ = glsl_program_map_.find("normal_drawing_face");
+    if (current_program_iter_ == glsl_program_map_.end())
+        exit(EXIT_FAILURE);
+    current_program_iter_->second.use();
+    sphere_node_->draw(current_program_iter_->second, M, V, P);
+    plane_node_->draw(current_program_iter_->second, M, V, P);
+
+    // WIREFRAME
+    current_program_iter_ = glsl_program_map_.find("wireframe");
+    if (current_program_iter_ == glsl_program_map_.end())
+        exit(EXIT_FAILURE);
     current_program_iter_->second.use();
     sphere_node_->draw(current_program_iter_->second, M, V, P);
     plane_node_->draw(current_program_iter_->second, M, V, P);

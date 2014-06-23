@@ -9,18 +9,15 @@ uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
 uniform mat4 MVP;
 
-out Vertex
-{
-  vec3 normal;
-  vec4 tangent;
-  vec4 color;
-} vertex;
+out vec3 vNormal;
+out vec4 vTangent;
+out vec4 vColor;
 
 void main()
 {
      gl_Position   = vec4(VertexPosition,1.0);
-     vertex.normal = VertexNormal;
-     vertex.tangent = VertexTangent;
-     vertex.color  = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+     vNormal = VertexNormal;
+     vTangent = VertexTangent;
+     vColor  = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 }
 

@@ -15,33 +15,35 @@ out vec4 Color;
 
 void main()
 {
+    vec4 wire_color = vec4(0.6f, 0.6f, 0.6f, 1.0f);
+    
     // Draw the Wireframe
     gl_Position = MVP * gl_in[0].gl_Position;
-    Color = color[0];
+    Color = wire_color;
     EmitVertex();
     
     gl_Position = MVP * gl_in[1].gl_Position;
-    Color = color[1];
+    Color = wire_color;
     EmitVertex();
     
     EndPrimitive();
 
     gl_Position = MVP * gl_in[1].gl_Position;
-    Color = color[1];
+    Color = wire_color;
     EmitVertex();
     
     gl_Position = MVP * gl_in[2].gl_Position;
-    Color = color[2];
+    Color = wire_color;
     EmitVertex();
     
     EndPrimitive();
 
     gl_Position = MVP * gl_in[2].gl_Position;
-    Color = color[2];
+    Color = wire_color;
     EmitVertex();
     
     gl_Position = MVP * gl_in[0].gl_Position;
-    Color = color[0];
+    Color = wire_color;
     EmitVertex();
     
     EndPrimitive();

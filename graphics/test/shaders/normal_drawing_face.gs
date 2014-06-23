@@ -9,38 +9,36 @@ layout(line_strip, max_vertices=2) out;
 
 uniform mat4 MVP;
 
-in Vertex
-{
-    vec3 normal;
-    vec4 tangent;
-    vec4 color;
-} vertex[];
+in vec3 vNormal[];
+in vec4 vTangent[];
+in vec4 vColor[];
 
 out vec4 Color;
 
 void main()
 {
-    float normal_length = 0.05f;
+    float normal_length = 0.02f;
     vec4 position[3];
 
-    position[0] = MVP * gl_in[0].gl_Position;
-    position[1] = MVP * gl_in[1].gl_Position;
-    position[2] = MVP * gl_in[2].gl_Position;
+    position[0] = gl_in[0].gl_Position;
+    position[1] = gl_in[1].gl_Position;
+    position[2] = gl_in[2].gl_Position;
 
-    vec4 v1 = position[1] - position[0];
-    vec4 v1 = position[2] - position[0];
+    vec3 v1 = (position[1] - position[0]).xyz;
+    vec3 v2 = (position[2] - position[0]).xyz;
     
-    vec4 normal = normalize(cross(v1,v2));
+    vec3 normal = normalize(cross(v1,v2));
 
     // start point
     vec4 P = (position[0] + position[1] + position[2]) / 3.0f;
+    P.w = 1.0f;
     gl_Position = MVP * P;
-    Color = vertex.color[0];
+    Color = vColor[0];
     EmitVertex();
     
     // end point
-    gl_Position = MVP * (P + normal_length * normal);
-    Color = vertex.color[0];
+    gl_Position = MVP * vec4(P.xyz + normal_length * normal, 1.0f);
+    Color = vColor[0];
     EmitVertex();
     
     EndPrimitive();

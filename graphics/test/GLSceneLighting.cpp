@@ -51,6 +51,10 @@ void GLSceneLighting::init(void)
                                                                "shaders/normal_drawing.gs",
                                                                "shaders/simple.frag");
 
+    glsl_program_map_["ntb_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
+                                                            "shaders/ntb_drawing.gs",
+                                                            "shaders/simple.frag");
+
     glsl_program_map_["normal_drawing_face"] = compileAndLinkShader("shaders/normal_drawing.vs",
                                                                     "shaders/normal_drawing_face.gs",
                                                                     "shaders/simple.frag");
@@ -260,13 +264,14 @@ void GLSceneLighting::render(void)
     plane_node_->draw(current_program_iter_->second, M, V, P);
 
     // PER-FACE NORMAL
+    /*
     current_program_iter_ = glsl_program_map_.find("normal_drawing_face");
     if (current_program_iter_ == glsl_program_map_.end())
         exit(EXIT_FAILURE);
     current_program_iter_->second.use();
     sphere_node_->draw(current_program_iter_->second, M, V, P);
     plane_node_->draw(current_program_iter_->second, M, V, P);
-
+    */
     // WIREFRAME
     current_program_iter_ = glsl_program_map_.find("wireframe");
     if (current_program_iter_ == glsl_program_map_.end())

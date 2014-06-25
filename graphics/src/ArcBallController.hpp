@@ -8,6 +8,9 @@
 #ifndef ARCBALLCONTROLLER_HPP_
 #define ARCBALLCONTROLLER_HPP_
 
+// GlobalIncludes
+#include <JU/Defs.hpp>      // JU::uint32
+
 /**
  * @brief   Arc-ball (spherical) camera controller
  *
@@ -32,10 +35,10 @@ class ArcBallController
         float max_azimuth_;
         float max_inclination_;
         bool active_;
-        float last_x_;
-        float last_y_;
-        float curr_x_;
-        float curr_y_;
+        JU::uint32 last_x_;
+        JU::uint32 last_y_;
+        JU::uint32 curr_x_;
+        JU::uint32 curr_y_;
         float radius_inc_;      //!< Increment to apply to the radius for each input signal
         float radius_delta_;    //!< Increase/decrease in radius accumulated since last update
 };

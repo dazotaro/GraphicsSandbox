@@ -5,11 +5,13 @@
  *      Author: jusabiaga
  */
 
-#include "GL/glew.h"                // Glut
-#include "GL/freeglut.h"            // Glut
-#include "GraphicsDefs.hpp"         // MIDDLE_BUTTON_SCROLL_DOWN/UP
-#include <iostream>		    // std::cout and std::endl
+// Local Includes
 #include "ArcBallController.hpp"
+#include "GraphicsDefs.hpp"         // MIDDLE_BUTTON_SCROLL_DOWN/UP
+
+// Global Includes
+#include <GL/freeglut.h>            // Glut
+#include <iostream>		            // std::cout and std::endl
 
 
 
@@ -28,10 +30,10 @@ ArcBallController::ArcBallController(int width, int height, float max_azimuth, f
       max_azimuth_(max_azimuth),
       max_inclination_(max_inclination),
       active_(false),
-      last_x_(0.0f),
-      last_y_(0.0f),
-      curr_x_(0.0f),
-      curr_y_(0.0f),
+      last_x_(0),
+      last_y_(0),
+      curr_x_(0),
+      curr_y_(0),
       radius_inc_(radius_inc),
       radius_delta_(0.0f)
 {}
@@ -54,8 +56,8 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
             if (state == GLUT_DOWN)
             {
                 active_ = true;
-                last_x_ = curr_x_ = normalize(x, width_);
-                last_y_ = curr_y_ = normalize(y, height_);
+                last_x_ = curr_x_ = x;
+                last_y_ = curr_y_ = y;
             }
             else if (state == GLUT_UP)
             {
@@ -91,8 +93,8 @@ void ArcBallController::mouseMotion(int x, int y)
 {
     if (active_)
     {
-        curr_x_ = normalize(x, width_);
-        curr_y_ = normalize(y, height_);
+        curr_x_ = x;
+        curr_y_ = y;
     }
 }
 
@@ -108,8 +110,8 @@ void ArcBallController::mouseMotion(int x, int y)
 void ArcBallController::update(float &radius_delta, float &inclination, float &azimuth)
 {
     radius_delta = radius_delta_;
-    azimuth      = (last_x_ - curr_x_) * max_azimuth_;
-    inclination  = (last_y_ - curr_y_) * max_inclination_;
+    azimuth      = normalize(last_x_ - curr_x_, width_)  * max_azimuth_;
+    inclination  = normalize(last_y_ - curr_y_, height_) * max_inclination_;
 
     if (!active_)
     {

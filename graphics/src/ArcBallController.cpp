@@ -54,10 +54,8 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
             if (state == GLUT_DOWN)
             {
                 active_ = true;
-                last_x_ = normalize(x, width_);
-                last_y_ = normalize(y, height_);
-                curr_x_ = last_x_;
-                curr_y_ = last_y_;
+                last_x_ = curr_x_ = normalize(x, width_);
+                last_y_ = curr_y_ = normalize(y, height_);
             }
             else if (state == GLUT_UP)
             {

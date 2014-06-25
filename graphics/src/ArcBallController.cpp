@@ -110,8 +110,16 @@ void ArcBallController::mouseMotion(int x, int y)
 void ArcBallController::update(float &radius_delta, float &inclination, float &azimuth)
 {
     radius_delta = radius_delta_;
-    azimuth      = normalize(last_x_ - curr_x_, width_)  * max_azimuth_;
-    inclination  = normalize(last_y_ - curr_y_, height_) * max_inclination_;
+    inclination = azimuth = 0.0f;
+
+    if (last_x_ != curr_x_)
+    {
+        azimuth = (normalize(last_x_, width_)  - normalize(curr_x_, width_))  * max_azimuth_;
+    }
+    if (last_y_ != curr_y_)
+    {
+        inclination = (normalize(last_y_, height_) - normalize(curr_y_, height_)) * max_inclination_;
+    }
 
     if (!active_)
     {
@@ -154,7 +162,6 @@ void ArcBallController::windowResize(int width, int height)
 float ArcBallController::normalize(int value, int range)
 {
     return ((float)value / (range - 1) * 2.0f - 1.0f);
-
 }
 
 

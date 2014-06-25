@@ -216,13 +216,15 @@ void GLSceneLighting::update(float time)
     //camera_->update(*camera_gps_);
     // LIGHTS: update position
 
-	float radius_delta, inclination_delta, azimuth_delta;
-	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+	//float radius_delta, inclination_delta, azimuth_delta;
+    //camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+
+    float radius_delta, angle;
+    glm::vec3 axis;
+    camera_controller_.update(radius_delta, angle, axis);
 
 	tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
-	                   radius_delta,
-	                   inclination_delta,
-	                   azimuth_delta);
+	                   radius_delta, angle, axis);
 }
 
 

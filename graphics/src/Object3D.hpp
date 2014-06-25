@@ -8,8 +8,10 @@
 #ifndef OBJECT3D_HPP_
 #define OBJECT3D_HPP_
 
-#include <iostream>
-#include <glm/glm.hpp>
+// Global includes
+#include <JU/Defs.hpp>      // JU::f32
+#include <iostream>         // std::ostream
+#include <glm/glm.hpp>      // glm::vec3
 
 /*!
   This class represents an object in 3D: its position and orientation.
@@ -51,9 +53,10 @@ class Object3D
 
         // OBJECT CONTROL FUNCTIONS
         void translate(const glm::vec3 &translate);
-        void rotateX(float angle);
-        void rotateY(float angle);
-        void rotateZ(float angle);
+        void rotateX(JU::f32 angle);
+        void rotateY(JU::f32 angle);
+        void rotateZ(JU::f32 angle);
+        void rotate(JU::f32 angle, const glm::vec3& axis);
 
         // Transformation Functions
         glm::mat4 getTransformToParent(void) const;

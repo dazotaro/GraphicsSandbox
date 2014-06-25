@@ -8,11 +8,15 @@
 #ifndef CAMERATHIRDPERSON_HPP_
 #define CAMERATHIRDPERSON_HPP_
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+// Local includes
 #include "CameraInterface.hpp"      // CameraInterface parent class
 #include "CameraIntrinsic.hpp"      // CamneraIntrinsic object contained
 #include "Object3D.hpp"             // Object3D
+
+// Global includes
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <JU/Defs.hpp>              // JU::f32
 
 /**
  * @brief   Third-person camera type
@@ -24,9 +28,9 @@ class CameraThirdPerson : public CameraInterface, public Object3D
     public:
         CameraThirdPerson(const CameraIntrinsic &camera_intrinsic,
                           const Object3D &target,
-                          float distance_to_target = 10.0f,
-                          float azimuth = 0.0f,
-                          float inclination = M_PI / 2.0f);
+                          JU::f32 distance_to_target = 10.0f,
+                          JU::f32 azimuth = 0.0f,
+                          JU::f32 inclination = M_PI / 2.0f);
 
 
         virtual ~CameraThirdPerson();
@@ -35,10 +39,11 @@ class CameraThirdPerson : public CameraInterface, public Object3D
         void update(const Object3D &object_3d);
         const glm::mat4& getPerspectiveMatrix(void) const;
         glm::mat4 getViewMatrix(void) const;
-        void setAspectRatio(float aspect_ratio);
+        void setAspectRatio(JU::f32 aspect_ratio);
 
         // Setters
-        void update(const Object3D &target, float distance_delta, float inclination_delta, float azimuth_delta);
+        void update(const Object3D &target, JU::f32 distance_delta, JU::f32 inclination_delta, JU::f32 azimuth_delta);
+        void update(const Object3D &target, JU::f32 distance_delta, JU::f32 angle, const glm::vec3& axis);
 
         // Algorithms
         void setFrameCartesian(const Object3D &target);
@@ -46,9 +51,9 @@ class CameraThirdPerson : public CameraInterface, public Object3D
 
     private:
         CameraIntrinsic intrinsic_;     //!< Intrinsic parameters of the camera
-        float distance_to_target_;      //!< Distance to the target (i.e. radius of the sphere in spherical coordinates
-        float azimuth_;                 //!< Azimuth angle in spherical coordinates
-        float inclination_;             //!< Inclination angle in spherical coordinates
+        JU::f32 distance_to_target_;      //!< Distance to the target (i.e. radius of the sphere in spherical coordinates
+        JU::f32 azimuth_;                 //!< Azimuth angle in spherical coordinates
+        JU::f32 inclination_;             //!< Inclination angle in spherical coordinates
 };
 
 #endif /* CameraThirdPerson_HPP_ */

@@ -24,7 +24,7 @@
 * @param max_inclination    Maximum inclination angle from swiping the whole range of the viewport
 * @param radius_delta       Increment/decrement of the radius
 */
-ArcBallController::ArcBallController(int width, int height, float max_azimuth, float max_inclination, float radius_inc)
+ArcBallController::ArcBallController(JU::uint32 width, JU::uint32 height, JU::f32 max_azimuth, JU::f32 max_inclination, JU::f32 radius_inc)
     : width_(width),
       height_(height),
       max_azimuth_(max_azimuth),
@@ -48,7 +48,7 @@ ArcBallController::ArcBallController(int width, int height, float max_azimuth, f
 * @param x                  x pixel coordinate in the viewport coordinate system (upper-left = (0, 0))
 * @param y                  y pixel coordinate in the viewport coordinate system (upper-left = (0, 0))
 */
-void ArcBallController::mouseClick(int button, int state, int x, int y)
+void ArcBallController::mouseClick(JU::uint32 button, JU::uint32 state, JU::uint32 x, JU::uint32 y)
 {
     switch(button)
     {
@@ -89,7 +89,7 @@ void ArcBallController::mouseClick(int button, int state, int x, int y)
 * @param x                  x pixel coordinate in the viewport coordinate system (upper-left = (0, 0))
 * @param y                  y pixel coordinate in the viewport coordinate system (upper-left = (0, 0))
 */
-void ArcBallController::mouseMotion(int x, int y)
+void ArcBallController::mouseMotion(JU::uint32 x, JU::uint32 y)
 {
     if (active_)
     {
@@ -107,19 +107,64 @@ void ArcBallController::mouseMotion(int x, int y)
 * @param inclination        Increase/decrease in inclination angle since the last read from controller
 * @param azimuth            Increase/decrease in azimuth angle since the last read from controller
 */
-void ArcBallController::update(float &radius_delta, float &inclination, float &azimuth)
+void ArcBallController::update(JU::f32 &radius_delta, JU::f32 &inclination, JU::f32 &azimuth)
 {
     radius_delta = radius_delta_;
     inclination = azimuth = 0.0f;
 
-    if (last_x_ != curr_x_)
+    if (last_x_ != curr_x_ || last_y_ != curr_y_)
     {
-        azimuth = (normalize(last_x_, width_)  - normalize(curr_x_, width_))  * max_azimuth_;
+        glm::vec3 OP1 = getPointOnSphere(last_x_, last_y_);
+        glm::vec3 OP2 = getPointOnSphere(curr_x_, curr_y_);
+        JU::f32 angle = acos(std::min(1.0f, OP1.x * OP2.x + OP1.y * OP2.y + OP1.z * OP2.z));
+        glm::vec3 axis = glm::cross(OP1, OP2);
     }
-    if (last_y_ != curr_y_)
+
+    if (!active_)
     {
-        inclination = (normalize(last_y_, height_) - normalize(curr_y_, height_)) * max_inclination_;
+        last_x_ = 0.0f;
+        last_y_ = 0.0f;
+        curr_x_ = 0.0f;
+        curr_y_ = 0.0f;
     }
+    else
+    {
+        last_x_ = curr_x_;
+        last_y_ = curr_y_;
+    }
+
+    radius_delta_ = 0.0f;
+}
+
+
+
+/**
+* @brief It updates updates the radius, inclination and azimuth with the delta's since the last update call
+*
+* @param radius_delta    Increase/decrease in radius since the last read from controller
+* @param angle           Angle of rotation
+* @param axis            Axis of rotation
+*/
+void ArcBallController::update(JU::f32& radius_delta, JU::f32& angle, glm::vec3& axis)
+{
+    radius_delta = radius_delta_;
+    angle = 0.0f;
+
+
+    if (last_x_ != curr_x_ || last_y_ != curr_y_)
+    {
+        glm::vec3 OP1 = getPointOnSphere(last_x_, last_y_);
+        glm::vec3 OP2 = getPointOnSphere(curr_x_, curr_y_);
+        JU::f32 angle = acos(std::min(1.0f, OP1.x * OP2.x + OP1.y * OP2.y + OP1.z * OP2.z));
+        glm::vec3 axis = glm::cross(OP1, OP2);
+    }
+    else
+    {
+        axis.x = 0.0f;
+        axis.y = 1.0f;
+        axis.z = 0.0f;
+    }
+
 
     if (!active_)
     {
@@ -145,7 +190,7 @@ void ArcBallController::update(float &radius_delta, float &inclination, float &a
 * @param width      New width of the viewport
 * @param height     New height of the viewport
 */
-void ArcBallController::windowResize(int width, int height)
+void ArcBallController::windowResize(JU::uint32 width, JU::uint32 height)
 {
     width_ = width;
     height_ = height;
@@ -159,9 +204,34 @@ void ArcBallController::windowResize(int width, int height)
 * @param value      x/y coordinate
 * @param range      Range of this axis (either width or height)
 */
-float ArcBallController::normalize(int value, int range)
+JU::f32 ArcBallController::normalize(JU::uint32 value, JU::uint32 range) const
 {
-    return ((float)value / (range - 1) * 2.0f - 1.0f);
+    return ((JU::f32)value / (range - 1) * 2.0f - 1.0f);
+}
+
+
+
+/**
+* @brief Get point on unit sphere
+*
+* @param x      X normalized coordinate
+* @param y      Y normalized coordinate
+*/
+glm::vec3 ArcBallController::getPointOnSphere(JU::uint32 x, JU::uint32 y) const
+{
+    glm::vec3 point(x, y, 0.0f);
+
+    // Flip Y coordinate value
+    point.y = - point.y;
+
+    // Compute distance to the center of the screen of point (x,y)
+    JU::f32 dist_sqr = point.x * point.x + point.y * point.y;
+
+    // If this is greater than one then we clicked farther than the sphere
+    if (dist_sqr <= 1.0f)
+        point.z = sqrt( 1.0f - dist_sqr);
+    else
+        point = glm::normalize(point);
 }
 
 

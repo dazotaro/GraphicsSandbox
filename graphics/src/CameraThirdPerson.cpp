@@ -21,10 +21,10 @@
 
 CameraThirdPerson::CameraThirdPerson(const CameraIntrinsic &camera_intrinsic,
                                      const Object3D &target,
-                                     float distance_to_target,
-                                     //float height_to_target,
-                                     float azimuth,
-                                     float inclination) :
+                                     JU::f32 distance_to_target,
+                                     //JU::f32 height_to_target,
+                                     JU::f32 azimuth,
+                                     JU::f32 inclination) :
                      intrinsic_         (camera_intrinsic),
                      distance_to_target_(distance_to_target),
                      azimuth_           (azimuth),
@@ -63,7 +63,7 @@ void CameraThirdPerson::update(const Object3D &target)
 *
 * @param target The frame of the target the camera is tracking
 */
-void CameraThirdPerson::update(const Object3D &target, float distance_delta, float inclination_delta, float azimuth_delta)
+void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, JU::f32 inclination_delta, JU::f32 azimuth_delta)
 {
     distance_to_target_ += distance_delta;
     inclination_        += inclination_delta;
@@ -73,6 +73,24 @@ void CameraThirdPerson::update(const Object3D &target, float distance_delta, flo
 }
 
 
+
+/**
+* @brief Update the camera frame
+*
+* @param target             The frame of the target the camera is tracking
+* @param distance_delta     Increase in distance to the target
+* @param angle              Angle to rotate (in radians)
+* @param axis               Axis of rotation
+*/
+void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, JU::f32 angle, const glm::vec3& axis)
+{
+    distance_to_target_ += distance_delta;
+
+    if (angle != 0.0f)
+        rotate(glm::degrees(angle), axis);
+
+    position_ = target.getPosition() - distance_to_target_ * z_axis_;
+}
 
 /**
 * @brief Updated the Object3D that the camera is.
@@ -85,8 +103,8 @@ void CameraThirdPerson::setFrameSpherical(const Object3D &target)
     CoordinateHelper::spherical2cartesian(distance_to_target_, inclination_, azimuth_, point_on_sphere[0], point_on_sphere[1], point_on_sphere[2]);
 
     /*
-	static float old_inc = 0.0f;
-    static float old_azi = 0.0f;
+	static JU::f32 old_inc = 0.0f;
+    static JU::f32 old_azi = 0.0f;
 
     if (fabs(old_inc - inclination_) > 0.0f || fabs(old_azi - azimuth_) > 0.0f)
     {
@@ -139,7 +157,7 @@ glm::mat4 CameraThirdPerson::getViewMatrix(void) const
 *
 * @param aspect_ratio_ The new aspect ratio (width / height)
 */
-void CameraThirdPerson::setAspectRatio(float aspect_ratio)
+void CameraThirdPerson::setAspectRatio(JU::f32 aspect_ratio)
 {
     intrinsic_.setAspectRatio(aspect_ratio);
 }

@@ -10,6 +10,7 @@
 
 // GlobalIncludes
 #include <JU/Defs.hpp>      // JU::uint32
+#include <glm/glm.hpp>      // glm::vec3
 
 /**
  * @brief   Arc-ball (spherical) camera controller
@@ -18,29 +19,34 @@
 class ArcBallController
 {
     public:
-        ArcBallController(int width, int height, float max_azimuth, float max_inclination, float radius_inc = 0.1f);
+        ArcBallController(JU::uint32 width, JU::uint32 height, JU::f32 max_azimuth, JU::f32 max_inclination, JU::f32 radius_inc = 0.1f);
 
-        void mouseClick(int button, int state, int x, int y);
-        void mouseMotion(int x, int y);
+        // Mouse Controllers
+        void mouseClick(JU::uint32 button, JU::uint32 state, JU::uint32 x, JU::uint32 y);
+        void mouseMotion(JU::uint32 x, JU::uint32 y);
 
-        void update(float &radius_delta, float &inclination, float &azimuth);
-        void windowResize(int width, int height);
+        void update(JU::f32& radius_delta, JU::f32& inclination, JU::f32& azimuth);
+        void update(JU::f32& radius_delta, JU::f32& angle, glm::vec3& axis);
+        void windowResize(JU::uint32 width, JU::uint32 height);
 
     private:
-        float normalize(int value, int range);
+        // Utility Functions
+        // -----------------
+        JU::f32 normalize(JU::uint32 value, JU::uint32 range) const;
+        glm::vec3 getPointOnSphere(JU::uint32 x, JU::uint32 y) const;
 
     private:
-        int width_;
-        int height_;
-        float max_azimuth_;
-        float max_inclination_;
+        JU::uint32 width_;
+        JU::uint32 height_;
+        JU::f32 max_azimuth_;
+        JU::f32 max_inclination_;
         bool active_;
         JU::uint32 last_x_;
         JU::uint32 last_y_;
         JU::uint32 curr_x_;
         JU::uint32 curr_y_;
-        float radius_inc_;      //!< Increment to apply to the radius for each input signal
-        float radius_delta_;    //!< Increase/decrease in radius accumulated since last update
+        JU::f32 radius_inc_;      //!< Increment to apply to the radius for each input signal
+        JU::f32 radius_delta_;    //!< Increase/decrease in radius accumulated since last update
 };
 
 #endif /* ARCBALLCONTROLLER_HPP_ */

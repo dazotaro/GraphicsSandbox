@@ -5,10 +5,13 @@
  *      Author: jusabiaga
  */
 
+// Local includes
+#include "Object3D.hpp"
+
+// Global includes
 #define GLM_SWIZZLE
 #include <glm/gtc/matrix_transform.hpp>     // glm::rotate, glm::translate
 #include <glm/gtx/transform2.hpp>           // glm::rotate, glm::translate
-#include "Object3D.hpp"
 
 /**
 * @brief Default Constructor
@@ -108,7 +111,7 @@ void Object3D::translate(const glm::vec3 &translate)
 *
 * @param angle Angle to rotate (in degrees)
 */
-void Object3D::rotateX(float angle)
+void Object3D::rotateX(JU::f32 angle)
 {
     glm::mat4 rotate = glm::rotate(angle, x_axis_);
 
@@ -122,7 +125,7 @@ void Object3D::rotateX(float angle)
 *
 * @param angle Angle to rotate (in degrees)
 */
-void Object3D::rotateY(float angle)
+void Object3D::rotateY(JU::f32 angle)
 {
     glm::mat4 rotate = glm::rotate(angle, y_axis_);
 
@@ -135,13 +138,31 @@ void Object3D::rotateY(float angle)
 *
 * @param angle Angle to rotate (in degrees)
 */
-void Object3D::rotateZ(float angle)
+void Object3D::rotateZ(JU::f32 angle)
 {
     glm::mat4 rotate = glm::rotate(angle, z_axis_);
 
     x_axis_ = glm::vec3(rotate * glm::vec4(x_axis_, 0.0f));
     y_axis_ = glm::vec3(rotate * glm::vec4(y_axis_, 0.0f));
 }
+
+
+
+/**
+* @brief Rotate the object around axis
+*
+* @param angle Angle to rotate (in degrees)
+* @param axis  Axis of rotation
+*/
+void Object3D::rotate(JU::f32 angle, const glm::vec3& axis)
+{
+    glm::mat4 rotation = glm::rotate(angle, axis);
+
+    x_axis_ = glm::vec3(rotation * glm::vec4(x_axis_, 0.0f));
+    y_axis_ = glm::vec3(rotation * glm::vec4(y_axis_, 0.0f));
+    z_axis_ = glm::vec3(rotation * glm::vec4(z_axis_, 0.0f));
+}
+
 
 /**
 * @brief Get the transformation to the parent's coordinates system (e.g. Model matrix if the parent is the World C.S.)
@@ -163,9 +184,9 @@ glm::mat4 Object3D::getTransformToParent(void) const
 */
 glm::mat4 Object3D::getTransformFromParent(void) const
 {
-    float x_dot = glm::dot(x_axis_, position_);
-    float y_dot = glm::dot(y_axis_, position_);
-    float z_dot = glm::dot(z_axis_, position_);
+    JU::f32 x_dot = glm::dot(x_axis_, position_);
+    JU::f32 y_dot = glm::dot(y_axis_, position_);
+    JU::f32 z_dot = glm::dot(z_axis_, position_);
 
     return glm::mat4(x_axis_.x, y_axis_.x, z_axis_.x, 0.0,
                      x_axis_.y, y_axis_.y, z_axis_.y, 0.0,

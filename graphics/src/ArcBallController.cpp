@@ -155,8 +155,8 @@ void ArcBallController::update(JU::f32& radius_delta, JU::f32& angle, glm::vec3&
     {
         glm::vec3 OP1 = getPointOnSphere(last_x_, last_y_);
         glm::vec3 OP2 = getPointOnSphere(curr_x_, curr_y_);
-        JU::f32 angle = acos(std::min(1.0f, OP1.x * OP2.x + OP1.y * OP2.y + OP1.z * OP2.z));
-        glm::vec3 axis = glm::cross(OP1, OP2);
+        angle = acos(std::min(1.0f, OP1.x * OP2.x + OP1.y * OP2.y + OP1.z * OP2.z));
+        axis = glm::cross(OP2, OP1);
     }
     else
     {
@@ -219,10 +219,10 @@ JU::f32 ArcBallController::normalize(JU::uint32 value, JU::uint32 range) const
 */
 glm::vec3 ArcBallController::getPointOnSphere(JU::uint32 x, JU::uint32 y) const
 {
-    glm::vec3 point(x, y, 0.0f);
+    glm::vec3 point(normalize(x, width_), normalize(y, height_), 0.0f);
 
     // Flip Y coordinate value
-    point.y = - point.y;
+    //point.y = - point.y;
 
     // Compute distance to the center of the screen of point (x,y)
     JU::f32 dist_sqr = point.x * point.x + point.y * point.y;
@@ -232,6 +232,8 @@ glm::vec3 ArcBallController::getPointOnSphere(JU::uint32 x, JU::uint32 y) const
         point.z = sqrt( 1.0f - dist_sqr);
     else
         point = glm::normalize(point);
+
+    return point;
 }
 
 

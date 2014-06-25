@@ -89,7 +89,7 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
     if (angle != 0.0f)
         rotate(glm::degrees(angle), axis);
 
-    position_ = target.getPosition() - distance_to_target_ * z_axis_;
+    position_ = target.getPosition() + distance_to_target_ * z_axis_;
 }
 
 /**

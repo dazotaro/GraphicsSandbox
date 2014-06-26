@@ -14,6 +14,7 @@
 // Global includes
 #include <JU/Defs.hpp>						// JU::f32
 #include <glm/gtc/matrix_transform.hpp>     // glm:lookAt
+#include <glm/gtx/transform2.hpp>           // glm::rotate, glm::translate
 #include <iostream>                         // std::cout, std::endl
 #include <cmath>							// std::fabsf
 
@@ -86,10 +87,18 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
 {
     distance_to_target_ += distance_delta;
 
-    if (angle != 0.0f)
-        rotate(glm::degrees(angle), axis);
+    glm::vec4 p1 (position_ - target.getPosition(), 1.0f);
+    glm::vec4 p2 (p1 + glm::vec4(y_axis_, 0.0f));
 
-    position_ = target.getPosition() + distance_to_target_ * z_axis_;
+    glm::mat4 rotation (glm::rotate(angle, axis));
+
+    glm::vec3 op1 (glm::vec3(rotation * p1));
+    glm::vec3 op2 (glm::vec3(rotation * p2));
+
+    position_ = target.getPosition() + op1;
+    z_axis_ = glm::normalize(op1);
+    y_axis_ = glm::normalize(op2 - op1);
+    x_axis_ = glm::normalize(glm::cross(y_axis_, z_axis_));
 }
 
 /**

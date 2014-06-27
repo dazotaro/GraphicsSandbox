@@ -10,6 +10,7 @@
 #include "CameraThirdPerson.hpp"
 #include "Object3D.hpp"                     // Object3D
 #include "CoordinateHelper.hpp"             // spherical2cartesian()
+#include "DebugGlm.hpp"                     // debug::print()
 
 // Global includes
 #include <JU/Defs.hpp>						// JU::f32
@@ -34,12 +35,10 @@ CameraThirdPerson::CameraThirdPerson(const CameraIntrinsic &camera_intrinsic,
     glm::vec3 point_on_sphere;      // given the spherical coordinates compute the cartesian ones for that point on the sphere
     CoordinateHelper::spherical2cartesian(distance_to_target, inclination_, azimuth_, point_on_sphere[0], point_on_sphere[1], point_on_sphere[2]);
 
-    glm::vec3 cop = point_on_sphere + target.getPosition();
-    glm::vec3 view = glm::normalize(cop - target.getPosition());
-    glm::vec3 u    = glm::normalize(glm::cross(target.getYAxis(), view));
-    glm::vec3 up   = glm::normalize(glm::cross(view, u));
-
-    Object3D(cop, u, up, view);
+    position_ = point_on_sphere + target.getPosition();                   // COP
+    z_axis_  = glm::normalize(position_ - target.getPosition());          // VIEW vector
+    x_axis_  = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), z_axis_));    // U vector
+    y_axis_  = glm::normalize(glm::cross(z_axis_, x_axis_));              // UP vector
 }
 
 CameraThirdPerson::~CameraThirdPerson()
@@ -87,15 +86,16 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
 {
     distance_to_target_ += distance_delta;
 
-    glm::vec4 p1 (position_ - target.getPosition(), 1.0f);
-    glm::vec4 p2 (p1 + glm::vec4(y_axis_, 0.0f));
+    //glm::vec4 p1 (position_ - target.getPosition(), 1.0f);
+    glm::vec4 p1 (distance_to_target_ * z_axis_, 1.0f);
+    glm::vec4 p2 (p1 + 40.0f * glm::vec4(y_axis_, 0.0f));
 
-    glm::mat4 rotation (glm::rotate(angle, axis));
+    glm::mat4 rotation (glm::rotate(glm::degrees(angle), axis));
 
     glm::vec3 op1 (glm::vec3(rotation * p1));
     glm::vec3 op2 (glm::vec3(rotation * p2));
 
-    position_ = target.getPosition() + op1;
+    position_ = target.getPosition() + glm::normalize(op1) * distance_to_target_;
     z_axis_ = glm::normalize(op1);
     y_axis_ = glm::normalize(op2 - op1);
     x_axis_ = glm::normalize(glm::cross(y_axis_, z_axis_));

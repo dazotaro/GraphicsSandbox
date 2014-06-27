@@ -17,6 +17,7 @@
 #include "ShapeHelper2.hpp"         // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
 #include "Material.hpp"             // MaterialManager
+#include "DebugGlm.hpp"             // debug::print
 
 
 
@@ -141,7 +142,7 @@ void GLSceneLighting::init(void)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
     tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*sphere_node_),
-    								   10.0f, 0.0f, M_PI / 4.0f);
+    								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     /*
@@ -223,8 +224,18 @@ void GLSceneLighting::update(float time)
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
-	tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
-	                   radius_delta, angle, axis);
+    if (angle != 0)
+    {
+        debug::print("Axis from ArcBallController", axis);
+
+        // Convert the axis from the camera to the world coordinate system
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+
+        debug::print("Axis after", axis);
+    }
+
+    tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
+                       radius_delta, angle, axis);
 }
 
 

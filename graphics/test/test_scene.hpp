@@ -83,6 +83,7 @@ static void display()
     glutPostRedisplay();
 
     #ifndef WIN32
+    /*
         // Print stats
         frame_rate.update(time);
 
@@ -96,6 +97,7 @@ static void display()
             fflush(stdout);
         }
         last_time = time;
+        */
     #endif
 }
 

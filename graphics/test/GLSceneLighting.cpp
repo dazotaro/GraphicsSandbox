@@ -224,15 +224,8 @@ void GLSceneLighting::update(float time)
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
-    if (angle != 0)
-    {
-        debug::print("Axis from ArcBallController", axis);
-
-        // Convert the axis from the camera to the world coordinate system
-        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
-
-        debug::print("Axis after", axis);
-    }
+    // Convert the axis from the camera to the world coordinate system
+    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
 
     tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
                        radius_delta, angle, axis);

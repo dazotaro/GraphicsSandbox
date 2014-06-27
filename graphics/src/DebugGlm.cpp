@@ -5,13 +5,10 @@
  *      Author: jusabiaga
  */
 
-#ifndef DEBUGGLM_HPP_
-#define DEBUGGLM_HPP_
 
+// Local include
+#include "DebugGlm.hpp"
 
-// Global include
-#include <string>           // std::cout, std::endl
-#include <glm/glm.hpp>      // glm::vec3
 
 namespace debug
 {
@@ -45,11 +42,19 @@ std::ostream& operator<<(std::ostream &out, const glm::mat4 &rhs)
 */
 
 
-void print(const char* string, const glm::vec3& vec);
+void print(const char* string, const glm::vec3& vec)
+{
+    std::printf("%s = (%f, %f, %f)\n", string, vec.x, vec.y, vec.z);
+}
 
-void print(const char* string, const glm::vec4& vec);
+
+
+void print(const char* string, const glm::vec4& vec)
+{
+    std::printf("%s = (%f, %f, %f, %f)\n", string, vec.x, vec.y, vec.z, vec.w);
+}
+
 
 
 }
 
-#endif /* DEBUGGLM_HPP_ */

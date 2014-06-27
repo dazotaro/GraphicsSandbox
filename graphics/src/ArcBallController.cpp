@@ -143,7 +143,7 @@ void ArcBallController::update(JU::f32 &radius_delta, JU::f32 &inclination, JU::
 *
 * @param radius_delta    Increase/decrease in radius since the last read from controller
 * @param angle           Angle of rotation
-* @param axis            Axis of rotation
+* @param axis            Axis of rotation (in right-handed camera coordinates: z axis going out the screen, Y going up)
 */
 void ArcBallController::update(JU::f32& radius_delta, JU::f32& angle, glm::vec3& axis)
 {
@@ -156,7 +156,7 @@ void ArcBallController::update(JU::f32& radius_delta, JU::f32& angle, glm::vec3&
         glm::vec3 OP1 = getPointOnSphere(last_x_, last_y_);
         glm::vec3 OP2 = getPointOnSphere(curr_x_, curr_y_);
         angle = acos(std::min(1.0f, OP1.x * OP2.x + OP1.y * OP2.y + OP1.z * OP2.z));
-        axis = glm::cross(OP2, OP1);
+        axis = glm::normalize(glm::cross(OP2, OP1));
     }
     else
     {

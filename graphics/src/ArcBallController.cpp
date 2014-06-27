@@ -222,7 +222,7 @@ glm::vec3 ArcBallController::getPointOnSphere(JU::uint32 x, JU::uint32 y) const
     glm::vec3 point(normalize(x, width_), normalize(y, height_), 0.0f);
 
     // Flip Y coordinate value
-    //point.y = - point.y;
+    point.y = - point.y;
 
     // Compute distance to the center of the screen of point (x,y)
     JU::f32 dist_sqr = point.x * point.x + point.y * point.y;

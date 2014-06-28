@@ -19,13 +19,12 @@
 class ArcBallController
 {
     public:
-        ArcBallController(JU::uint32 width, JU::uint32 height, JU::f32 max_azimuth, JU::f32 max_inclination, JU::f32 radius_inc = 0.1f);
+        ArcBallController(JU::uint32 width, JU::uint32 height, JU::f32 radius_inc = 0.1f);
 
         // Mouse Controllers
         void mouseClick(JU::uint32 button, JU::uint32 state, JU::uint32 x, JU::uint32 y);
         void mouseMotion(JU::uint32 x, JU::uint32 y);
 
-        void update(JU::f32& radius_delta, JU::f32& inclination, JU::f32& azimuth);
         void update(JU::f32& radius_delta, JU::f32& angle, glm::vec3& axis);
         void windowResize(JU::uint32 width, JU::uint32 height);
 
@@ -38,8 +37,6 @@ class ArcBallController
     private:
         JU::uint32 width_;
         JU::uint32 height_;
-        JU::f32 max_azimuth_;
-        JU::f32 max_inclination_;
         bool active_;
         JU::uint32 last_x_;
         JU::uint32 last_y_;

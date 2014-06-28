@@ -24,11 +24,9 @@
 * @param max_inclination    Maximum inclination angle from swiping the whole range of the viewport
 * @param radius_delta       Increment/decrement of the radius
 */
-ArcBallController::ArcBallController(JU::uint32 width, JU::uint32 height, JU::f32 max_azimuth, JU::f32 max_inclination, JU::f32 radius_inc)
+ArcBallController::ArcBallController(JU::uint32 width, JU::uint32 height, JU::f32 radius_inc)
     : width_(width),
       height_(height),
-      max_azimuth_(max_azimuth),
-      max_inclination_(max_inclination),
       active_(false),
       last_x_(0),
       last_y_(0),
@@ -96,44 +94,6 @@ void ArcBallController::mouseMotion(JU::uint32 x, JU::uint32 y)
         curr_x_ = x;
         curr_y_ = y;
     }
-}
-
-
-
-/**
-* @brief It updates updates the radius, inclination and azimuth with the delta's since the last update call
-*
-* @param radius_delta       Increase/decrease in radius since the last read from controller
-* @param inclination        Increase/decrease in inclination angle since the last read from controller
-* @param azimuth            Increase/decrease in azimuth angle since the last read from controller
-*/
-void ArcBallController::update(JU::f32 &radius_delta, JU::f32 &inclination, JU::f32 &azimuth)
-{
-    radius_delta = radius_delta_;
-    inclination = azimuth = 0.0f;
-
-    if (last_x_ != curr_x_ || last_y_ != curr_y_)
-    {
-        glm::vec3 OP1 = getPointOnSphere(last_x_, last_y_);
-        glm::vec3 OP2 = getPointOnSphere(curr_x_, curr_y_);
-        JU::f32 angle = acos(std::min(1.0f, OP1.x * OP2.x + OP1.y * OP2.y + OP1.z * OP2.z));
-        glm::vec3 axis = glm::cross(OP1, OP2);
-    }
-
-    if (!active_)
-    {
-        last_x_ = 0.0f;
-        last_y_ = 0.0f;
-        curr_x_ = 0.0f;
-        curr_y_ = 0.0f;
-    }
-    else
-    {
-        last_x_ = curr_x_;
-        last_y_ = curr_y_;
-    }
-
-    radius_delta_ = 0.0f;
 }
 
 

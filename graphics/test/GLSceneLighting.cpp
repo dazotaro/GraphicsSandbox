@@ -26,7 +26,7 @@ GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height)
                                      gl_plane_(0), gl_plane_instance_(0),
                                      sphere_node_(0), plane_node_(0),
                                      camera_gps_(0), camera_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.2f)
+                                     camera_controller_(width, height, 0.2f)
 {
 }
 
@@ -213,13 +213,6 @@ void GLSceneLighting::loadLights(void) const
 */
 void GLSceneLighting::update(float time)
 {
-    // camera_: update position and orientation
-    //camera_->update(*camera_gps_);
-    // LIGHTS: update position
-
-	//float radius_delta, inclination_delta, azimuth_delta;
-    //camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
-
     float radius_delta, angle;
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
@@ -299,6 +292,7 @@ void GLSceneLighting::resize(int width, int height)
 {
     GLScene::resize(width, height);
     camera_->setAspectRatio(static_cast<float>(width)/height);
+    camera_controller_.windowResize(width, height);
 }
 
 

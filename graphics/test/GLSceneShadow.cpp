@@ -27,7 +27,7 @@ GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
                                      camera_gps_(0), camera_(0),
                                      shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
                                      shadowFBO_(0), depthTex_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.5f)
+                                     camera_controller_(width, height, 0.5f)
 {
 }
 
@@ -80,12 +80,12 @@ void GLSceneShadow::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 16, 16);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
-    // Create instance of GLMEsh (there could be more than one)
+    // Create instance of GLMesh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
     gl_sphere_instance_->addColorTexture("test");
     // Give the sphere a position and a orientation
@@ -130,9 +130,9 @@ void GLSceneShadow::init(void)
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
    */
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f),
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*sphere_node),
-    								   10.0f, 0.0f, M_PI / 4.0f);
+    								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
 
@@ -272,13 +272,15 @@ void GLSceneShadow::loadLights(void) const
 */
 void GLSceneShadow::update(float time)
 {
-	float radius_delta, inclination_delta, azimuth_delta;
-	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+    float radius_delta, angle;
+    glm::vec3 axis;
+    camera_controller_.update(radius_delta, angle, axis);
 
-	tp_camera_->update(static_cast<const Object3D&>(*(node_map_["sphere"])),
-	                   radius_delta,
-	                   inclination_delta,
-	                   azimuth_delta);
+    // Convert the axis from the camera to the world coordinate system
+    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+
+    tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]),
+                       radius_delta, angle, axis);
 
 	static float delta_theta = M_PI * 0.05f;
 	glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
@@ -308,9 +310,9 @@ void GLSceneShadow::drawScene(const CameraInterface *camera) const
 	// Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
-    glm::mat4 V(camera->getViewMatrix());
+    glm::mat4 V(tp_camera_->getViewMatrix());
     // Perspective Matrix
-    glm::mat4 P(camera->getPerspectiveMatrix());
+    glm::mat4 P(tp_camera_->getPerspectiveMatrix());
     // Shadow Matrix
     glm::mat4 shadow_matrix = bias * light_frustum_->getPerspectiveMatrix() * light_frustum_->getViewMatrix();
     // Draw
@@ -379,9 +381,9 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
-    glm::mat4 V(camera_->getViewMatrix());
+    glm::mat4 V(tp_camera_->getViewMatrix());
     // Perspective Matrix
-    glm::mat4 P(camera_->getPerspectiveMatrix());
+    glm::mat4 P(tp_camera_->getPerspectiveMatrix());
     // Draw each object
     drawScene(camera_);
 }

@@ -24,7 +24,7 @@ GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
                                      camera_gps_(0), camera_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.2f)
+                                     camera_controller_(width, height, 0.2f)
 {
 }
 
@@ -121,9 +121,9 @@ void GLSceneNormal::init(void)
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f),
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*sphere_node),
-    								   10.0f, 0.0f, M_PI / 4.0f);
+    								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     /*
@@ -203,13 +203,15 @@ void GLSceneNormal::loadLights(void) const
 */
 void GLSceneNormal::update(float time)
 {
-	float radius_delta, inclination_delta, azimuth_delta;
-	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+    float radius_delta, angle;
+    glm::vec3 axis;
+    camera_controller_.update(radius_delta, angle, axis);
 
-	tp_camera_->update(static_cast<const Object3D&>(*(node_map_["sphere"])),
-	                   radius_delta,
-	                   inclination_delta,
-	                   azimuth_delta);
+    // Convert the axis from the camera to the world coordinate system
+    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+
+    tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]),
+                       radius_delta, angle, axis);
 
 	// LIGHTS: update position
     static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution

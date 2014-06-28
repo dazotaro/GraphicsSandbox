@@ -83,28 +83,26 @@ static void display()
     glutPostRedisplay();
 
     #ifndef WIN32
-    /*
-        // Print stats
-        frame_rate.update(time);
+	// Print stats
+	frame_rate.update(time);
 
-        static int frames = 0;
-        if (!(++frames % 100))
-        {
-            printf("\rFPS = %f; Current Shader Program = %s                        ",
-                   frame_rate.getFPS(),
-                   scene->getGLSLCurrentProgramString());
+	static int frames = 0;
+	if (!(++frames % 100))
+	{
+		printf("\rFPS = %f; Current Shader Program = %s                        ",
+			   frame_rate.getFPS(),
+			   scene->getGLSLCurrentProgramString());
 
-            fflush(stdout);
-        }
-        last_time = time;
-        */
+		fflush(stdout);
+	}
+	last_time = time;
     #endif
 }
 
 static void init(void)
 {
-    //scene = new GLSceneNormal(WIDTH, HEIGHT);
-    scene = new GLSceneLighting(WIDTH, HEIGHT);
+    scene = new GLSceneNormal(WIDTH, HEIGHT);
+    //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);

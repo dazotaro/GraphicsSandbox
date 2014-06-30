@@ -8,7 +8,7 @@
 layout(location = 0) in vec3 VertexPosition;
 layout(location = 1) in vec2 VertexTexture;
 layout(location = 2) in vec3 VertexNormal;
-layout(location = 3) in vec4 VertexTangent;
+//layout(location = 3) in vec4 VertexTangent;
 
 out vec3 Normal;
 out vec3 Position;

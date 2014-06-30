@@ -47,7 +47,7 @@ void GLSceneShadow::init(void)
     //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
     //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
 
-    current_program_iter_ = glsl_program_map_.find("perfragment");
+    current_program_iter_ = glsl_program_map_.find("shadow_mapping");
     
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
@@ -236,9 +236,9 @@ void GLSceneShadow::loadLights(void) const
 
     // 0
     glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
-    light_position = camera_->getViewMatrix() * light_position;
+    light_position = tp_camera_->getViewMatrix() * light_position;
     (current_program_iter_->second).setUniform("Light.Position",  light_position);
-    (current_program_iter_->second).setUniform("Light.Intensity", glm::vec3(0.8f,0.8f,0.8f));
+    (current_program_iter_->second).setUniform("Light.Intensity", glm::vec3(1.0f, 1.0f, 1.0f));
     /*
     // 1
     (current_program_iter_->second).setUniform("lights[1].Position",  glm::vec4(0.0f,5.0f,0.0f,1.0f));
@@ -385,7 +385,7 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
     // Perspective Matrix
     glm::mat4 P(tp_camera_->getPerspectiveMatrix());
     // Draw each object
-    drawScene(camera_);
+    drawScene(tp_camera_);
 }
 
 /**
@@ -440,7 +440,7 @@ void GLSceneShadow::renderShadow(void) const
     //glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     // Draw the scene
-    drawScene(camera_);
+    drawScene(tp_camera_);
 }
 
 /**
@@ -452,7 +452,7 @@ void GLSceneShadow::renderShadow(void) const
 void GLSceneShadow::resize(int width, int height)
 {
     GLScene::resize(width, height);
-    camera_->setAspectRatio(static_cast<float>(width)/height);
+    tp_camera_->setAspectRatio(static_cast<float>(width)/height);
     camera_controller_.windowResize(width, height);
 }
 

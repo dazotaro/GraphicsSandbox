@@ -86,7 +86,23 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
 {
     distance_to_target_ += distance_delta;
 
-    //glm::vec4 p1 (position_ - target.getPosition(), 1.0f);
+    glm::vec4 p1 (distance_to_target_ * z_axis_, 1.0f);
+
+    glm::mat4 rotation (glm::rotate(glm::degrees(angle), axis));
+
+    glm::vec3 op1 (glm::vec3(rotation * p1));
+
+    if ((1.0f - fabs(glm::dot(glm::normalize(op1), glm::vec3(0.0f, 1.0f, 0.0f)))) > 0.005f)
+	{
+		position_ = target.getPosition() + glm::normalize(op1) * distance_to_target_;
+		z_axis_ = glm::normalize(op1);
+		x_axis_ = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), z_axis_));
+		y_axis_ = glm::normalize(glm::cross(z_axis_, x_axis_));
+	}
+
+    /*
+    distance_to_target_ += distance_delta;
+
     glm::vec4 p1 (distance_to_target_ * z_axis_, 1.0f);
     glm::vec4 p2 (p1 + 40.0f * glm::vec4(y_axis_, 0.0f));
 
@@ -99,6 +115,7 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
     z_axis_ = glm::normalize(op1);
     y_axis_ = glm::normalize(op2 - op1);
     x_axis_ = glm::normalize(glm::cross(y_axis_, z_axis_));
+    */
 }
 
 /**

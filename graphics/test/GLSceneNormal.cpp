@@ -64,6 +64,7 @@ void GLSceneNormal::init(void)
     TextureManager::loadTexture("normal_map", "texture/multi_normal_map.tga");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
     TextureManager::loadTexture("test", "texture/test.tga");
+    TextureManager::loadTexture("rusted", "texture/rusted_metal.jpg");
 
     // OBJECT LOADING
     // --------------
@@ -71,14 +72,14 @@ void GLSceneNormal::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
-    gl_sphere_instance_->addColorTexture("test");
+    gl_sphere_instance_->addColorTexture("rusted");
     gl_sphere_instance_->addNormalTexture("normal_map");
     // Give the sphere a position and a orientation
     Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position

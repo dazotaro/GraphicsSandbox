@@ -23,7 +23,7 @@
 GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
-                                     camera_gps_(0), camera_(0),
+                                     camera_gps_(0), camera_(0), control_camera_(true),
                                      camera_controller_(width, height, 0.2f)
 {
 }
@@ -72,7 +72,7 @@ void GLSceneNormal::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
@@ -208,11 +208,18 @@ void GLSceneNormal::update(float time)
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
-    // Convert the axis from the camera to the world coordinate system
-    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
-
-    tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]),
-                       radius_delta, angle, axis);
+    // Use the arcball to control the camera or an object?
+    if (control_camera_)
+    {
+        // Convert the axis from the camera to the world coordinate system
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+        tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]), radius_delta, angle, axis);
+    }
+    else
+    {
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
+        node_map_["sphere"]->rotate(glm::degrees(angle), axis);
+    }
 
 	// LIGHTS: update position
     static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
@@ -295,6 +302,11 @@ void GLSceneNormal::keyboard(unsigned char key, int x, int y)
         case '0':
             if(++current_program_iter_ == glsl_program_map_.end())
                 current_program_iter_ = glsl_program_map_.begin();
+            break;
+
+        case 'c':
+        case 'C':
+            control_camera_ = !control_camera_;
             break;
 
         case 'a':

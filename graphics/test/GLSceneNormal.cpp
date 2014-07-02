@@ -72,7 +72,7 @@ void GLSceneNormal::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE, 48, 48);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO

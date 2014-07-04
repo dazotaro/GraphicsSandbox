@@ -84,7 +84,6 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
 */
 void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, JU::f32 angle, const glm::vec3& axis)
 {
-    /*
     distance_to_target_ += distance_delta;
 
     glm::vec4 p1 (distance_to_target_ * z_axis_, 1.0f);
@@ -100,8 +99,8 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
 		x_axis_ = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), z_axis_));
 		y_axis_ = glm::normalize(glm::cross(z_axis_, x_axis_));
 	}
-	*/
 
+    /*
     distance_to_target_ += distance_delta;
 
     glm::vec4 p1 (distance_to_target_ * z_axis_, 1.0f);
@@ -116,6 +115,7 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
     z_axis_ = glm::normalize(op1);
     y_axis_ = glm::normalize(op2 - op1);
     x_axis_ = glm::normalize(glm::cross(y_axis_, z_axis_));
+    */
 }
 
 /**

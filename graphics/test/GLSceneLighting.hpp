@@ -19,7 +19,6 @@ class GLMeshInstance;
 class Node3D;
 class Object3D;
 class CameraInterface;
-class CameraFirstPerson;
 class CameraThirdPerson;
 
 /*
@@ -31,6 +30,10 @@ class GLSceneLighting : public GLScene
 {
     public:
         static const int MAX_LIGHTS = 8;
+
+        // TYPEDEFS
+        typedef std::map<std::string, Node3D *> NodeMap;
+        typedef NodeMap::const_iterator NodeMapIterator;
 
     public:
         GLSceneLighting(int width, int height);
@@ -50,16 +53,17 @@ class GLSceneLighting : public GLScene
         void loadLights(void) const;
 
     private:
-        GLMesh*          gl_sphere_;
-        GLMeshInstance*  gl_sphere_instance_;
-        GLMesh*          gl_plane_;
-        GLMeshInstance*  gl_plane_instance_;
-        Node3D*          sphere_node_;
-        Node3D*          plane_node_;
-        Object3D*        camera_gps_;
+        GLMesh*         gl_sphere_;
+        GLMeshInstance* gl_sphere_instance_;
+        GLMesh*         gl_plane_;
+        GLMeshInstance* gl_plane_instance_;
+        Object3D*       camera_gps_;
+        NodeMap			node_map_;
         //CameraFirstPerson *fp_camera_;
-        CameraThirdPerson *tp_camera_;
+        CameraThirdPerson* tp_camera_;
         CameraInterface* camera_;
+
+        bool control_camera_;
 
         LightPositionalVector  lights_positional_;
         LightDirectionalVector lights_directional_;

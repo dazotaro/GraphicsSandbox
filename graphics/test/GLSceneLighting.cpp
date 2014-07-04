@@ -11,7 +11,7 @@
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
 #include "Object3D.hpp"             // Object3D
-#include "CameraInterface.hpp"      // camera_Interface
+#include "CameraInterface.hpp"      // CameraInterface
 #include "CameraFirstPerson.hpp"    // CameraFirstPerson
 #include "CameraThirdPerson.hpp"    // CameraThirdPerson
 #include "ShapeHelper2.hpp"         // build Mesh helper funtions
@@ -19,13 +19,14 @@
 #include "Material.hpp"             // MaterialManager
 #include "DebugGlm.hpp"             // debug::print
 
+// Global includes
+#include <glm/gtx/transform.hpp>	// glm::rotate
 
 
 GLSceneLighting::GLSceneLighting(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
-                                     sphere_node_(0), plane_node_(0),
-                                     camera_gps_(0), camera_(0),
+                                     camera_gps_(0), camera_(0), control_camera_(true),
                                      camera_controller_(width, height, 0.2f)
 {
 }
@@ -47,7 +48,7 @@ void GLSceneLighting::init(void)
     //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
     //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
-    //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
     glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
                                                                "shaders/normal_drawing.gs",
                                                                "shaders/simple.frag");
@@ -64,7 +65,7 @@ void GLSceneLighting::init(void)
                                                           "shaders/wireframe.gs",
                                                           "shaders/simple.frag");
 
-    current_program_iter_ = glsl_program_map_.find("perfragment");
+    current_program_iter_ = glsl_program_map_.find("perfragment_texture");
     
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
@@ -76,7 +77,9 @@ void GLSceneLighting::init(void)
 
     // TEXTURES
     // --------
-    //TextureManager::loadTexture("test", "texture/test.tga");
+    TextureManager::loadTexture("test", "texture/test.tga");
+    TextureManager::loadTexture("brick", "texture/brick1.jpg");
+    TextureManager::loadTexture("pool", "texture/pool.png");
 
     // MATERIALS
     // ---------
@@ -88,30 +91,27 @@ void GLSceneLighting::init(void)
     if (!MaterialManager::getMaterial("green_rubber", mat_plane))
         exit(EXIT_FAILURE);
 
-    std::printf("Ruby\n");
-    mat_sphere.print();
-    std::printf("Emerald\n");
-    mat_plane.print();
-
-    // SPHERE
+     // SPHERE
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 16, 16);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMesh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
-    gl_sphere_instance_->addColorTexture("test");
+    gl_sphere_instance_->addColorTexture("pool");
     // Give the sphere a position and a orientation
     Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
                     glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
     NodePointerList no_children;
-    sphere_node_ = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+
+	node_map_["sphere"] = sphere_node;
 
     // PLANE
     // ------
@@ -122,15 +122,18 @@ void GLSceneLighting::init(void)
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
     gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
-    gl_plane_instance_->addColorTexture("test");
+    gl_plane_instance_->addColorTexture("brick");
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    plane_node_ = new Node3D(plane, gl_plane_instance_, no_children, true);
+    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, no_children, true);
 
-    // Create the camera_
+	node_map_["plane"] = plane_node;
+
+
+    // Create the Camera    // Create the camera_
     glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
     glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
@@ -141,7 +144,7 @@ void GLSceneLighting::init(void)
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
     tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
-    								   static_cast<Object3D>(*sphere_node_),
+    								   static_cast<Object3D>(*sphere_node),
     								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
@@ -152,11 +155,25 @@ void GLSceneLighting::init(void)
     */
 
     // LIGHTS
-    lights_positional_.push_back(LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.8f, 0.8f)));
+    //---------
+    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
+    // Create instance of GLMEsh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
+    // Color texture for light object
+    gl_sphere_instance_->addColorTexture("light");
 
+    Object3D root_sphere(light_position,
+                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    NodePointerList light_children;
+    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
+
+    node_map_["light"] = light_node;
+
+    lights_positional_.push_back(LightPositional(light_position, light_intensity));
 }
-
-
 
 void GLSceneLighting::loadMaterial(void) const
 {
@@ -170,15 +187,14 @@ void GLSceneLighting::loadMaterial(void) const
 
 void GLSceneLighting::loadLights(void) const
 {
-    //for (LightPositionalIterator iter = lights_positional.begin(); iter != lights_positional.end(); ++iter)
-    //{
+    // WARNING: The shader expects the light position in eye coordinates
+	(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
+    (current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
 
-    // 0
-    glm::vec4 light_position (camera_gps_->getPosition(), 1.0f);
-    light_position = camera_->getViewMatrix() * light_position;
-    (current_program_iter_->second).setUniform("Light.Position",  light_position);
-    (current_program_iter_->second).setUniform("Light.Intensity", glm::vec3(0.8f,0.8f,0.8f));
     /*
+    // 0
+    (current_program_iter_->second).setUniform("lights[0].Position",  glm::vec4(5.0f,0.0f,0.0f,1.0f));
+    (current_program_iter_->second).setUniform("lights[0].Intensity", glm::vec3(0.8f,0.8f,0.8f));
     // 1
     (current_program_iter_->second).setUniform("lights[1].Position",  glm::vec4(0.0f,5.0f,0.0f,1.0f));
     (current_program_iter_->second).setUniform("lights[1].Intensity", glm::vec3(0.8f,0.8f,0.8f));
@@ -217,11 +233,32 @@ void GLSceneLighting::update(float time)
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
-    // Convert the axis from the camera to the world coordinate system
-    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+    // Use the arcball to control the camera or an object?
+    if (control_camera_)
+    {
+        // Convert the axis from the camera to the world coordinate system
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+        tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]), radius_delta, angle, axis);
+    }
+    else
+    {
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
+        node_map_["sphere"]->rotate(glm::degrees(angle), axis);
+    }
 
-    tp_camera_->update(static_cast<const Object3D&>(*sphere_node_),
-                       radius_delta, angle, axis);
+	// LIGHTS: update position
+    static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
+
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+    for (LightPositionalIterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
+    {
+        glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
+        light->position_.x = position.x;
+        light->position_.y = position.y;
+        light->position_.z = position.z;
+
+        node_map_["light"]->setPosition(light->position_);
+    }
 }
 
 
@@ -235,49 +272,27 @@ void GLSceneLighting::render(void)
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    current_program_iter_->second.use();
+
+    // LOAD LIGHTS
+    loadLights();
+    
+    //TextureManager::bindTexture(current_program_iter_->second, "normal_map", "NormalMapTex");
+    //TextureManager::bindTexture(current_program_iter_->second, "test", "ColorTex0");
+
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
     glm::mat4 V(tp_camera_->getViewMatrix());
     // Perspective Matrix
     glm::mat4 P(tp_camera_->getPerspectiveMatrix());
+    // Draw each object
+    for (NodeMapIterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
+    {
+        (iter->second)->draw(current_program_iter_->second, M, V, P);
+    }
 
-    // SOLID
-    current_program_iter_ = glsl_program_map_.find("perfragment");
-    if (current_program_iter_ == glsl_program_map_.end())
-        exit(EXIT_FAILURE);
-    current_program_iter_->second.use();
-    // LOAD MATERIAL
-    loadMaterial();
-    // LOAD LIGHTS
-    loadLights();
-    sphere_node_->draw(current_program_iter_->second, M, V, P);
-    plane_node_->draw(current_program_iter_->second, M, V, P);
-
-    // PER-VERTEX NORMAL
-    current_program_iter_ = glsl_program_map_.find("normal_drawing");
-    if (current_program_iter_ == glsl_program_map_.end())
-        exit(EXIT_FAILURE);
-    current_program_iter_->second.use();
-    sphere_node_->draw(current_program_iter_->second, M, V, P);
-    plane_node_->draw(current_program_iter_->second, M, V, P);
-
-    // PER-FACE NORMAL
-    /*
-    current_program_iter_ = glsl_program_map_.find("normal_drawing_face");
-    if (current_program_iter_ == glsl_program_map_.end())
-        exit(EXIT_FAILURE);
-    current_program_iter_->second.use();
-    sphere_node_->draw(current_program_iter_->second, M, V, P);
-    plane_node_->draw(current_program_iter_->second, M, V, P);
-    */
-    // WIREFRAME
-    current_program_iter_ = glsl_program_map_.find("wireframe");
-    if (current_program_iter_ == glsl_program_map_.end())
-        exit(EXIT_FAILURE);
-    current_program_iter_->second.use();
-    sphere_node_->draw(current_program_iter_->second, M, V, P);
-    plane_node_->draw(current_program_iter_->second, M, V, P);
+    TextureManager::unbindAllTextures();
 }
 
 
@@ -313,34 +328,39 @@ void GLSceneLighting::keyboard(unsigned char key, int x, int y)
                 current_program_iter_ = glsl_program_map_.begin();
             break;
 
+        case 'c':
+        case 'C':
+            control_camera_ = !control_camera_;
+            break;
+
         case 'a':
         case 'A':
-            sphere_node_->rotateX(-1.0f);
+            node_map_["cubes"]->rotateX(-1.0f);
             break;
 
         case 'd':
         case 'D':
-            sphere_node_->rotateX(1.0f);
+            node_map_["cubes"]->rotateX(1.0f);
             break;
 
         case 'q':
         case 'Q':
-            sphere_node_->rotateY(1.0f);
+            node_map_["cubes"]->rotateY(1.0f);
             break;
 
         case 'e':
         case 'E':
-            sphere_node_->rotateY(-1.0f);
+            node_map_["cubes"]->rotateY(-1.0f);
             break;
 
         case 'w':
         case 'W':
-            sphere_node_->rotateZ(-1.0f);
+            node_map_["cubes"]->rotateZ(-1.0f);
             break;
 
         case 's':
         case 'S':
-            sphere_node_->rotateZ(1.0f);
+            node_map_["cubes"]->rotateZ(1.0f);
             break;
 
         /*
@@ -409,11 +429,15 @@ void GLSceneLighting::cleanup(void)
     delete gl_sphere_instance_;
     delete gl_plane_;
     delete gl_plane_instance_;
-    delete sphere_node_;
-    delete plane_node_;
     delete camera_gps_;
     //delete fp_camera_;
     delete tp_camera_;
+
+    std::map<std::string, Node3D *>::const_iterator iter;
+    for (iter = node_map_.begin(); iter != node_map_.end(); ++iter)
+    {
+        delete iter->second;
+    }
 }
 
 

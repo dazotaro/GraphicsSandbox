@@ -1,7 +1,7 @@
 #version 420
 
-in vec3 Position;
-in vec3 Normal;
+in vec3 Position_eye;
+in vec3 Normal_eye;
 in vec2 TexCoord;
 
 
@@ -22,27 +22,27 @@ uniform sampler2D ColorTex0;
 
 layout( location = 0 ) out vec4 FragColor;
 
-vec3 ads(vec4 position, vec3 normal, out vec3 ambAndDiff, out vec3 spec)
+vec3 ads(vec4 position, vec3 norm)
 {
-    vec3 s = normalize(vec3(Light.Position - position));
+	vec4 Kad = texture(ColorTex0, TexCoord);
+    vec3 s = normalize( vec3(Light.Position - position) );
     vec3 v = normalize(vec3(-position));
-    vec3 r = reflect(-s, normal);
+    vec3 r = reflect( -s, norm );
     vec3 I = Light.Intensity;
+   
+    vec3 ambient = I * Kad.rgb;
+     
+    float sDotN = dot(s,norm);
+    vec3 diffuse = I * Kad.rgb * max(sDotN, 0.0);
+    
+    float rDotV = dot(r, v);
+    vec3 specular = I * Ks * pow(max(rDotV, 0.0), shininess);
 
-	ambAndDiff = I * (Ka + Kd * max(dot(s, normal), 0.0));
-	spec = I * (Ks * pow(max(dot(r,v), 0.0), shininess));
-	
-	return ambAndDiff + spec;
+    //return I * (Ka + Kd * max(dot(s, norm), 0.0) + Ks * pow(max(dot(r,v), 0.0), Shininess));
+    return ambient + diffuse + specular;
 }
 
 void main()
 {
-	vec3 totalAmbDiff = vec3(0.0);
-	vec3 totalSpec    = vec3(0.0);
-	vec4 texColor = texture(ColorTex0, TexCoord);
-
-	vec3 AaD, spec;
-    ads(vec4(Position, 1.0f), Normal, AaD, spec);
-	
-    FragColor = vec4(AaD, 1.0) * texColor + vec4(spec, 1.0);
+    FragColor = vec4(ads(vec4(Position_eye, 1.0f), Normal_eye), 1.0);
 }

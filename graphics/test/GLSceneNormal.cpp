@@ -16,6 +16,8 @@
 #include "CameraThirdPerson.hpp"    // CameraThirdPerson
 #include "ShapeHelper2.hpp"         // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
+#include "Material.hpp"             // MaterialManager
+#include "DebugGlm.hpp"             // debug::print
 
 // Global includes
 #include <glm/gtx/transform.hpp>	// glm::rotate
@@ -66,6 +68,17 @@ void GLSceneNormal::init(void)
     TextureManager::loadTexture("test", "texture/test.tga");
     TextureManager::loadTexture("rusted", "texture/rusted_metal.jpg");
 
+
+    // MATERIALS
+    // ---------
+    MaterialManager::init();
+    Material mat_sphere;
+    if (!MaterialManager::getMaterial("ruby", mat_sphere))
+        exit(EXIT_FAILURE);
+    Material mat_plane;
+    if (!MaterialManager::getMaterial("green_rubber", mat_plane))
+        exit(EXIT_FAILURE);
+
     // OBJECT LOADING
     // --------------
     // SPHERE
@@ -78,7 +91,7 @@ void GLSceneNormal::init(void)
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);//, &mat_sphere);
     gl_sphere_instance_->addColorTexture("rusted");
     gl_sphere_instance_->addNormalTexture("normal_map");
     // Give the sphere a position and a orientation
@@ -99,7 +112,7 @@ void GLSceneNormal::init(void)
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);
+    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);//, &mat_plane);
     gl_plane_instance_->addColorTexture("test");
     gl_plane_instance_->addNormalTexture("normal_map");
     // Give the plane a position and a orientation
@@ -284,6 +297,7 @@ void GLSceneNormal::resize(int width, int height)
 {
     GLScene::resize(width, height);
     camera_->setAspectRatio(static_cast<float>(width)/height);
+    camera_controller_.windowResize(width, height);
 }
 
 

@@ -26,7 +26,7 @@ GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0), gl_plane_(0), gl_plane_instance_(0),
                                      camera_gps_(0), camera_(0),
                                      shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
-                                     shadowFBO_(0), depthTex_(0),
+                                     shadowFBO_(0), depthTex_(0), control_camera_(true),
                                      camera_controller_(width, height, 0.5f)
 {
 }
@@ -276,11 +276,18 @@ void GLSceneShadow::update(float time)
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
-    // Convert the axis from the camera to the world coordinate system
-    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
-
-    tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]),
-                       radius_delta, angle, axis);
+    // Use the arcball to control the camera or an object?
+    if (control_camera_)
+    {
+        // Convert the axis from the camera to the world coordinate system
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+        tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]), radius_delta, angle, axis);
+    }
+    else
+    {
+        axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
+        node_map_["sphere"]->rotate(glm::degrees(angle), axis);
+    }
 
 	static float delta_theta = M_PI * 0.05f;
 	glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
@@ -381,11 +388,11 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
-    glm::mat4 V(tp_camera_->getViewMatrix());
+    glm::mat4 V(camera_->getViewMatrix());
     // Perspective Matrix
-    glm::mat4 P(tp_camera_->getPerspectiveMatrix());
+    glm::mat4 P(camera_->getPerspectiveMatrix());
     // Draw each object
-    drawScene(tp_camera_);
+    drawScene(camera_);
 }
 
 /**
@@ -440,7 +447,7 @@ void GLSceneShadow::renderShadow(void) const
     //glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     // Draw the scene
-    drawScene(tp_camera_);
+    drawScene(camera_);
 }
 
 /**
@@ -480,6 +487,11 @@ void GLSceneShadow::keyboard(unsigned char key, int x, int y)
                 std::cout << "Per-fragment Lighting Enabled" << std::cout;
             }
 
+            break;
+
+        case 'c':
+        case 'C':
+            control_camera_ = !control_camera_;
             break;
 
         case 'a':
@@ -552,16 +564,15 @@ void GLSceneShadow::keyboard(unsigned char key, int x, int y)
             fp_camera_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
             break;
 
-        case 'c':
-        case 'C':
-            if (camera_ == fp_camera_)
+        case '1':
+            if (camera_ == tp_camera_)
             {
                 camera_ = light_frustum_;
                 std::cout << "Light Frustum" << std::endl;
             }
             else
             {
-                camera_ = fp_camera_;
+                camera_ = tp_camera_;
                 std::cout << "First Person Camera" << std::endl;
             }
             break;

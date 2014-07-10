@@ -74,6 +74,9 @@ class GLSceneShadow : public GLScene
         GLuint shadowFBO_;
         GLuint depthTex_;
 
+
+        bool control_camera_;
+
         LightPositionalVector  lights_positional_;
         LightDirectionalVector lights_directional_;
         LightSpotlightVector   lights_spotlight_;

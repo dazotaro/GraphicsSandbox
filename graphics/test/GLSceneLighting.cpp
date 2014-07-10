@@ -77,9 +77,10 @@ void GLSceneLighting::init(void)
 
     // TEXTURES
     // --------
-    TextureManager::loadTexture("test", "texture/test.tga");
+    TextureManager::loadTexture("test",  "texture/test.tga");
     TextureManager::loadTexture("brick", "texture/brick1.jpg");
-    TextureManager::loadTexture("pool", "texture/pool.png");
+    TextureManager::loadTexture("pool",  "texture/pool.png");
+    TextureManager::loadTexture("light", "texture/light_texture.tga");
 
     // MATERIALS
     // ---------

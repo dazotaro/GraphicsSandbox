@@ -127,6 +127,20 @@ void TextureManager::bindTexture(const GLSLProgram &program, const std::string &
     num_tex_bound_++;
 }
 
+
+
+void TextureManager::bindTexture(const GLSLProgram &program, JU::uint32 tex_id, const std::string &uniform_name)
+{
+    glActiveTexture(GL_TEXTURE0 + num_tex_bound_);
+    glBindTexture(GL_TEXTURE_2D, tex_id);
+
+    program.setUniform(uniform_name.c_str(), num_tex_bound_);
+
+    num_tex_bound_++;
+}
+
+
+
 void TextureManager::unbindAllTextures()
 {
     num_tex_bound_ = 0;

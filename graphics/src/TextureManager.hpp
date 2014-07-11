@@ -8,7 +8,11 @@
 #ifndef TEXTUREMANAGER_HPP_
 #define TEXTUREMANAGER_HPP_
 
+// Local Includes
 #include "gl_core_4_2.h"                // glLoadGen generated header file
+
+// Global Includes
+#include <JU/Defs.hpp>              // JU::uint32
 #include <string>
 #include <map>
 
@@ -20,6 +24,7 @@ class TextureManager
     public:
         static bool loadTexture(const std::string &texture_name, const std::string &filename);
         static void bindTexture(const GLSLProgram &program, const std::string &texture_name, const std::string &uniform_name);
+        static void bindTexture(const GLSLProgram &program, JU::uint32 tex_id, const std::string &uniform_name);
         static void unbindAllTextures();
         static void deleteAllTextures();
 

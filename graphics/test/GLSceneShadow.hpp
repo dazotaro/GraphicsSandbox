@@ -62,6 +62,8 @@ class GLSceneShadow : public GLScene
         GLMeshInstance*  gl_sphere_instance_;
         GLMesh*          gl_plane_;
         GLMeshInstance*  gl_plane_instance_;
+        GLMeshInstance*  gl_plane_shadow_instance_;
+        Node3D*          shadow_plane_node_;
         Object3D*        camera_gps_;
         CameraFirstPerson *fp_camera_;
         CameraFirstPerson *light_frustum_;

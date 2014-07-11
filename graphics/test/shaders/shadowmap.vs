@@ -10,8 +10,8 @@ layout(location = 1) in vec2 VertexTexture;
 layout(location = 2) in vec3 VertexNormal;
 //layout(location = 3) in vec4 VertexTangent;
 
-out vec3 Normal;
 out vec3 Position;
+out vec3 Normal;
 out vec4 ShadowCoord;
 
 uniform mat4 Model;

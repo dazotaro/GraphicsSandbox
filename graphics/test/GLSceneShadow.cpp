@@ -80,7 +80,7 @@ void GLSceneShadow::init(void)
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 16, 16);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 64);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
@@ -117,19 +117,19 @@ void GLSceneShadow::init(void)
 
 	node_map_["plane"] = plane_node;
 
+	// SHADOW MAP PLANE
+	// ----------------
+	gl_plane_shadow_instance_ = new GLMeshInstance(gl_plane_, 0.5f, 0.5f, 1.0f);
+    // Give the plane a position and a orientation
+    Object3D plane2(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
+                   glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
+                   glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
+                   glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
+    shadow_plane_node_ = new Node3D(plane2, gl_plane_shadow_instance_, no_children, true);
 
     // Create the Camera    // Create the camera_
-    /*
-	glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
-    glm::vec3 camera_z = glm::normalize(camera_position);
-    glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
-    glm::vec3 camera_y = glm::normalize(glm::cross(camera_z, camera_x));
-    camera_gps_ = new Object3D(camera_position, // camera_'s position (eye's coordinates)
-                               camera_x, // camera_'s X axis
-                               camera_y, // camera_'s Y axis
-                               camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
-   */
-    //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
+	// -----------------
+	//fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
     tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*sphere_node),
     								   10.0f, 0.0f, M_PI / 2.0f);
@@ -289,12 +289,12 @@ void GLSceneShadow::update(float time)
         node_map_["sphere"]->rotate(glm::degrees(angle), axis);
     }
 
-	static float delta_theta = M_PI * 0.05f;
+	static float delta_theta = M_PI * 0.02f;
 	glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), delta_theta * time, glm::vec3(0.0f, 1.0f, 0.0f));
 	light_position = rotation * light_position;
 
-    glm::vec3 light_z = glm::normalize(glm::vec3(light_position.x, light_position.y, light_position.z));
+    glm::vec3 light_z = glm::normalize(glm::vec3(light_position.x, light_position.y, light_position.z) - node_map_["sphere"]->getPosition());
     glm::vec3 light_x = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), light_z));
     glm::vec3 light_y = glm::normalize(glm::cross(light_z, light_x));
 
@@ -302,6 +302,8 @@ void GLSceneShadow::update(float time)
 	light_frustum_->setXAxis(light_x);
 	light_frustum_->setYAxis(light_y);
 	light_frustum_->setZAxis(light_z);
+
+	node_map_["light"]->setPosition(glm::vec3(light_position.x, light_position.y, light_position.z));
 }
 
 /**
@@ -317,30 +319,19 @@ void GLSceneShadow::drawScene(const CameraInterface *camera) const
 	// Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
-    glm::mat4 V(tp_camera_->getViewMatrix());
+    glm::mat4 V(camera->getViewMatrix());
     // Perspective Matrix
-    glm::mat4 P(tp_camera_->getPerspectiveMatrix());
+    glm::mat4 P(camera->getPerspectiveMatrix());
     // Shadow Matrix
     glm::mat4 shadow_matrix = bias * light_frustum_->getPerspectiveMatrix() * light_frustum_->getViewMatrix();
     // Draw
     current_program_iter_->second.setUniform("ShadowMatrix", shadow_matrix);
 
     // Draw each object
-    /*
     for (NodeMapIterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
     {
-        (current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
-    */
-
-    NodeMapIterator iter = node_map_.find("sphere");
-    //(current_program_iter_->second).setUniform("Ka", 0.8f, 0.1f, 0.1f);
-    (iter->second)->draw(current_program_iter_->second, M, V, P);
-
-    iter = node_map_.find("plane");
-    //(current_program_iter_->second).setUniform("Ka", 0.6f, 0.6f, 0.6f);
-    (iter->second)->draw(current_program_iter_->second, M, V, P);
 
     TextureManager::unbindAllTextures();
 }
@@ -381,7 +372,7 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // LOAD MATERIAL
-    loadMaterial();
+    //loadMaterial();
     // LOAD LIGHTS
     loadLights();
 
@@ -435,11 +426,9 @@ void GLSceneShadow::renderShadow(void) const
     // Clear both the depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Activate the shadow map texture
-    /*
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthTex_);
-    current_program_iter_->second.setUniform("ShadowMap", 0);
-    */
+
+    TextureManager::bindTexture(current_program_iter_.second, depthTex_, "ShadowMap");
+
     // Select the fragment shader subroutine to shade the scene with the shadow map
     GLuint pass2Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");
     glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass2Index);
@@ -598,6 +587,8 @@ void GLSceneShadow::cleanup(void)
     delete camera_gps_;
     delete fp_camera_;
     delete light_frustum_;
+    delete gl_plane_shadow_instance_;
+    delete shadow_plane_node_;
 }
 
 void GLSceneShadow::spitOutDepthBuffer() const

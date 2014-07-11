@@ -347,9 +347,9 @@ void GLSceneShadow::render(void)
     }
     else
     {
+        //current_program_iter_->second.use();
         renderShadow();
     }
-    current_program_iter_->second.use();
 
     /*
     current_program_iter_ = glsl_program_map_.find("shadow_mapping");
@@ -392,7 +392,7 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
 void GLSceneShadow::renderShadow(void) const
 {
     // LOAD MATERIAL
-    loadMaterial();
+    //loadMaterial();
     // LOAD LIGHTS
     loadLights();
 
@@ -427,7 +427,7 @@ void GLSceneShadow::renderShadow(void) const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Activate the shadow map texture
 
-    TextureManager::bindTexture(current_program_iter_.second, depthTex_, "ShadowMap");
+    TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
 
     // Select the fragment shader subroutine to shade the scene with the shadow map
     GLuint pass2Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");

@@ -46,7 +46,7 @@ void shadeWithShadow()
     vec3 diffAndSpec = phongModelDiffAndSpec();
 
     float shadow = textureProj(ShadowMap, ShadowCoord);
-    //float shadow = 1.0;
+    //shadow = 1.0;
 
     // If the fragment is in shadow, use ambient light only.
     FragColor = vec4(diffAndSpec * shadow + ambient, 1.0);

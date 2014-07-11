@@ -119,12 +119,7 @@ bool TextureManager::loadTexture(const std::string &texture_name, const std::str
 
 void TextureManager::bindTexture(const GLSLProgram &program, const std::string &texture_name, const std::string &uniform_name)
 {
-    glActiveTexture(GL_TEXTURE0 + num_tex_bound_);
-    glBindTexture(GL_TEXTURE_2D, texture_map_[texture_name]);
-
-    program.setUniform(uniform_name.c_str(), num_tex_bound_);
-
-    num_tex_bound_++;
+    bindTexture(program, texture_map_[texture_name], uniform_name);
 }
 
 
@@ -135,6 +130,8 @@ void TextureManager::bindTexture(const GLSLProgram &program, JU::uint32 tex_id, 
     glBindTexture(GL_TEXTURE_2D, tex_id);
 
     program.setUniform(uniform_name.c_str(), num_tex_bound_);
+
+    std::printf("Texture %s bound to active texture %i\n", uniform_name.c_str(), num_tex_bound_);
 
     num_tex_bound_++;
 }

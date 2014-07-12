@@ -84,6 +84,15 @@ bool TextureManager::loadTexture(const std::string &texture_name, const std::str
 }
 
 
+bool TextureManager::registerTexture(const std::string &texture_name, JU::uint32 tex_id)
+{
+    // If the texture is not yet in memory
+    if (texture_map_.find(texture_name) == texture_map_.end())
+    {
+        texture_map_[texture_name] = tex_id;
+    }
+}
+
 /*
 bool TextureManager::loadTexture(const std::string &texture_name, const std::string &filename)
 {
@@ -131,7 +140,7 @@ void TextureManager::bindTexture(const GLSLProgram &program, JU::uint32 tex_id, 
 
     program.setUniform(uniform_name.c_str(), num_tex_bound_);
 
-    std::printf("Texture %s bound to active texture %i\n", uniform_name.c_str(), num_tex_bound_);
+    //std::printf("Texture %s bound to active texture %i\n", uniform_name.c_str(), num_tex_bound_);
 
     num_tex_bound_++;
 }

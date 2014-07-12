@@ -44,10 +44,12 @@ void GLSceneShadow::init(void)
     //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
     glsl_program_map_["shadow_mapping"] = compileAndLinkShader("shaders/shadowmap.vs", "shaders/shadowmap.fs");
+    glsl_program_map_["texture_clip"] = compileAndLinkShader("shaders/texture_clip.vs", "shaders/texture_clip.fs");
     //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
     //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
 
     current_program_iter_ = glsl_program_map_.find("shadow_mapping");
+    current_program_iter_->second.use();
     
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
@@ -87,7 +89,7 @@ void GLSceneShadow::init(void)
     gl_sphere_->init();
     // Create instance of GLMesh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
-    gl_sphere_instance_->addColorTexture("test");
+    //gl_sphere_instance_->addColorTexture("test");
     // Give the sphere a position and a orientation
     Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
@@ -107,7 +109,7 @@ void GLSceneShadow::init(void)
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
     gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
-    gl_plane_instance_->addColorTexture("test");
+    //gl_plane_instance_->addColorTexture("test");
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
@@ -119,12 +121,12 @@ void GLSceneShadow::init(void)
 
 	// SHADOW MAP PLANE
 	// ----------------
-	gl_plane_shadow_instance_ = new GLMeshInstance(gl_plane_, 0.5f, 0.5f, 1.0f);
+	gl_plane_shadow_instance_ = new GLMeshInstance(gl_plane_, 0.3f, 0.3f * width_ / height_, 1.0f);
     // Give the plane a position and a orientation
-    Object3D plane2(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
-                   glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
-                   glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
-                   glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
+    Object3D plane2(glm::vec3(-0.7f, -0.6f, 0.0f), // Model's position
+                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
+                    glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
+                    glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
     shadow_plane_node_ = new Node3D(plane2, gl_plane_shadow_instance_, no_children, true);
 
     // Create the Camera    // Create the camera_
@@ -153,9 +155,9 @@ void GLSceneShadow::init(void)
     glm::vec3 light_position (0.0f, 20.0f, 10.0f);
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f, &mat_sphere);
     // Color texture for light object
-    gl_sphere_instance_->addColorTexture("light");
+    //gl_sphere_instance_->addColorTexture("light");
 
     Object3D root_sphere(light_position,
                          glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
@@ -391,18 +393,16 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
 */
 void GLSceneShadow::renderShadow(void) const
 {
-    // LOAD MATERIAL
-    //loadMaterial();
-    // LOAD LIGHTS
-    loadLights();
-
     // PASS 1 (RECORD DEPTH)
     // ----------------------------------
     // Set up the viewport
     glViewport(0, 0, shadow_map_width_, shadow_map_height_);
+    // Bind the shadow map
     // Bind the frame buffer containing the shadow map
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
     // Clear it
+    glEnable(GL_DEPTH_TEST);
+    glClearDepth(1.0f);
     glClear(GL_DEPTH_BUFFER_BIT);
     // Select the fragment shader subroutine to record the depth
     GLuint pass1Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "recordDepth");
@@ -418,7 +418,10 @@ void GLSceneShadow::renderShadow(void) const
     //spitOutDepthBuffer();
 
     // PASS 2 (RENDER THE SCENE)
-        // -------------------------
+    // -------------------------
+    // LOAD LIGHTS
+    loadLights();
+
     // Set up the viewport
     glViewport(0, 0, width_, height_);
     // Bind to the default frame buffer
@@ -427,7 +430,12 @@ void GLSceneShadow::renderShadow(void) const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Activate the shadow map texture
 
-    TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
+    //TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
+    glActiveTexture(GL_TEXTURE0 + 7);
+    glBindTexture(GL_TEXTURE_2D, depthTex_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+    current_program_iter_->second.setUniform("ShadowMap", 7);
 
     // Select the fragment shader subroutine to shade the scene with the shadow map
     GLuint pass2Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");
@@ -437,6 +445,30 @@ void GLSceneShadow::renderShadow(void) const
     glCullFace(GL_BACK);
     // Draw the scene
     drawScene(camera_);
+
+    // DRAW PLANE in homogeneous clip coordinates
+    glm::mat4 M(1.0f);
+    // View matrix
+    glm::mat4 V(1.0f);
+    // Perspective Matrix
+    glm::mat4 P(1.0f);
+    // Disable depth buffer
+    glDisable(GL_DEPTH_TEST);
+    // Set the program
+    GLSLProgramMapIter iter = glsl_program_map_.find("texture_clip");
+    // Bind the shadow map
+    /*
+    TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    */
+    glActiveTexture(GL_TEXTURE0 + 5);
+    glBindTexture(GL_TEXTURE_2D, depthTex_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    current_program_iter_->second.use();
+    current_program_iter_->second.setUniform("ShadowMap", 5);
+
+    // Render
+    shadow_plane_node_->draw(iter->second, M, V, P);
 }
 
 /**

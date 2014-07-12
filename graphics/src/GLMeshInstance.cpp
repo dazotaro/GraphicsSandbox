@@ -104,6 +104,8 @@ GLMeshInstance::~GLMeshInstance()
 */
 void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, const glm::mat4 &view, const glm::mat4 &projection) const
 {
+	program.use();
+
     // Update Model matrix with the local scale
     glm::mat4 new_model = model * glm::scale(glm::vec3(scaleX_, scaleY_, scaleZ_));
     // View * Model
@@ -115,7 +117,7 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
     program.setUniform("Model", new_model);
     program.setUniform("ModelViewMatrix", mv);
     program.setUniform("NormalMatrix", glm::mat3(glm::vec3(mv[0]), glm::vec3(mv[1]), glm::vec3(mv[2])));
-    program.setUniform("MVP", projection * mv);
+    program.setUniform("MVP", MVP);
 
     if (material_)
     {

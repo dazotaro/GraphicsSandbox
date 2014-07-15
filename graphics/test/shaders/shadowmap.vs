@@ -1,4 +1,4 @@
-#version 400
+#version 420
 
 // GPU gems 3 Chapter 10
 // GPU gems 2 Chapter 17

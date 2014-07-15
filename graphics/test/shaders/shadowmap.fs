@@ -1,4 +1,4 @@
-#version 400
+#version 420
 
 struct LightInfo {
     vec4 Position;
@@ -52,7 +52,7 @@ void shadeWithShadow()
     FragColor = vec4(diffAndSpec * shadow + ambient, 1.0);
 
     // Gamma correct
-    FragColor = pow( FragColor, vec4(1.0 / 2.2) );
+    //FragColor = pow( FragColor, vec4(1.0 / 2.2) );
 }
 
 subroutine (RenderPassType)

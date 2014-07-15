@@ -1,4 +1,4 @@
-#version 400
+#version 420
 
 uniform sampler2D ShadowMap;
 
@@ -8,5 +8,9 @@ out vec4 outputColor;
 
 void main()
 {
-    outputColor = texture(ShadowMap, texCoords);
+    vec4 color = texture(ShadowMap, texCoords);
+    
+    int channel = 0;
+    
+    outputColor = vec4(color[channel], color[channel], color[channel], 1.0);
 }

@@ -32,6 +32,10 @@ class GLSceneShadow : public GLScene
         static const int MAX_LIGHTS = 8;
 
         // TYPEDEFS
+        typedef std::map<std::string, GLMesh *> MeshMap;
+        typedef MeshMap::const_iterator MeshMapIterator;
+        typedef std::map<std::string, GLMeshInstance *> MeshInstanceMap;
+        typedef MeshInstanceMap::const_iterator MeshInstanceMapIterator;
         typedef std::map<std::string, Node3D *> NodeMap;
         typedef NodeMap::const_iterator NodeMapIterator;
 
@@ -49,33 +53,39 @@ class GLSceneShadow : public GLScene
         void resize(int width, int height);
 
     private:
+
+        // Initialization functions
+    	void initializeGLSLPrograms();
+    	void initializeMeshes();
+    	void initializeCameras();
+    	void initializeLights();
+    	void initializeObjects();
+    	void initializeShadowMap();
+
         void renderPerfragmentLighting(void) const;
         void renderShadow(void) const;
-        void drawScene(const CameraInterface *camera) const;
+        void drawScene(const CameraInterface* camera) const;
         void cleanup(void);
-        void loadMaterial(void) const;
         void loadLights(void) const;
         void spitOutDepthBuffer() const;
 
     private:
-        GLMesh*          gl_sphere_;
-        GLMeshInstance*  gl_sphere_instance_;
-        GLMesh*          gl_plane_;
-        GLMeshInstance*  gl_plane_instance_;
-        GLMeshInstance*  gl_plane_shadow_instance_;
-        Node3D*          shadow_plane_node_;
-        Object3D*        camera_gps_;
-        CameraFirstPerson *fp_camera_;
-        CameraFirstPerson *light_frustum_;
-        CameraThirdPerson *tp_camera_;
-        CameraInterface* camera_;
-        NodeMap			node_map_;
+        GLMeshInstance*  	gl_plane_shadow_instance_;
+        Node3D*          	shadow_plane_node_;
+        Object3D*        	camera_gps_;
+        CameraFirstPerson*	fp_camera_;
+        CameraFirstPerson*	light_frustum_;
+        CameraThirdPerson*	tp_camera_;
+        CameraInterface* 	camera_;
+        MeshMap 			mesh_map_;
+        MeshInstanceMap 	mesh_instance_map_;
+        NodeMap				node_map_;
+
         int shadow_map_width_;
         int shadow_map_height_;
         bool pcf_enabled_;
         GLuint shadowFBO_;
         GLuint depthTex_;
-
 
         bool control_camera_;
 

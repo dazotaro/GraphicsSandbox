@@ -8,10 +8,14 @@
 #ifndef GLMESHINSTANCE_HPP_
 #define GLMESHINSTANCE_HPP_
 
+// Local Includes
 #include "gl_core_4_2.h"                // glLoadGen generated header file
+#include "DrawInterface.hpp"    // DrawInterface
+
+// Global Includes
+#include <JU/Defs.hpp>			// JU::f32
 #include <string>               // std:string
 #include <map>                  // std::map
-#include "DrawInterface.hpp"    // DrawInterface
 
 // Forward Declarations
 class GLSLProgram;
@@ -29,16 +33,20 @@ class Material;
 class GLMeshInstance : public DrawInterface
 {
     public:
-        explicit GLMeshInstance(const GLMesh *mesh,
-                                float scaleX = 1.0f,
-                                float scaleY = 1.0f,
-                                float scaleZ = 1.0f,
-                                const Material* material = 0);
+		GLMeshInstance() : mesh_(0), scaleX_(1.0f), scaleY_(1.0f), scaleZ_(1.0f), material_(0) {}
+
+        GLMeshInstance(const GLMesh* mesh,
+                       JU::f32 scaleX = 1.0f,
+                       JU::f32 scaleY = 1.0f,
+                       JU::f32 scaleZ = 1.0f,
+                       const Material* material = 0);
         ~GLMeshInstance();
 
         void addColorTexture(const std::string &texture_name);
         void addNormalTexture(const std::string &texture_name);
-        void addMaterial(const Material* material);
+        void setMesh(const GLMesh* mesh);
+        void setScale(JU::f32 x, JU::f32 y, JU::f32 z);
+        void setMaterial(const Material* material);
 
         void draw(const GLSLProgram &program,
         		  const glm::mat4 & model,
@@ -46,10 +54,10 @@ class GLMeshInstance : public DrawInterface
         		  const glm::mat4 &projection) const;
 
     private:
-        const GLMesh *mesh_;                //!< Shared Mesh object
-        float scaleX_;                      //!< Scale factor in the X axis
-        float scaleY_;                      //!< Scale factor in the Y axis
-        float scaleZ_;                      //!< Scale factor in the Z axis
+        const GLMesh* mesh_;                //!< Shared Mesh object
+        JU::f32 scaleX_;                      //!< Scale factor in the X axis
+        JU::f32 scaleY_;                      //!< Scale factor in the Y axis
+        JU::f32 scaleZ_;                      //!< Scale factor in the Z axis
         Material* material_;					//!< Material coefficients
         std::vector<std::string> color_texture_name_list_;
         std::string normal_map_texture_name_;

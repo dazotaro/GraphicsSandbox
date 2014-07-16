@@ -23,121 +23,205 @@
 #include "Material.hpp"				// MaterialManager
 
 GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
-									 gl_sphere_(0), gl_sphere_instance_(0), gl_plane_(0), gl_plane_instance_(0),
-                                     camera_gps_(0), camera_(0),
+									 camera_gps_(0), camera_(0),
                                      shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
                                      shadowFBO_(0), depthTex_(0), control_camera_(true),
                                      camera_controller_(width, height, 0.5f)
 {
 }
 
+
+
 GLSceneShadow::~GLSceneShadow()
 {
     // TODO Auto-generated destructor stub
 }
 
+
+
 /**
-* @brief Initialized the Scene
+* @brief Initialized GLSLProgram objects
 */
-void GLSceneShadow::init(void)
+void GLSceneShadow::initializeGLSLPrograms()
 {
     //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
     glsl_program_map_["shadow_mapping"] = compileAndLinkShader("shaders/shadowmap.vs", "shaders/shadowmap.fs");
     glsl_program_map_["texture_clip"] = compileAndLinkShader("shaders/texture_clip.vs", "shaders/texture_clip.fs");
     //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
-    //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
 
     current_program_iter_ = glsl_program_map_.find("shadow_mapping");
     current_program_iter_->second.use();
-    
-    glClearColor(0.0,0.0,0.0,1.0);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glDepthRange(0.0f, 1.0f);
-    glEnable(GL_CULL_FACE); // enables face culling
-    glCullFace(GL_BACK); // tells OpenGL to cull back faces (the sane default setting)
+}
 
-    // TEXTURES
-    // --------
-    //TextureManager::loadTexture("test", "texture/test.tga");
 
-    // MATERIALS
-    // ---------
-    MaterialManager::init();
-    Material mat_sphere;
-    if (!MaterialManager::getMaterial("chrome", mat_sphere))
-    	exit(EXIT_FAILURE);
-    Material mat_plane;
-    if (!MaterialManager::getMaterial("red_rubber", mat_plane))
-    	exit(EXIT_FAILURE);
 
-    std::printf("Pearl\n");
-    mat_sphere.print();
-    std::printf("Emerald\n");
-    mat_plane.print();
-
-    // SPHERE
+/**
+* @brief Initialized the Meshes
+*/
+void GLSceneShadow::initializeMeshes()
+{
+    // GLMESH
     // ------
-    // Create Mesh
     Mesh2 mesh;
+    GLMesh* pGlMesh;
+    // Plane
+    // -----
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    mesh.computeTangents();
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["plane"] = pGlMesh;
+    // Cube
+    // -----
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE);
+    mesh.computeTangents();
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["cube"] = pGlMesh;
+    // Cylinder
+    // -----
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 64);
+    mesh.computeTangents();
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["cylinder"] = pGlMesh;
+    // Cube
+    // -----
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 64);
+    mesh.computeTangents();
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["cone"] = pGlMesh;
+    // Cube
+    // -----
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 64);
     mesh.computeTangents();
-    gl_sphere_ = new GLMesh(mesh);
-    // Load the Mesh into VBO and VAO
-    gl_sphere_->init();
-    // Create instance of GLMesh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
-    //gl_sphere_instance_->addColorTexture("test");
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["sphere"] = pGlMesh;
+    // Cube
+    // -----
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 64, 64);
+    mesh.computeTangents();
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["torus"] = pGlMesh;
+}
+
+
+
+/**
+* @brief Initialized the Cameras
+*/
+void GLSceneShadow::initializeCameras()
+{
+	tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
+    								   static_cast<Object3D>(*node_map_["main"]),
+    								   10.0f, 0.0f, M_PI / 2.0f);
+    camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
+}
+
+
+
+/**
+* @brief Initialized the Lights
+*/
+void GLSceneShadow::initializeLights()
+{
+
+}
+
+
+
+/**
+* @brief Initialized the Lights
+*/
+void GLSceneShadow::initializeObjects()
+{
+    // TEXTURES
+    // ----------------------------------------------------------------
+    //TextureManager::loadTexture("test", "texture/test.tga");
+
+	// MATERIALS
+	// ---------
+	MaterialManager::init();
+
+	// MAIN MESH
+    // ---------
+    Material material;
+    GLMeshInstance* mesh_instance;
+    std::string material_name("chrome");
+    if (!MaterialManager::getMaterial(material_name, material))
+    {
+    	std::printf("Material %s not found\n", material_name.c_str());
+    	exit(EXIT_FAILURE);
+    }
+    mesh_instance = new GLMeshInstance;
+    mesh_instance->setMesh(mesh_map_["sphere"]);
+    mesh_instance->setScale(5.0f, 5.0f, 5.0f);
+    mesh_instance->setMaterial(&material);
+    mesh_instance_map_["main"] = mesh_instance;
+
+    // PLANE
+    // ------
+    material_name = "green_plastic";
+    if (!MaterialManager::getMaterial(material_name, material))
+    {
+    	std::printf("Material %s not found\n", material_name.c_str());
+    	exit(EXIT_FAILURE);
+    }
+    mesh_instance = new GLMeshInstance;
+    mesh_instance->setMesh(mesh_map_["plane"]);
+    mesh_instance->setScale(50.0f, 50.0f, 5.0f);
+    mesh_instance->setMaterial(&material);
+    mesh_instance_map_["plane"] = mesh_instance;
+
+    // LIGHT SPHERE
+    mesh_instance = new GLMeshInstance;
+    mesh_instance->setMesh(mesh_map_["sphere"]);
+    mesh_instance->setScale(1.0f, 1.0f, 1.0f);
+    TextureManager::loadTexture("light", "texture/light_texture.tga");
+    mesh_instance->addColorTexture("light");
+    mesh_instance_map_["light"] = mesh_instance;
+
+    // NODES
+    // ----------------------------------------------------------------
+    // Main
+    // ----
     // Give the sphere a position and a orientation
-    Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
+    Object3D main  (glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
                     glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
     NodePointerList no_children;
-    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+    Node3D* main_node = new Node3D(main, mesh_instance_map_["main"], no_children, true);
 
-	node_map_["sphere"] = sphere_node;
+	node_map_["main"] = main_node;
 
-    // PLANE
-    // ------
-    // Create Mesh
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
-    gl_plane_ = new GLMesh(mesh);
-    // Load the Mesh into VBO and VAO
-    gl_plane_->init();
-    // Create instance of GLMEsh (there could be more than one)
-    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
-    //gl_plane_instance_->addColorTexture("test");
+    // Plane
+    // -----
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, no_children, true);
+    Node3D* plane_node = new Node3D(plane, mesh_instance_map_["plane"], no_children, true);
 
 	node_map_["plane"] = plane_node;
 
-	// SHADOW MAP PLANE
-	// ----------------
-	gl_plane_shadow_instance_ = new GLMeshInstance(gl_plane_, 0.3f, 0.3f * width_ / height_, 1.0f);
-    // Give the plane a position and a orientation
-    Object3D plane2(glm::vec3(-0.7f, -0.6f, 0.0f), // Model's position
-                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
-                    glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
-                    glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
-    shadow_plane_node_ = new Node3D(plane2, gl_plane_shadow_instance_, no_children, true);
-
-    // Create the Camera    // Create the camera_
-	// -----------------
-	//fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
-    								   static_cast<Object3D>(*sphere_node),
-    								   10.0f, 0.0f, M_PI / 2.0f);
-    camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
+}
 
 
+
+/**
+* @brief Initialized the Lights
+*/
+void GLSceneShadow::initializeShadowMap()
+{
+    // Light
+    // -----
     // LIGHT FRUSTUM
     glm::vec3 frustum_position (10.0f, 30.0f, 0.0f);
     glm::vec3 frustum_z = glm::normalize(frustum_position);
@@ -150,26 +234,54 @@ void GLSceneShadow::init(void)
                                frustum_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     light_frustum_= new CameraFirstPerson(CameraIntrinsic(90.f, (float)shadow_map_width_/shadow_map_height_, 1.f, 100.f), light_Frustum_3d);
 
-    // LIGHTS
-    //---------
-    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
-    // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f, &mat_sphere);
-    // Color texture for light object
-    //gl_sphere_instance_->addColorTexture("light");
 
-    Object3D root_sphere(light_position,
+    Object3D root_sphere(light_frustum_->getPosition(),
                          glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
                          glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
                          glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
     NodePointerList light_children;
-    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
+    Node3D *light_node = new Node3D(root_sphere, mesh_instance_map_["light"], light_children, true);
 
     node_map_["light"] = light_node;
 
-    setupFBO();
 
+    // SHADOW MAP PLANE
+	// ----------------
+	gl_plane_shadow_instance_ = new GLMeshInstance(mesh_map_["plane"], 0.3f, 0.3f * width_ / height_, 1.0f);
+    // Give the plane a position and a orientation
+    Object3D plane2(glm::vec3(-0.7f, -0.6f, 0.0f), // Model's position
+                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
+                    glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
+                    glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
+    NodePointerList no_children;
+    shadow_plane_node_ = new Node3D(plane2, gl_plane_shadow_instance_, no_children, true);
+
+    setupFBO();
+}
+
+
+
+/**
+* @brief Initialized the Scene
+*/
+void GLSceneShadow::init(void)
+{
+	initializeGLSLPrograms();
+	initializeMeshes();
+	initializeObjects();
+	initializeLights();
+	initializeCameras();
+	initializeShadowMap();
+
+
+    glClearColor(0.0,0.0,0.0,1.0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+    glDepthRange(0.0f, 1.0f);
+    glEnable(GL_CULL_FACE); // enables face culling
+    glCullFace(GL_BACK); // tells OpenGL to cull back faces (the sane default setting)
 }
 
 /**
@@ -223,14 +335,6 @@ void GLSceneShadow::setupFBO(void)
     glBindFramebuffer(GL_FRAMEBUFFER,0);
 }
 
-void GLSceneShadow::loadMaterial(void) const
-{
-    (current_program_iter_->second).setUniform("Kd", 0.8f, 0.1f, 0.1f);
-    (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
-    (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
-    (current_program_iter_->second).setUniform("Shininess", 10.0f);
-}
-
 void GLSceneShadow::loadLights(void) const
 {
     //for (LightPositionalIterator iter = lights_positional.begin(); iter != lights_positional.end(); ++iter)
@@ -278,17 +382,24 @@ void GLSceneShadow::update(float time)
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
+    NodeMapIterator main_iter = node_map_.find("main");
+    if (main_iter == node_map_.end())
+    {
+    	std::printf("Main Object Node not found\n");
+    	exit(EXIT_FAILURE);
+    }
+
     // Use the arcball to control the camera or an object?
     if (control_camera_)
     {
         // Convert the axis from the camera to the world coordinate system
         axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
-        tp_camera_->update(static_cast<const Object3D&>(*node_map_["sphere"]), radius_delta, angle, axis);
+        tp_camera_->update(static_cast<const Object3D&>(*main_iter->second), radius_delta, angle, axis);
     }
     else
     {
         axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
-        node_map_["sphere"]->rotate(glm::degrees(angle), axis);
+        main_iter->second->rotate(glm::degrees(angle), axis);
     }
 
 	static float delta_theta = M_PI * 0.02f;
@@ -296,7 +407,7 @@ void GLSceneShadow::update(float time)
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), delta_theta * time, glm::vec3(0.0f, 1.0f, 0.0f));
 	light_position = rotation * light_position;
 
-    glm::vec3 light_z = glm::normalize(glm::vec3(light_position.x, light_position.y, light_position.z) - node_map_["sphere"]->getPosition());
+    glm::vec3 light_z = glm::normalize(glm::vec3(light_position.x, light_position.y, light_position.z) - main_iter->second	->getPosition());
     glm::vec3 light_x = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), light_z));
     glm::vec3 light_y = glm::normalize(glm::cross(light_z, light_x));
 
@@ -305,13 +416,13 @@ void GLSceneShadow::update(float time)
 	light_frustum_->setYAxis(light_y);
 	light_frustum_->setZAxis(light_z);
 
-	node_map_["light"]->setPosition(glm::vec3(light_position.x, light_position.y, light_position.z));
+	node_map_["light"]->setPosition(light_frustum_->getPosition());
 }
 
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneShadow::drawScene(const CameraInterface *camera) const
+void GLSceneShadow::drawScene(const CameraInterface* camera) const
 {
 	static glm::mat4 bias (0.5f, 0.0f, 0.0f, 0.0f,
 						   0.0f, 0.5f, 0.0f, 0.0f,
@@ -372,6 +483,7 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // Clear both the depth and color buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
     // LOAD MATERIAL
     //loadMaterial();
@@ -395,6 +507,9 @@ void GLSceneShadow::renderShadow(void) const
 {
     // PASS 1 (RECORD DEPTH)
     // ----------------------------------
+    // LOAD LIGHTS
+    loadLights();
+
     // Set up the viewport
     glViewport(0, 0, shadow_map_width_, shadow_map_height_);
     // Bind the shadow map
@@ -496,6 +611,8 @@ void GLSceneShadow::resize(int width, int height)
 */
 void GLSceneShadow::keyboard(unsigned char key, int x, int y)
 {
+	static MeshMapIterator mesh_iter = mesh_map_.find("sphere");
+
     switch (key)
     {
         case '0':
@@ -599,6 +716,17 @@ void GLSceneShadow::keyboard(unsigned char key, int x, int y)
                 std::cout << "First Person Camera" << std::endl;
             }
             break;
+
+        case '2':
+        	if (++mesh_iter == mesh_map_.end())
+        		mesh_iter = mesh_map_.begin();
+
+        	mesh_instance_map_["main"]->setMesh(mesh_iter->second);
+        	break;
+
+        default:
+        	std::printf("Unhandled key %c\n", key);
+        	break;
     }
 }
 
@@ -614,10 +742,12 @@ void GLSceneShadow::mouseMotion(int x, int y)
 
 void GLSceneShadow::cleanup(void)
 {
-    delete gl_sphere_;
-    delete gl_sphere_instance_;
-    delete gl_plane_;
-    delete gl_plane_instance_;
+	for (MeshMapIterator iter = mesh_map_.begin(); iter != mesh_map_.end(); ++iter)
+		delete iter->second;
+
+	for (MeshInstanceMapIterator iter = mesh_instance_map_.begin(); iter != mesh_instance_map_.end(); ++iter)
+		delete iter->second;
+
     delete camera_gps_;
     delete fp_camera_;
     delete light_frustum_;

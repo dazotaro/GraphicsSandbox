@@ -65,11 +65,39 @@ void GLMeshInstance::addNormalTexture(const std::string &texture_name)
 
 
 /**
+* @brief Set the mesh
+*
+* @param mesh pointer to mesh
+*/
+void GLMeshInstance::setMesh(const GLMesh* mesh)
+{
+	mesh_ = mesh;
+}
+
+
+
+/**
+* @brief Set scale factors
+*
+* @param x X scale factor
+* @param y Y scale factor
+* @param z Z scale factor
+*/
+void GLMeshInstance::setScale(JU::f32 x, JU::f32 y, JU::f32 z)
+{
+	scaleX_ = x;
+	scaleY_ = y;
+	scaleZ_ = z;
+}
+
+
+
+/**
 * @brief Set the material coefficients
 *
 * @param texture_name Name of texture (as stored by TextureManager)
 */
-void GLMeshInstance::addMaterial(const Material* material)
+void GLMeshInstance::setMaterial(const Material* material)
 {
 	if(material_)
 		delete material_;

@@ -457,15 +457,17 @@ void GLSceneShadow::renderShadow(void) const
     // Set the program
     GLSLProgramMapIter iter = glsl_program_map_.find("texture_clip");
     // Bind the shadow map
-    /*
+
     TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-    */
+
+    /*
     glActiveTexture(GL_TEXTURE0 + 5);
     glBindTexture(GL_TEXTURE_2D, depthTex_);
+    */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-    current_program_iter_->second.use();
-    current_program_iter_->second.setUniform("ShadowMap", 5);
+    //current_program_iter_->second.use();
+    //current_program_iter_->second.setUniform("ShadowMap", 5);
 
     // Render
     shadow_plane_node_->draw(iter->second, M, V, P);

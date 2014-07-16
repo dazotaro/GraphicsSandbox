@@ -20,6 +20,8 @@ in vec4 ShadowCoord;
 
 layout (location = 0) out vec4 FragColor;
 
+int pfc_size = 2;
+
 vec3 phongModelDiffAndSpec()
 {
     vec3 n = Normal;
@@ -45,8 +47,18 @@ void shadeWithShadow()
     vec3 ambient = Light.Intensity * Ka;
     vec3 diffAndSpec = phongModelDiffAndSpec();
 
-    float shadow = textureProj(ShadowMap, ShadowCoord);
-    //shadow = 1.0;
+    float shadow = 0.0;
+
+    for (int i = -pfc_size; i <= pfc_size; i++)
+    {
+        for (int j = -pfc_size; j <= pfc_size; j++)
+        {
+            shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(i, j));
+        }
+    }
+    
+    shadow /= 2 * (pfc_size + 1) * 2 * (pfc_size + 1);
+    
 
     // If the fragment is in shadow, use ambient light only.
     FragColor = vec4(diffAndSpec * shadow + ambient, 1.0);

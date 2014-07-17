@@ -1,13 +1,21 @@
 
+
+// Local includes
 #include "GLSLProgram.hpp"    // GLSLProgram
 
+
+// Global includes
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <sys/stat.h>
 
+
+// MACROS
 #define DEBUG 0
 
+
+// CONST AND STATIC
 #if DEBUG
     static std::ostream &debug = std::cout;
 #else
@@ -18,7 +26,9 @@ const std::string GLSLProgram::COLOR_TEX_PREFIX ("ColorTex");
 const std::string GLSLProgram::NORMAL_MAP_TEX_PREFIX ("NormalMapTex");
 
 
-GLSLProgram::GLSLProgram() : handle_(0), linked_(false) { }
+GLSLProgram::GLSLProgram() : handle_(0), linked_(false) {}
+
+
 
 bool GLSLProgram::compileShaderFromFile(const char * fileName, GLSLShader::GLSLShaderType type)
 {
@@ -49,7 +59,7 @@ bool GLSLProgram::compileShaderFromFile(const char * fileName, GLSLShader::GLSLS
     std::ostringstream code;
     while (inFile.good())
     {
-        int c = inFile.get();
+        JU::int32 c = inFile.get();
         if (!inFile.eof())
             code << (char) c;
     }
@@ -58,7 +68,9 @@ bool GLSLProgram::compileShaderFromFile(const char * fileName, GLSLShader::GLSLS
     return compileShaderFromString(code.str(), type);
 }
 
-bool GLSLProgram::compileShaderFromString(const string & source, GLSLShader::GLSLShaderType type)
+
+
+bool GLSLProgram::compileShaderFromString(const std::string & source, GLSLShader::GLSLShaderType type)
 {
     if (handle_ <= 0)
     {
@@ -100,18 +112,18 @@ bool GLSLProgram::compileShaderFromString(const string & source, GLSLShader::GLS
     glCompileShader(shaderhandle_ );
 
     // Check for errors
-    int result;
+    JU::int32 result;
     glGetShaderiv(shaderhandle_, GL_COMPILE_STATUS, &result);
     if (GL_FALSE == result)
     {
         // Compile failed, store log and return false
-        int length = 0;
+        JU::int32 length = 0;
         log_string_ = "";
         glGetShaderiv(shaderhandle_, GL_INFO_LOG_LENGTH, &length);
         if (length > 0)
         {
             char * c_log = new char[length];
-            int written = 0;
+            JU::int32 written = 0;
             glGetShaderInfoLog(shaderhandle_, length, &written, c_log);
             log_string_ = c_log;
             delete [] c_log;
@@ -127,6 +139,8 @@ bool GLSLProgram::compileShaderFromString(const string & source, GLSLShader::GLS
     }
 }
 
+
+
 bool GLSLProgram::link()
 {
     if( linked_ ) return true;
@@ -134,29 +148,35 @@ bool GLSLProgram::link()
 
     glLinkProgram(handle_);
 
-    int status = 0;
+    GLint status = 0;
     glGetProgramiv( handle_, GL_LINK_STATUS, &status);
-    if( GL_FALSE == status ) {
+    if (GL_FALSE == status)
+    {
         // Store log and return false
-        int length = 0;
+        GLint length = 0;
         log_string_ = "";
 
         glGetProgramiv(handle_, GL_INFO_LOG_LENGTH, &length );
 
-        if( length > 0 ) {
+        if (length > 0)
+        {
             char * c_log = new char[length];
-            int written = 0;
+            GLint written = 0;
             glGetProgramInfoLog(handle_, length, &written, c_log);
             log_string_ = c_log;
             delete [] c_log;
         }
 
         return false;
-    } else {
+    }
+    else
+    {
         linked_ = true;
         return linked_;
     }
 }
+
+
 
 void GLSLProgram::use() const
 {
@@ -166,36 +186,48 @@ void GLSLProgram::use() const
     glUseProgram(handle_);
 }
 
-string GLSLProgram::log() const
+
+
+std::string GLSLProgram::log() const
 {
     return log_string_;
 }
 
-int GLSLProgram::getHandle() const
+
+
+GLuint GLSLProgram::getHandle() const
 {
     return handle_;
 }
+
+
 
 bool GLSLProgram::isLinked() const
 {
     return linked_;
 }
 
-void GLSLProgram::bindAttribLocation( GLuint location, const char * name)
+
+
+void GLSLProgram::bindAttribLocation(GLuint location, const char * name)
 {
     glBindAttribLocation(handle_, location, name);
 }
 
-void GLSLProgram::bindFragDataLocation( GLuint location, const char * name )
+
+
+void GLSLProgram::bindFragDataLocation(GLuint location, const char * name)
 {
     glBindFragDataLocation(handle_, location, name);
 }
 
+
+
 void GLSLProgram::setUniform(const char *name, float x, float y, float z) const
 {
-    int loc = getUniformLocation(name);
+    GLint loc = getUniformLocation(name);
 
-    if( loc >= 0 )
+    if (loc >= 0)
     {
         glUniform3f(loc,x,y,z);
     }
@@ -205,16 +237,20 @@ void GLSLProgram::setUniform(const char *name, float x, float y, float z) const
     }
 }
 
+
+
 void GLSLProgram::setUniform(const char *name, const glm::vec3 & v) const
 {
     this->setUniform(name,v.x,v.y,v.z);
 }
 
+
+
 void GLSLProgram::setUniform(const char *name, const glm::vec4 & v) const
 {
-    int loc = getUniformLocation(name);
+    GLint loc = getUniformLocation(name);
 
-    if( loc >= 0 )
+    if (loc >= 0)
     {
         glUniform4f(loc,v.x,v.y,v.z,v.w);
     }
@@ -224,10 +260,13 @@ void GLSLProgram::setUniform(const char *name, const glm::vec4 & v) const
     }
 }
 
+
+
 void GLSLProgram::setUniform(const char *name, const glm::mat4 & m) const
 {
-    int loc = getUniformLocation(name);
-    if( loc >= 0 )
+    GLint loc = getUniformLocation(name);
+
+    if (loc >= 0)
     {
         glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0][0]);
     }
@@ -237,11 +276,13 @@ void GLSLProgram::setUniform(const char *name, const glm::mat4 & m) const
     }
 }
 
+
+
 void GLSLProgram::setUniform(const char *name, const glm::mat3 & m) const
 {
-    int loc = getUniformLocation(name);
+    GLint loc = getUniformLocation(name);
 
-    if(loc >= 0)
+    if (loc >= 0)
     {
         glUniformMatrix3fv(loc, 1, GL_FALSE, &m[0][0]);
     }
@@ -251,11 +292,13 @@ void GLSLProgram::setUniform(const char *name, const glm::mat3 & m) const
     }
 }
 
+
+
 void GLSLProgram::setUniform(const char *name, float val) const
 {
-    int loc = getUniformLocation(name);
+    GLint loc = getUniformLocation(name);
 
-    if(loc >= 0)
+    if (loc >= 0)
     {
         glUniform1f(loc, val);
     }
@@ -265,11 +308,13 @@ void GLSLProgram::setUniform(const char *name, float val) const
     }
 }
 
-void GLSLProgram::setUniform(const char *name, int val) const
-{
-    int loc = getUniformLocation(name);
 
-    if(loc >= 0)
+
+void GLSLProgram::setUniform(const char *name, JU::int32 val) const
+{
+    GLint loc = getUniformLocation(name);
+
+    if (loc >= 0)
     {
         glUniform1i(loc, val);
     }
@@ -278,12 +323,14 @@ void GLSLProgram::setUniform(const char *name, int val) const
         debug << "Uniform: " << name << " not found." << std::endl;
     }
 }
+
+
 
 void GLSLProgram::setUniform(const char *name, bool val) const
 {
-    int loc = getUniformLocation(name);
+    GLint loc = getUniformLocation(name);
 
-    if(loc >= 0)
+    if (loc >= 0)
     {
         glUniform1i(loc, val);
     }
@@ -292,6 +339,8 @@ void GLSLProgram::setUniform(const char *name, bool val) const
         debug << "Uniform: " << name << " not found." << std::endl;
     }
 }
+
+
 
 void GLSLProgram::printActiveUniforms()  const
 {
@@ -307,7 +356,7 @@ void GLSLProgram::printActiveUniforms()  const
 
     printf(" Location | Name\n");
     printf("------------------------------------------------\n");
-    for( int i = 0; i < nUniforms; ++i )
+    for (JU::int32 i = 0; i < nUniforms; ++i)
     {
         glGetActiveUniform( handle_, i, maxLen, &written, &size, &type, name );
         location = glGetUniformLocation(handle_, name);
@@ -316,6 +365,8 @@ void GLSLProgram::printActiveUniforms()  const
 
     free(name);
 }
+
+
 
 void GLSLProgram::printActiveAttribs() const
 {
@@ -331,7 +382,7 @@ void GLSLProgram::printActiveAttribs() const
 
     printf(" Index | Name\n");
     printf("------------------------------------------------\n");
-    for( int i = 0; i < nAttribs; i++ )
+    for (JU::int32 i = 0; i < nAttribs; i++)
     {
         glGetActiveAttrib( handle_, i, maxLength, &written, &size, &type, name );
         location = glGetAttribLocation(handle_, name);
@@ -341,16 +392,18 @@ void GLSLProgram::printActiveAttribs() const
     free(name);
 }
 
+
+
 bool GLSLProgram::validate()
 {
-    if( ! isLinked() )
+    if (!isLinked())
         return false;
 
     GLint status;
     glValidateProgram( handle_ );
     glGetProgramiv( handle_, GL_VALIDATE_STATUS, &status );
 
-    if( GL_FALSE == status )
+    if (GL_FALSE == status)
     {
         // Store log and return false
         int length = 0;
@@ -358,10 +411,10 @@ bool GLSLProgram::validate()
 
         glGetProgramiv(handle_, GL_INFO_LOG_LENGTH, &length );
 
-        if( length > 0 )
+        if (length > 0)
         {
             char * c_log = new char[length];
-            int written = 0;
+            JU::int32 written = 0;
             glGetProgramInfoLog(handle_, length, &written, c_log);
             log_string_ = c_log;
             delete [] c_log;
@@ -375,15 +428,19 @@ bool GLSLProgram::validate()
     }
 }
 
-int GLSLProgram::getUniformLocation(const char * name) const
+
+
+GLint GLSLProgram::getUniformLocation(const char * name) const
 {
     return glGetUniformLocation(handle_, name);
 }
 
-bool GLSLProgram::fileExists( const string & fileName )
+
+
+bool GLSLProgram::fileExists( const std::string & fileName )
 {
     struct stat info;
-    int ret = -1;
+    JU::int32 ret = -1;
 
     ret = stat(fileName.c_str(), &info);
     return 0 == ret;

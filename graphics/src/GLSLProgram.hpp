@@ -1,12 +1,16 @@
 #ifndef GLSLPROGRAM_H
 #define GLSLPROGRAM_H
 
+
+// Local Includes
 #include "gl_core_4_2.h"                // glLoadGen generated header file
 
-#include <string>
-using std::string;
+// Global Includes
+#include <string>               // std::string
+#include <glm/glm.hpp>          // glm::vecX
+#include <JU/Defs.hpp>          // JU::int32
 
-#include <glm/glm.hpp>
+
 
 namespace GLSLShader
 {
@@ -19,6 +23,8 @@ namespace GLSLShader
         TESS_EVALUATION
     };
 };
+
+
 
 /*
  * @brief   Class encapsulating a GLSL Program
@@ -34,40 +40,40 @@ class GLSLProgram
 
         GLSLProgram();
 
-        bool   compileShaderFromFile( const char * fileName, GLSLShader::GLSLShaderType type );
-        bool   compileShaderFromString( const string & source, GLSLShader::GLSLShaderType type );
-        bool   link();
-        bool   validate();
-        void   use() const;
+        bool compileShaderFromFile( const char * fileName, GLSLShader::GLSLShaderType type );
+        bool compileShaderFromString( const std::string & source, GLSLShader::GLSLShaderType type );
+        bool link();
+        bool validate();
+        void use() const;
 
-        string log() const;
+        std::string log() const;
 
-        int    getHandle() const;
-        bool   isLinked() const;
+        GLuint getHandle() const;
+        bool isLinked() const;
 
-        void   bindAttribLocation( GLuint location, const char * name);
-        void   bindFragDataLocation( GLuint location, const char * name );
+        void bindAttribLocation( GLuint location, const char * name);
+        void bindFragDataLocation( GLuint location, const char * name );
 
-        void   setUniform( const char *name, float x, float y, float z) const;
-        void   setUniform( const char *name, const glm::vec3 & v) const;
-        void   setUniform( const char *name, const glm::vec4 & v) const;
-        void   setUniform( const char *name, const glm::mat4 & m) const;
-        void   setUniform( const char *name, const glm::mat3 & m) const;
-        void   setUniform( const char *name, float val ) const;
-        void   setUniform( const char *name, int val ) const;
-        void   setUniform( const char *name, bool val ) const;
+        void setUniform( const char *name, float x, float y, float z) const;
+        void setUniform( const char *name, const glm::vec3 & v) const;
+        void setUniform( const char *name, const glm::vec4 & v) const;
+        void setUniform( const char *name, const glm::mat4 & m) const;
+        void setUniform( const char *name, const glm::mat3 & m) const;
+        void setUniform( const char *name, float val ) const;
+        void setUniform( const char *name, int val ) const;
+        void setUniform( const char *name, bool val ) const;
 
-        void   printActiveUniforms() const;
-        void   printActiveAttribs() const;
-
-    private:
-        int  getUniformLocation(const char * name ) const;
-        bool fileExists( const string & fileName );
+        void printActiveUniforms() const;
+        void printActiveAttribs() const;
 
     private:
-        int  handle_;
-        bool linked_;
-        string log_string_;
+        GLint getUniformLocation(const char * name ) const;
+        bool  fileExists( const std::string & fileName );
+
+    private:
+        GLuint      handle_;
+        bool        linked_;
+        std::string log_string_;
 };
 
 #endif // GLSLPROGRAM_H

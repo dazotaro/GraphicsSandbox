@@ -93,37 +93,10 @@ bool TextureManager::registerTexture(const std::string &texture_name, JU::uint32
     }
 }
 
-/*
-bool TextureManager::loadTexture(const std::string &texture_name, const std::string &filename)
+void TextureManager::bindTexture(const std::string &texture_name)
 {
-	//std::cout << __PRETTY_FUNCTION__ << std::endl;
-	std::cout << texture_name.c_str() << ", " << filename.c_str() << std::endl;
-
-	GLuint tex_id = SOIL_CREATE_NEW_ID;
-
-	std::map<std::string, GLuint>::const_iterator texture_iter = texture_map_.find(texture_name);
-	// If the texture is not yet in memory
-    if (texture_iter != texture_map_.end())
-    {
-    	tex_id = texture_iter->second;
-    }
-
-	tex_id = SOIL_load_OGL_texture(filename.c_str(), SOIL_LOAD_AUTO, tex_id, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y);
-	std::cout << "Texture id retrieved by SOIL_load_OGL_texture = " << tex_id << std::endl;
-
-	if(tex_id == 0)
-		return false;
-
-	texture_map_[texture_name] = tex_id;
-
-	glBindTexture(GL_TEXTURE_2D, tex_id);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    return true;
+    glBindTexture(GL_TEXTURE_2D, texture_map_[texture_name]);
 }
-*/
-
 
 
 void TextureManager::bindTexture(const GLSLProgram &program, const std::string &texture_name, const std::string &uniform_name)
@@ -140,8 +113,6 @@ void TextureManager::bindTexture(const GLSLProgram &program, JU::uint32 tex_id, 
 
     program.setUniform(uniform_name.c_str(), num_tex_bound_);
 
-    //std::printf("Texture %s bound to active texture %i\n", uniform_name.c_str(), num_tex_bound_);
-
     num_tex_bound_++;
 }
 
@@ -150,6 +121,16 @@ void TextureManager::bindTexture(const GLSLProgram &program, JU::uint32 tex_id, 
 void TextureManager::unbindAllTextures()
 {
     num_tex_bound_ = 0;
+}
+
+
+
+void TextureManager::deleteTexture(const std::string& texture_name)
+{
+    TextureMapIterator iter = texture_map_.find(texture_name);
+
+    if (iter != texture_map_.end())
+        glDeleteTextures(1, &iter->second);
 }
 
 

@@ -223,7 +223,7 @@ void GLSLProgram::bindFragDataLocation(GLuint location, const char * name)
 
 
 
-void GLSLProgram::setUniform(const char *name, float x, float y, float z) const
+void GLSLProgram::setUniform(const char* name, float x, float y, float z) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -239,14 +239,14 @@ void GLSLProgram::setUniform(const char *name, float x, float y, float z) const
 
 
 
-void GLSLProgram::setUniform(const char *name, const glm::vec3 & v) const
+void GLSLProgram::setUniform(const char* name, const glm::vec3 & v) const
 {
     this->setUniform(name,v.x,v.y,v.z);
 }
 
 
 
-void GLSLProgram::setUniform(const char *name, const glm::vec4 & v) const
+void GLSLProgram::setUniform(const char* name, const glm::vec4 & v) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -262,7 +262,7 @@ void GLSLProgram::setUniform(const char *name, const glm::vec4 & v) const
 
 
 
-void GLSLProgram::setUniform(const char *name, const glm::mat4 & m) const
+void GLSLProgram::setUniform(const char* name, const glm::mat4 & m) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -278,7 +278,7 @@ void GLSLProgram::setUniform(const char *name, const glm::mat4 & m) const
 
 
 
-void GLSLProgram::setUniform(const char *name, const glm::mat3 & m) const
+void GLSLProgram::setUniform(const char* name, const glm::mat3 & m) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -294,7 +294,7 @@ void GLSLProgram::setUniform(const char *name, const glm::mat3 & m) const
 
 
 
-void GLSLProgram::setUniform(const char *name, float val) const
+void GLSLProgram::setUniform(const char* name, float val) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -310,7 +310,7 @@ void GLSLProgram::setUniform(const char *name, float val) const
 
 
 
-void GLSLProgram::setUniform(const char *name, JU::int32 val) const
+void GLSLProgram::setUniform(const char* name, JU::int32 val) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -326,7 +326,7 @@ void GLSLProgram::setUniform(const char *name, JU::int32 val) const
 
 
 
-void GLSLProgram::setUniform(const char *name, bool val) const
+void GLSLProgram::setUniform(const char* name, bool val) const
 {
     GLint loc = getUniformLocation(name);
 
@@ -338,6 +338,35 @@ void GLSLProgram::setUniform(const char *name, bool val) const
     {
         debug << "Uniform: " << name << " not found." << std::endl;
     }
+}
+
+
+
+void GLSLProgram::setSamplerUniform(const char* name)
+{
+    HashMapSamplerTexUnit::const_iterator iter = hmSamplerToTexUnit_.find(std::string(name));
+
+    if (iter == hmSamplerToTexUnit_.end())
+    {
+        JU::int32 id = hmSamplerToTexUnit_.size() + 7;
+        hmSamplerToTexUnit_[name] = id;
+        setUniform(name, id);
+    }
+}
+
+
+
+JU::int32 GLSLProgram::getSamplerTexUnit(const char* name) const
+{
+    HashMapSamplerTexUnit::const_iterator iter = hmSamplerToTexUnit_.find(std::string(name));
+
+    if (iter == hmSamplerToTexUnit_.end())
+    {
+        std::printf("%s: %s: sampler %s not found\n", __FILE__, __FUNCTION__, name);
+        exit(EXIT_FAILURE);
+    }
+
+    return iter->second;
 }
 
 

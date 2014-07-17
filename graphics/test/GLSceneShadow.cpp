@@ -44,12 +44,13 @@ GLSceneShadow::~GLSceneShadow()
 */
 void GLSceneShadow::initializeGLSLPrograms()
 {
-    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
+
     glsl_program_map_["shadow_mapping"] = compileAndLinkShader("shaders/shadowmap.vs", "shaders/shadowmap.fs");
+    glsl_program_map_["shadow_mapping"].setSamplerUniform("shadow_map");
+
     glsl_program_map_["texture_clip"] = compileAndLinkShader("shaders/texture_clip.vs", "shaders/texture_clip.fs");
-    //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
-    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+    glsl_program_map_["texture_clip"].setSamplerUniform("tex_image");
 
     current_program_iter_ = glsl_program_map_.find("shadow_mapping");
     current_program_iter_->second.use();
@@ -164,6 +165,14 @@ void GLSceneShadow::initializeObjects()
     mesh_instance->setMaterial(&material);
     mesh_instance_map_["main"] = mesh_instance;
 
+    // TORUS
+    // ------
+    mesh_instance = new GLMeshInstance;
+    mesh_instance->setMesh(mesh_map_["torus"]);
+    mesh_instance->setScale(5.0f, 5.0f, 5.0f);
+    mesh_instance->setMaterial(&material);
+    mesh_instance_map_["torus"] = mesh_instance;
+
     // PLANE
     // ------
     material_name = "green_plastic";
@@ -177,6 +186,7 @@ void GLSceneShadow::initializeObjects()
     mesh_instance->setScale(50.0f, 50.0f, 5.0f);
     mesh_instance->setMaterial(&material);
     mesh_instance_map_["plane"] = mesh_instance;
+
 
     // LIGHT SPHERE
     mesh_instance = new GLMeshInstance;
@@ -198,7 +208,18 @@ void GLSceneShadow::initializeObjects()
     NodePointerList no_children;
     Node3D* main_node = new Node3D(main, mesh_instance_map_["main"], no_children, true);
 
-	node_map_["main"] = main_node;
+    node_map_["main"] = main_node;
+
+    // Torus
+    // ----
+    // Give the sphere a position and a orientation
+    Object3D torus (glm::vec3( 5.0f, 20.0f,  0.0f), // Model's position
+                    glm::vec3( 1.0f,  0.0f,  0.0f), // Model's X axis
+                    glm::vec3( 0.0f,  0.0f, -1.0f), // Model's Y axis
+                    glm::vec3( 0.0f,  1.0f,  0.0f));// Model's Z axis
+    Node3D* torus_node = new Node3D(torus, mesh_instance_map_["torus"], no_children, true);
+
+    node_map_["torus"] = torus_node;
 
     // Plane
     // -----
@@ -232,7 +253,7 @@ void GLSceneShadow::initializeShadowMap()
                                frustum_x, // camera_'s X axis
                                frustum_y, // camera_'s Y axis
                                frustum_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
-    light_frustum_= new CameraFirstPerson(CameraIntrinsic(90.f, (float)shadow_map_width_/shadow_map_height_, 1.f, 100.f), light_Frustum_3d);
+    light_frustum_= new CameraFirstPerson(CameraIntrinsic(90.f, (float)shadow_map_width_/shadow_map_height_, 5.f, 200.f), light_Frustum_3d);
 
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
 
@@ -250,7 +271,7 @@ void GLSceneShadow::initializeShadowMap()
 	// ----------------
 	gl_plane_shadow_instance_ = new GLMeshInstance(mesh_map_["plane"], 0.3f, 0.3f * width_ / height_, 1.0f);
     // Give the plane a position and a orientation
-    Object3D plane2(glm::vec3(-0.7f, -0.6f, 0.0f), // Model's position
+    Object3D plane2(glm::vec3(-0.8f, -0.65f, 0.0f), // Model's position
                     glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
                     glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
                     glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
@@ -290,9 +311,20 @@ void GLSceneShadow::init(void)
 void GLSceneShadow::setupFBO(void)
 {
     GLfloat border[] = {1.0f, 0.0f,0.0f,0.0f };
+
+    // Create and set up the FBO
+    glGenFramebuffers(1, &shadowFBO_);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
+
     // The depth buffer texture
     glGenTextures(1, &depthTex_);
+
+    // Store the texture handle with TextureManager
+    TextureManager::registerTexture("shadow_map", depthTex_);
+
+    glActiveTexture(GL_TEXTURE0 + glsl_program_map_["shadow_mapping"].getSamplerTexUnit("shadow_map"));
     glBindTexture(GL_TEXTURE_2D, depthTex_);
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow_map_width_,
                  shadow_map_height_, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     if (pcf_enabled_)
@@ -313,13 +345,6 @@ void GLSceneShadow::setupFBO(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 
-    // Assign the depth buffer texture to texture channel 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthTex_);
-
-    // Create and set up the FBO
-    glGenFramebuffers(1, &shadowFBO_);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex_, 0);
 
     GLenum drawBuffers[] = {GL_NONE};
@@ -445,8 +470,6 @@ void GLSceneShadow::drawScene(const CameraInterface* camera) const
     {
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
-
-    TextureManager::unbindAllTextures();
 }
 
 /**
@@ -512,21 +535,26 @@ void GLSceneShadow::renderShadow(void) const
 
     // Set up the viewport
     glViewport(0, 0, shadow_map_width_, shadow_map_height_);
-    // Bind the shadow map
+
     // Bind the frame buffer containing the shadow map
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO_);
+
     // Clear it
     glEnable(GL_DEPTH_TEST);
     glClearDepth(1.0f);
     glClear(GL_DEPTH_BUFFER_BIT);
+
     // Select the fragment shader subroutine to record the depth
     GLuint pass1Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "recordDepth");
     glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index);
+
     // Enable front-face culling
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
+
     // Draw the scene
     drawScene(light_frustum_);
+
     glFlush();
     glFinish();
 
@@ -545,12 +573,10 @@ void GLSceneShadow::renderShadow(void) const
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Activate the shadow map texture
 
-    //TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
-    glActiveTexture(GL_TEXTURE0 + 7);
-    glBindTexture(GL_TEXTURE_2D, depthTex_);
+    glActiveTexture(GL_TEXTURE0 + current_program_iter_->second.getSamplerTexUnit("shadow_map"));
+    TextureManager::bindTexture("shadow_map");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-    current_program_iter_->second.setUniform("ShadowMap", 7);
 
     // Select the fragment shader subroutine to shade the scene with the shadow map
     GLuint pass2Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");
@@ -569,20 +595,14 @@ void GLSceneShadow::renderShadow(void) const
     glm::mat4 P(1.0f);
     // Disable depth buffer
     glDisable(GL_DEPTH_TEST);
+
     // Set the program
     GLSLProgramMapIter iter = glsl_program_map_.find("texture_clip");
+    iter->second.use();
     // Bind the shadow map
-
-    TextureManager::bindTexture(current_program_iter_->second, depthTex_, "ShadowMap");
+    glActiveTexture(GL_TEXTURE0 + iter->second.getSamplerTexUnit("tex_image"));
+    TextureManager::bindTexture("shadow_map");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-
-    /*
-    glActiveTexture(GL_TEXTURE0 + 5);
-    glBindTexture(GL_TEXTURE_2D, depthTex_);
-    */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-    //current_program_iter_->second.use();
-    //current_program_iter_->second.setUniform("ShadowMap", 5);
 
     // Render
     shadow_plane_node_->draw(iter->second, M, V, P);

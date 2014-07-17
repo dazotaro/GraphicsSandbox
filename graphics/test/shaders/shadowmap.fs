@@ -12,7 +12,7 @@ uniform vec3 Ka;            // Ambient reflectivity
 uniform vec3 Ks;            // Specular reflectivity
 uniform float shininess;    // Specular shininess factor
 
-uniform sampler2DShadow ShadowMap;
+uniform sampler2DShadow shadow_map;
 
 in vec3 Position;
 in vec3 Normal;
@@ -53,7 +53,7 @@ void shadeWithShadow()
     {
         for (int j = -pfc_size; j <= pfc_size; j++)
         {
-            shadow += textureProjOffset(ShadowMap, ShadowCoord, ivec2(i, j));
+            shadow += textureProjOffset(shadow_map, ShadowCoord, ivec2(i, j));
         }
     }
     

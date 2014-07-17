@@ -1,6 +1,6 @@
 #version 420
 
-uniform sampler2D ShadowMap;
+uniform sampler2D tex_image;
 
 in vec2 texCoords;
 
@@ -8,7 +8,7 @@ out vec4 outputColor;
 
 void main()
 {
-    vec4 color = texture(ShadowMap, texCoords);
+    vec4 color = texture(tex_image, texCoords);
     
     int channel = 0;
     

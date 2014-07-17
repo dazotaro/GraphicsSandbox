@@ -22,17 +22,15 @@ vec3 ads(vec4 position, vec3 norm)
     vec3 s = normalize( vec3(Light.Position - position) );
     vec3 v = normalize(vec3(-position));
     vec3 r = reflect( -s, norm );
-    vec3 I = Light.Intensity;
-   
-    vec3 ambient = I * Ka;
+    
+    vec3 ambient = Light.Intensity * Ka;
      
-    float sDotN = dot(s,norm);
-    vec3 diffuse = I * Kd * max(sDotN, 0.0);
+    float sDotN = max(dot(s,norm), 0.0);
+    vec3 diffuse = Light.Intensity * Kd * sDotN;
     
     float rDotV = dot(r, v);
-    vec3 specular = I * Ks * pow(max(rDotV, 0.0), shininess);
+    vec3 specular = Light.Intensity * Ks * pow(max(rDotV, 0.0), shininess);
 
-    //return I * (Ka + Kd * max(dot(s, norm), 0.0) + Ks * pow(max(dot(r,v), 0.0), Shininess));
     return ambient + diffuse + specular;
 }
 

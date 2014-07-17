@@ -57,7 +57,7 @@ void shadeWithShadow()
         }
     }
     
-    shadow /= 2 * (pfc_size + 1) * 2 * (pfc_size + 1);
+    shadow /= (2 * pfc_size + 1) * (2 * pfc_size + 1);
 
     // If the fragment is in shadow, use ambient light only.
     FragColor = vec4(diffAndSpec * shadow + ambient, 1.0);

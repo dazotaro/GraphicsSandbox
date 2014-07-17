@@ -67,10 +67,10 @@ typedef HashMapVertexIndices::const_iterator HashMapVertexIndicesConstIter;
 * Helper function to aid the buildShape functions in handling vertex duplication
 *
 * @oaram vertex             The new vertex data
-* @oaram hpPositions    	A hash map with all the positions and their indices
-* @param hpNormals          A hash map with all the normals and their indices
-* @param hpTexCoords        A hash map with all the texture coordinates and their indices
-* @param hpVertexIndices    A hash map with all the vertex indices (position, normal, tex) and their indices into the corresponding vector
+* @oaram mPositions    	A hash map with all the positions and their indices
+* @param mNormals          A hash map with all the normals and their indices
+* @param mTexCoords        A hash map with all the texture coordinates and their indices
+* @param hmVertexIndices    A hash map with all the vertex indices (position, normal, tex) and their indices into the corresponding vector
 * @param vPositions			Vector with all the vertex positions, indexed with the value stored in its corresponding hash map
 * @param vNormals			Vector with all the vertex normals, indexed with the value stored in its corresponding hash map
 * @param vTexCoords			Vector with all the vertex texture coordinates, indexed with the value stored in its corresponding hash map
@@ -79,10 +79,10 @@ typedef HashMapVertexIndices::const_iterator HashMapVertexIndicesConstIter;
 * @return The index to retrieve this vector from the vector of vertex indices (vVertexIndices)
 */
 inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
-						  	  	  	  	MapVec3& hpPositions,
-						  	  	  	  	MapVec3& hpNormals,
-						  	  	  	  	MapVec2& hpTexCoords,
-						  	  	  	  	HashMapVertexIndices& hpVertexIndices,
+						  	  	  	  	MapVec3& mPositions,
+						  	  	  	  	MapVec3& mNormals,
+						  	  	  	  	MapVec2& mTexCoords,
+						  	  	  	  	HashMapVertexIndices& hmVertexIndices,
 						  	  	  	  	Mesh2::VectorPositions& vPositions,
 						  	  	  	  	Mesh2::VectorNormals& vNormals,
 						  	  	  	  	Mesh2::VectorTexCoords& vTexCoords,
@@ -93,10 +93,10 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
     // POSITION
     //---------
     JU::uint32 pos_index;
-    MapVec3ConstIter pos_iter = hpPositions.find(vertex.position_);
-    if (pos_iter == hpPositions.end())
+    MapVec3ConstIter pos_iter = mPositions.find(vertex.position_);
+    if (pos_iter == mPositions.end())
     {
-    	hpPositions[vertex.position_] = pos_index = vPositions.size();
+    	mPositions[vertex.position_] = pos_index = vPositions.size();
     	vPositions.push_back(vertex.position_);
     }
     else
@@ -105,10 +105,10 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
     // NORMAL
     //---------
     JU::uint32 normal_index;
-    MapVec3ConstIter normal_iter = hpNormals.find(vertex.normal_);
-    if (normal_iter == hpNormals.end())
+    MapVec3ConstIter normal_iter = mNormals.find(vertex.normal_);
+    if (normal_iter == mNormals.end())
     {
-    	hpNormals[vertex.normal_] = normal_index = vNormals.size();
+    	mNormals[vertex.normal_] = normal_index = vNormals.size();
     	vNormals.push_back(vertex.normal_);
     }
     else
@@ -117,10 +117,10 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
     // TEXTURE COORDINATE
     //---------
     JU::uint32 tex_index;
-    MapVec2ConstIter tex_iter = hpTexCoords.find(vertex.tex_coords_);
-    if (tex_iter == hpTexCoords.end())
+    MapVec2ConstIter tex_iter = mTexCoords.find(vertex.tex_coords_);
+    if (tex_iter == mTexCoords.end())
     {
-    	hpTexCoords[vertex.tex_coords_] = tex_index = vTexCoords.size();
+    	mTexCoords[vertex.tex_coords_] = tex_index = vTexCoords.size();
     	vTexCoords.push_back(vertex.tex_coords_);
     }
     else
@@ -129,10 +129,10 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
 
     // VERTEX: Does this vertex already exist?
     Mesh2::VertexIndices vertex_indices (pos_index, normal_index, tex_index);
-    HashMapVertexIndicesConstIter vtx_iter = hpVertexIndices.find(vertex_indices);
-    if (vtx_iter == hpVertexIndices.end())
+    HashMapVertexIndicesConstIter vtx_iter = hmVertexIndices.find(vertex_indices);
+    if (vtx_iter == hmVertexIndices.end())
     {
-        hpVertexIndices[vertex_indices] = vertex_index = vVertexIndices.size();
+        hmVertexIndices[vertex_indices] = vertex_index = vVertexIndices.size();
         vVertexIndices.push_back(vertex_indices);
     }
     else
@@ -152,7 +152,7 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
 * @oaram v1                 Vertex of quad
 * @oaram v2                 Vertex of quad
 * @oaram v3                 Vertex of quad
-* @oaram hpVertexIndices    A hash map with all the vertex indices per vertex-key
+* @oaram hmVertexIndices    A hash map with all the vertex indices per vertex-key
 * @param vVertices          A vector with all the vertices
 * @param vIndices           A vector with all the indices to the vertices
 *
@@ -161,19 +161,19 @@ inline Mesh2::VertexIndex processVertex(const ShapeHelper2::Vertex& vertex,
 inline void addTriangle(const ShapeHelper2::Vertex& 	v0,
                         const ShapeHelper2::Vertex& 	v1,
                         const ShapeHelper2::Vertex& 	v2,
-                        MapVec3& 					    hpPositions,
-						MapVec3& 					    hpNormals,
-						MapVec2& 					    hpTexCoords,
-						HashMapVertexIndices& 			hpVertexIndices,
+                        MapVec3& 					    mPositions,
+						MapVec3& 					    mNormals,
+						MapVec2& 					    mTexCoords,
+						HashMapVertexIndices& 			hmVertexIndices,
 						Mesh2::VectorPositions& 		vPositions,
 						Mesh2::VectorNormals& 			vNormals,
 						Mesh2::VectorTexCoords& 		vTexCoords,
 						Mesh2::VectorVertexIndices& 	vVertexIndices,
 						Mesh2::VectorTriangleIndices& 	vTriangleIndices)
 {
-	Mesh2::VertexIndex v0_index (processVertex(v0, hpPositions, hpNormals, hpTexCoords, hpVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices));
-	Mesh2::VertexIndex v1_index (processVertex(v1, hpPositions, hpNormals, hpTexCoords, hpVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices));
-	Mesh2::VertexIndex v2_index (processVertex(v2, hpPositions, hpNormals, hpTexCoords, hpVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices));
+	Mesh2::VertexIndex v0_index (processVertex(v0, mPositions, mNormals, mTexCoords, hmVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices));
+	Mesh2::VertexIndex v1_index (processVertex(v1, mPositions, mNormals, mTexCoords, hmVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices));
+	Mesh2::VertexIndex v2_index (processVertex(v2, mPositions, mNormals, mTexCoords, hmVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices));
 
 	vTriangleIndices.push_back(Mesh2::TriangleIndices(v0_index, v1_index, v2_index));
 }
@@ -189,7 +189,7 @@ inline void addTriangle(const ShapeHelper2::Vertex& 	v0,
 * @oaram v1                 Vertex of quad
 * @oaram v2                 Vertex of quad
 * @oaram v3                 Vertex of quad
-* @oaram hpVertexIndices    A hash map with all the vertex indices per vertex-key
+* @oaram hmVertexIndices    A hash map with all the vertex indices per vertex-key
 * @param vVertices          A vector with all the vertices
 * @param vIndices           A vector with all the indices to the vertices
 *
@@ -199,18 +199,18 @@ inline void addTriangulatedQuad(const ShapeHelper2::Vertex& v0,
                                 const ShapeHelper2::Vertex& v1,
                                 const ShapeHelper2::Vertex& v2,
                                 const ShapeHelper2::Vertex& v3,
-                                MapVec3& 				    hpPositions,
-                                MapVec3& 				    hpNormals,
-                                MapVec2& 				    hpTexCoords,
-                                HashMapVertexIndices& 		hpVertexIndices,
+                                MapVec3& 				    mPositions,
+                                MapVec3& 				    mNormals,
+                                MapVec2& 				    mTexCoords,
+                                HashMapVertexIndices& 		hmVertexIndices,
                                 Mesh2::VectorPositions& 	vPositions,
                                 Mesh2::VectorNormals& 		vNormals,
                                 Mesh2::VectorTexCoords& 	vTexCoords,
                                 Mesh2::VectorVertexIndices& vVertexIndices,
   							  Mesh2::VectorTriangleIndices& vTriangleIndices)
 {
-    addTriangle(v0, v1, v2, hpPositions, hpNormals, hpTexCoords, hpVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
-    addTriangle(v0, v2, v3, hpPositions, hpNormals, hpTexCoords, hpVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+    addTriangle(v0, v1, v2, mPositions, mNormals, mTexCoords, hmVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+    addTriangle(v0, v2, v3, mPositions, mNormals, mTexCoords, hmVertexIndices, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 }
 
 
@@ -285,10 +285,10 @@ void ShapeHelper2::buildPlane(std::string&  				name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    MapVec3 hpPositions	(vec3Compare);
-    MapVec3 hpNormals  	(vec3Compare);
-    MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+    MapVec3 mPositions	(vec3Compare);
+    MapVec3 mNormals  	(vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0(-0.5f,  0.5f, 0.0f, // position
                0.0f,  0.0f, 1.0f, // normal
@@ -304,7 +304,7 @@ void ShapeHelper2::buildPlane(std::string&  				name,
                1.0f,  1.0f);      // texture coordinates
 
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 }
 
@@ -325,10 +325,10 @@ void ShapeHelper2::buildCube(std::string&  					name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    MapVec3 hpPositions	(vec3Compare);
-    MapVec3 hpNormals  	(vec3Compare);
-    MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(30, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+    MapVec3 mPositions	(vec3Compare);
+    MapVec3 mNormals  	(vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(30, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
 
@@ -346,7 +346,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
                  0.0f, 0.0f, 1.0f, // normal
                  1.0f, 1.0f);      // texture coordinates
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
     // Face 1: normal (0, 0, -1)
@@ -363,7 +363,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
                  0.0f, 0.0f,-1.0f, // normal
                  1.0f, 1.0f);      // texture coordinates
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
     // Face 2: normal (1, 0, 0)
@@ -380,7 +380,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
                  1.0f, 0.0f, 0.0f, // normal
                  1.0f, 1.0f);      // texture coordinates
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
     // Face 3: normal (-1, 0, 0)
@@ -397,7 +397,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
                 -1.0f, 0.0f, 0.0f, // normal
                  1.0f, 1.0f);      // texture coordinates
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
     // Face 4: normal (0, 1, 0)
@@ -414,7 +414,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
                  0.0f, 1.0f, 0.0f, // normal
                  1.0f, 1.0f);      // texture coordinates
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
     // Face 5: normal (0, -1, 0)
@@ -431,7 +431,7 @@ void ShapeHelper2::buildCube(std::string&  					name,
                  0.0f,-1.0f, 0.0f, // normal
                  1.0f, 1.0f);      // texture coordinates
     addTriangulatedQuad(v0, v1, v2, v3,
-    					hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+    					mPositions, mNormals, mTexCoords, hmVertexIndices,
     					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 }
 
@@ -468,10 +468,10 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    MapVec3 hpPositions	(vec3Compare);
-    MapVec3 hpNormals  	(vec3Compare);
-    MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+    MapVec3 mPositions	(vec3Compare);
+    MapVec3 mNormals  	(vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
 
@@ -496,7 +496,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
                     top_normal, // normal
                     glm::vec2(x2 + 0.5f, y2 + 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
-        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			mPositions, mNormals, mTexCoords, hmVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -523,7 +523,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
         			bottom_normal, // normal
                     glm::vec2(-x1 + 0.5f, y1 + 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
-        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			mPositions, mNormals, mTexCoords, hmVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -556,7 +556,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
         			norm2, // normal
                     glm::vec2(s2, 1.0f));      // texture coordinates
         addTriangulatedQuad(v0, v1, v2, v3,
-        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			mPositions, mNormals, mTexCoords, hmVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -597,10 +597,10 @@ void ShapeHelper2::buildCone(std::string&  					name,
     vVertexIndices.clear();
 
     Vertex vertex;                      // Vertex data
-    MapVec3 hpPositions (vec3Compare);
-    MapVec3 hpNormals   (vec3Compare);
-    MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);       // Hash map to keep track of uniqueness of vertices and their indices
+    MapVec3 mPositions (vec3Compare);
+    MapVec3 mNormals   (vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(10 * num_slices, vertexIndicesHash);       // Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
 
@@ -625,7 +625,7 @@ void ShapeHelper2::buildCone(std::string&  					name,
                     bottom_normal, // normal
                     glm::vec2(-x1 + 0.5f, y1 + 0.5f));      // texture coordinates
         addTriangle(v0, v1, v2,
-                    hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+                    mPositions, mNormals, mTexCoords, hmVertexIndices,
                     vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -661,7 +661,7 @@ void ShapeHelper2::buildCone(std::string&  					name,
                     norm2, // normal
                     glm::vec2(s2, 0.0f));      // texture coordinates
         addTriangle(v0, v1, v2,
-                    hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+                    mPositions, mNormals, mTexCoords, hmVertexIndices,
                     vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -705,10 +705,10 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    MapVec3 hpPositions	(vec3Compare);
-    MapVec3 hpNormals  	(vec3Compare);
-    MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+    MapVec3 mPositions	(vec3Compare);
+    MapVec3 mNormals  	(vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(10 * num_slices, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
 
@@ -742,7 +742,7 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
                     norm2, // normal
                     glm::vec2(s2, t));      // texture coordinates
         addTriangle(v0, v1, v2,
-        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			mPositions, mNormals, mTexCoords, hmVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -778,7 +778,7 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
                     bottom_normal, // normal
                     glm::vec2(0.5f * (s1 + s2), 0.0f));      // texture coordinates
         addTriangle(v0, v1, v2,
-        			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+        			mPositions, mNormals, mTexCoords, hmVertexIndices,
         			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
 
         theta += DELTA_THETA;
@@ -832,7 +832,7 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
             			norm3, // normal
                         glm::vec2(s2, t1));      // texture coordinates
             addTriangulatedQuad(v0, v1, v2, v3,
-            			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+            			mPositions, mNormals, mTexCoords, hmVertexIndices,
             			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
         }
     }
@@ -881,10 +881,10 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
     vVertexIndices.clear();
 
     Vertex vertex;						// Vertex data
-    MapVec3 hpPositions	(vec3Compare);
-    MapVec3 hpNormals  	(vec3Compare);
-    MapVec2 hpTexCoords (vec2Compare);
-    HashMapVertexIndices hpVertexIndices(10 * num_slices1 * num_slices2, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+    MapVec3 mPositions	(vec3Compare);
+    MapVec3 mNormals  	(vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(10 * num_slices1 * num_slices2, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     Vertex v0, v1, v2, v3;
 
@@ -939,7 +939,7 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
             			norm3, // normal
                         glm::vec2(s2, t1));      // texture coordinates
             addTriangulatedQuad(v0, v1, v2, v3,
-            			hpPositions, hpNormals, hpTexCoords, hpVertexIndices,
+            			mPositions, mNormals, mTexCoords, hmVertexIndices,
             			vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
     	}
     }

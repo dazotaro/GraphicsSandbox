@@ -9,17 +9,16 @@
 #define XMLHANDLER_HPP_
 
 // Global Includes
-#include <boost/property_tree/ptree.hpp>                                // ptree
+#include <boost/property_tree/ptree.hpp>    // ptree
+
+namespace JU {
 
 // XML Import and Export class
-class XMLHandler
+namespace XMLHandler
 {
-    public:
-        XMLHandler() {}
-        virtual ~XMLHandler() {}
+    bool load(const char* filename, boost::property_tree::ptree& pt);
+    void save(const char* filename, const boost::property_tree::ptree&);
+}
 
-    public:
-        bool load(const char* filename, boost::property_tree::ptree& pt);
-        void save(const char* filename, const boost::property_tree::ptree&) const;
-};
+}
 #endif /* XMLHANDLER_HPP_ */

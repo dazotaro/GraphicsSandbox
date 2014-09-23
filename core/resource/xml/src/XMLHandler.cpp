@@ -12,7 +12,9 @@
 #include <boost/property_tree/detail/xml_parser_writer_settings.hpp>    // xml_parser_writer_settings
 #include <locale>                                                       // std::locale()
 
-bool XMLHandler::load(const char* filename, boost::property_tree::ptree& pt)
+namespace JU { namespace XMLHandler {
+
+bool load(const char* filename, boost::property_tree::ptree& pt)
 {
     // Load the XML file into the property tree. If reading fails
     // (cannot open file, parse error), an exception is thrown.
@@ -22,8 +24,12 @@ bool XMLHandler::load(const char* filename, boost::property_tree::ptree& pt)
 }
 
 
-void XMLHandler::save(const char* filename, const boost::property_tree::ptree& pt) const
+void save(const char* filename, const boost::property_tree::ptree& pt)
 {
-
+    // Set the tab to four spaces
+    boost::property_tree::xml_parser::xml_writer_settings<char> settings(' ', 4);
+    // Write the property tree to the XML file.
+    write_xml(filename, pt, std::locale(), settings);
 }
 
+} }   // namespace XMLHandler namespace JU

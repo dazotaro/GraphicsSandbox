@@ -9,12 +9,12 @@
 #define GLSCENECOMETTAIL_HPP_
 
 // Local includes
-#include <JU/GLScene.hpp>      	    // GLScene
-#include <JU/ArcBallController.hpp> // ArcBallController
-#include <JU/GLParticleSystem.hpp>  // GLParticleSystem
+#include "GLScene.hpp"      	    // GLScene
+#include "ArcBallController.hpp" // ArcBallController
+#include "GLParticleSystem.hpp"  // GLParticleSystem
 
 // Global includes
-#include <JU/Defs.hpp>              // uint16
+#include "common/Defs.hpp"              // uint16
 #include <vector>                   // std::vector
 
 // Forward Declarations

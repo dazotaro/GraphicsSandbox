@@ -8,7 +8,7 @@
 #ifndef IMAGEHELPER_HPP_
 #define IMAGEHELPER_HPP_
 
-#include <JU/Defs.hpp>		// JU::uint32
+#include "common/Defs.hpp"		// JU::uint32
 
 namespace JU
 {

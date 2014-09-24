@@ -12,7 +12,7 @@
 #include "gl_core_4_2.h"                // glLoadGen generated header file
 
 // Global Includes
-#include <JU/Defs.hpp>              // JU::uint32
+#include "common/Defs.hpp"              // JU::uint32
 #include <string>
 #include <map>
 

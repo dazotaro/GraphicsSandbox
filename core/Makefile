@@ -5,7 +5,8 @@ LIB_FILENAME = lib$(LIB_NAME).a
 
 # Subdirectories
 COMMON_DIR = ./common/
-XML_DIR = ./resource/xml/
+XML_DIR = ./xml/
+PTREE_DIR = ./ptree/
 
 .PHONY: test
 
@@ -13,7 +14,10 @@ all :
 	cd $(XML_DIR)src; make 
 
 install : archive
-	cp $(SRC_DIR)$(LIB_FILENAME) $(LIB_DIR); cp --parents $(COMMON_DIR)*.hpp $(INC_DIR); cp --parents $(XML_DIR)src/*.hpp $(INC_DIR)
+	cp $(SRC_DIR)$(LIB_FILENAME) $(LIB_DIR);\
+    cp --parents $(COMMON_DIR)*.hpp $(INC_DIR);\
+    cp --parents $(XML_DIR)src/*.hpp $(INC_DIR);\
+    cp --parents $(PTREE_DIR)src/*.hpp $(INC_DIR);
 
 archive :
 	ar cvr $(LIB_FILENAME) $(XML_DIR)src/*.o

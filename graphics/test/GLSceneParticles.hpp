@@ -13,7 +13,7 @@
 #include "ArcBallController.hpp" // ArcBallController
 
 // Global includes
-#include <JU/Defs.hpp>              // uint16
+#include "common/Defs.hpp"              // uint16
 #include <vector>                   // std::vector
 
 // Forward Declarations

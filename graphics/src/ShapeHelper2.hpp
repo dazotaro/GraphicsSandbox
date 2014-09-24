@@ -10,7 +10,7 @@
 
 // Global includes
 #include <vector>			// std::vector
-#include <JU/Defs.hpp>		// Custom data types
+#include "common/Defs.hpp"		// Custom data types
 #include <string>			// std::string
 #include <glm/glm.hpp>		// glm::vec2, glm::vec3
 

@@ -16,7 +16,7 @@
 // Global includes
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <JU/Defs.hpp>              // JU::f32
+#include "common/Defs.hpp"              // JU::f32
 
 /**
  * @brief   Third-person camera type

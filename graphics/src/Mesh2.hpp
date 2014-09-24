@@ -12,7 +12,7 @@
 #include <glm/glm.hpp>      // glm::vec3, glm::vec2
 #include <vector>           // std::vector
 #include <string>           // std::string
-#include <JU/Defs.hpp>		// uint32
+#include "common/Defs.hpp"		// uint32
 
 
 

@@ -10,7 +10,7 @@
 
 // Global includes
 #include <SOIL.h>                   // SOIL_load_image
-#include <JU/ImageHelper.hpp>       // imageInvertVertically
+#include "ImageHelper.hpp"       	// imageInvertVertically
 #include <cstdio>                   // std::printf
 
 

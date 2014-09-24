@@ -8,7 +8,7 @@
 // Global Includes
 #include <string>               // std::string
 #include <glm/glm.hpp>          // glm::vecX
-#include <JU/Defs.hpp>          // JU::int32
+#include "common/Defs.hpp"          // JU::int32
 #include <unordered_map>        // std::unordered_map
 
 

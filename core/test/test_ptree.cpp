@@ -12,12 +12,18 @@
 
 int main(void)
 {
-    const char* filename = "data/debug.xml";
+    const char* filename = "data/ptree.xml";
 
     boost::property_tree::ptree pt;
+    boost::property_tree::ptree pt2;
 
     JU::XMLHandler::load(filename, pt);
-    JU::XMLHandler::save("after.xml", pt);
+
+    BaseClass object;
+    object.importFromPropertyTree(pt);
+    object.exportToPropertyTree(pt2);
+
+    JU::XMLHandler::save("ptree_after.xml", pt2);
 
     return 0;
 }

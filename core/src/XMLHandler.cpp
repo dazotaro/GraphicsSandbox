@@ -18,8 +18,8 @@ bool load(const char* filename, boost::property_tree::ptree& pt)
 {
     // Load the XML file into the property tree. If reading fails
     // (cannot open file, parse error), an exception is thrown.
-    read_xml(filename, pt);
-
+    // The "trim_whitespace" ensures that the tab-for-spaces do not create empty lines
+    read_xml(filename, pt, boost::property_tree::xml_parser::trim_whitespace );
     return true;
 }
 

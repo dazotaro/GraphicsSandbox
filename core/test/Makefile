@@ -4,23 +4,22 @@ LIB_NAME =
 
 OPTS = -O2 -g -Wall -fmessage-length=0 -std=c++11
 
-OBJS = XMLHandler.o test.o
+OBJS = test.o 
 
 INC = -iquote../src/
 
 LIBDIR = -L../src/
 
-VPATH = ../src:./
+LIBS = -l$(LIB_NAME) 
 
-TARGET = test 
-
+TARGET = core 
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) ../src/$(LIBNAME)
 	$(CC) -o $(TARGET) $(OBJS) $(OPTS) $(LIBDIR) $(LIBS)
 	
-%.o: %.cpp 
+%.o : %.cpp 
 	$(CC) -c $< $(OPTS) $(INC)
 
 clean:

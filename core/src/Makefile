@@ -12,6 +12,7 @@
 # VARIABLE DEFINITIONS
 # --------------------
 CC = g++
+LIB_FILENAME = 
 LIBS_DIR = -L.
 INC =
 MACROS =
@@ -21,6 +22,7 @@ OBJS = XMLHandler.o
 # TARGETS
 # -------
 all: $(OBJS)
+	ar cvr $(LIB_FILENAME) $(OBJS)
 
 %.o : %.cpp 
 	$(CC) -c $< $(OPTS) $(MACROS) $(INC)

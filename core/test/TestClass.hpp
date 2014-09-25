@@ -48,10 +48,10 @@ class DerivedClass
 
 
 
-class OtherClass : public JU::PropertyTree
+class AggregationClass : public JU::PropertyTree
 {
     public:
-        virtual ~OtherClass() {}
+        virtual ~AggregationClass() {}
 
     public:
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
@@ -59,6 +59,7 @@ class OtherClass : public JU::PropertyTree
 
     public:
         std::string string_;
+        BaseClass   base_class_;
 };
 
 #endif /* TESTCLASS_HPP_ */

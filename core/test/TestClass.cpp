@@ -9,9 +9,9 @@
 
 bool BaseClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
 {
-    integer_  = pt.get<int>("test.int");
-    floating_ = pt.get<float>("test.float");
-    boolean_  = pt.get<bool>("test.bool");
+    integer_  = pt.get<int>("base.int");
+    floating_ = pt.get<float>("base.float");
+    boolean_  = pt.get<bool>("base.bool");
 
     return true;
 }
@@ -20,9 +20,9 @@ bool BaseClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
 
 bool BaseClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
 {
-    pt.put("test.int",   integer_);
-    pt.put("test.float", floating_);
-    pt.put("test.bool",  boolean_);
+    pt.put("base.int",   integer_);
+    pt.put("base.float", floating_);
+    pt.put("base.bool",  boolean_);
 
     return true;
 }
@@ -43,15 +43,23 @@ bool DerivedClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
 
 
 
-bool OtherClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
+bool AggregationClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
 {
+    string_ = pt.get<std::string>("other.string");
+
+    boost::property_tree::ptree base_ptree = pt.get_child("other.base");
+    base_class_.importFromPropertyTree(base_ptree);
+
     return true;
 }
 
 
 
-bool OtherClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
+bool AggregationClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
 {
+    pt.put("other.string", string_);
+    base_class_.exportToPropertyTree(pt);
+
     return true;
 }
 

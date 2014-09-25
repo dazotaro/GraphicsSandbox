@@ -12,7 +12,7 @@
 #include "DrawInterface.hpp"    // DrawInterface parent class
 
 // Global includes
-#include "common/Defs.hpp"          // uint32
+#include "Defs.hpp"          // uint32
 #include "gl_core_4_2.h"                // glLoadGen generated header file
 #include <glm/glm.hpp>          // glm::vec3/vec4
 #include <vector>               // std::vector

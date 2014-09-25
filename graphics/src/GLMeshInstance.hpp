@@ -13,7 +13,7 @@
 #include "DrawInterface.hpp"    // DrawInterface
 
 // Global Includes
-#include "common/Defs.hpp"			// JU::f32
+#include "Defs.hpp"			// JU::f32
 #include <string>               // std:string
 #include <map>                  // std::map
 

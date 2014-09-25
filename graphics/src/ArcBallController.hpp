@@ -9,7 +9,7 @@
 #define ARCBALLCONTROLLER_HPP_
 
 // GlobalIncludes
-#include "common/Defs.hpp"      // JU::uint32
+#include "Defs.hpp"      // JU::uint32
 #include <glm/glm.hpp>      // glm::vec3
 
 /**

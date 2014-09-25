@@ -19,7 +19,7 @@
 #include "GLParticleSystem.hpp"			// GLParticleSystem
 
 // Global includes
-#include "common/Defs.hpp"					// uint32
+#include "Defs.hpp"					// uint32
 
 GLSceneParticles::GLSceneParticles(int width, int height) : GLScene(width, height),
                                      camera_gps_(0), camera_target_(0), camera_(0),

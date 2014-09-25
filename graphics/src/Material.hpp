@@ -10,7 +10,7 @@
 
 // Global includes
 #include <glm/glm.hpp>		// glm::vec3
-#include "common/Defs.hpp"		// JU::f32
+#include "Defs.hpp"		// JU::f32
 #include <unordered_map>	// std::unordered_map
 #include <string>			// std::string
 #include <unordered_map>	// std::unordered_map

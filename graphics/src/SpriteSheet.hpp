@@ -13,7 +13,7 @@
 
 // Global Includes
 #include <string>       // std::string
-#include "common/Defs.hpp"  // Basic data types
+#include "Defs.hpp"  // Basic data types
 
 class SpriteSheet : public Texture
 {

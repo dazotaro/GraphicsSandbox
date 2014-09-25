@@ -13,7 +13,7 @@
 #include "DebugGlm.hpp"                     // debug::print()
 
 // Global includes
-#include "common/Defs.hpp"						// JU::f32
+#include "Defs.hpp"						// JU::f32
 #include <glm/gtc/matrix_transform.hpp>     // glm:lookAt
 #include <glm/gtx/transform2.hpp>           // glm::rotate, glm::translate
 #include <iostream>                         // std::cout, std::endl

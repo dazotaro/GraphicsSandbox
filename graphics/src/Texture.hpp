@@ -12,7 +12,7 @@
 #include "gl_core_4_2.h"            // glLoadGen generated header file
 
 // Global includes
-#include "common/Defs.hpp"  // Basic type typedefs
+#include "Defs.hpp"  // Basic type typedefs
 #include <string>       // std::string
 
 class Texture

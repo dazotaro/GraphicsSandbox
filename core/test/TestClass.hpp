@@ -27,7 +27,7 @@ class BaseClass : public JU::PropertyTree
         // Given a property tree, it imports its contents into the object
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
         // It exports the contents of the object to a property tree
-        virtual bool exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const;
+        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
 
     public:
         int     integer_;
@@ -48,7 +48,7 @@ class DerivedClass : public BaseClass
         // Given a property tree, it imports its contents into the object
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
         // It exports the contents of the object to a property tree
-        virtual bool exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const;
+        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
 
     public:
         std::string string_;
@@ -67,11 +67,31 @@ class AggregationClass : public JU::PropertyTree
         // Given a property tree, it imports its contents into the object
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
         // It exports the contents of the object to a property tree
-        virtual bool exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const;
+        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
 
     public:
         std::string string_;
         BaseClass   base_class_;
+};
+
+
+
+class ContainerClass : public JU::PropertyTree
+{
+    public:
+        virtual ~ContainerClass() {}
+
+    public:
+        // It returns the [XML,JSON] tag of object
+        virtual const char* getTag() const { return "container"; }
+        // Given a property tree, it imports its contents into the object
+        virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
+        // It exports the contents of the object to a property tree
+        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
+
+    public:
+        std::string string_;
+        std::vector<BaseClass> vBase_;
 };
 
 #endif /* TESTCLASS_HPP_ */

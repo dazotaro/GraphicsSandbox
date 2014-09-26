@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container>
+    <string>jorgito</string>
+    <bases>
+        <base>
+            <int>1</int>
+            <float>1.1</float>
+            <bool>true</bool>
+        </base>
+        <base>
+            <int>2</int>
+            <float>2.2</float>
+            <bool>false</bool>
+        </base>
+        <base>
+            <int>3</int>
+            <float>3.3</float>
+            <bool>true</bool>
+        </base>
+        <base>
+            <int>4</int>
+            <float>4.4</float>
+            <bool>false</bool>
+        </base>
+        <base>
+            <int>5</int>
+            <float>5.5</float>
+            <bool>true</bool>
+        </base>
+        <base>
+            <int>6</int>
+            <float>6.6</float>
+            <bool>false</bool>
+        </base>
+    </bases>
+</container>

@@ -24,7 +24,7 @@ void testBaseClass()
     pt = pt.get_child(object.getTag());
 
     object.importFromPropertyTree(pt);
-    object.exportToPropertyTree("", pt2);
+    object.exportToPropertyTree(pt2);
 
     JU::XMLHandler::save(output_filename, pt2);
 }
@@ -45,7 +45,7 @@ void testAggregationClass()
     pt = pt.get_child(object.getTag());
 
     object.importFromPropertyTree(pt);
-    object.exportToPropertyTree("", pt2);
+    object.exportToPropertyTree(pt2);
 
     JU::XMLHandler::save(output_filename, pt2);
 }
@@ -66,7 +66,7 @@ void testDerivedClass()
     pt = pt.get_child(object.getTag());
 
     object.importFromPropertyTree(pt);
-    object.exportToPropertyTree("", pt2);
+    object.exportToPropertyTree(pt2);
 
     JU::XMLHandler::save(output_filename, pt2);
 }
@@ -87,7 +87,7 @@ void testXML2JSON()
     pt = pt.get_child(object.getTag());
 
     object.importFromPropertyTree(pt);
-    object.exportToPropertyTree("", pt2);
+    object.exportToPropertyTree(pt2);
 
     JU::JSONHandler::save(output_filename, pt2);
 }
@@ -108,7 +108,28 @@ void testJSON2XML()
     pt = pt.get_child(object.getTag());
 
     object.importFromPropertyTree(pt);
-    object.exportToPropertyTree("", pt2);
+    object.exportToPropertyTree(pt2);
+
+    JU::XMLHandler::save(output_filename, pt2);
+}
+
+
+
+void testContainerClass()
+{
+    const char* input_filename  = "data/ptree_container.xml";
+    const char* output_filename = "ptree_container_after.xml";
+
+    boost::property_tree::ptree pt;
+    boost::property_tree::ptree pt2;
+
+    JU::XMLHandler::load(input_filename, pt);
+
+    ContainerClass object;
+    pt = pt.get_child(object.getTag());
+
+    object.importFromPropertyTree(pt);
+    object.exportToPropertyTree(pt2);
 
     JU::XMLHandler::save(output_filename, pt2);
 }
@@ -117,11 +138,14 @@ void testJSON2XML()
 
 int main(void)
 {
+
     testBaseClass();
     testAggregationClass();
     testDerivedClass();
     testXML2JSON();
     testJSON2XML();
+
+    testContainerClass();
 
     return 0;
 }

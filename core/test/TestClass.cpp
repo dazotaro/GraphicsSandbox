@@ -18,13 +18,13 @@ bool BaseClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
 
 
 
-bool BaseClass::exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const
+bool BaseClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
 {
-    std::string local_path (buildLocalPath(path, BaseClass::getTag()));
+    boost::property_tree::ptree& node = pt.add(BaseClass::getTag(), "");
 
-    pt.put(local_path + "int",   integer_);
-    pt.put(local_path + "float", floating_);
-    pt.put(local_path + "bool",  boolean_);
+    node.put("int",   integer_);
+    node.put("float", floating_);
+    node.put("bool",  boolean_);
 
     return true;
 }
@@ -35,7 +35,7 @@ bool DerivedClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
 {
     string_ = pt.get<std::string>("string");
 
-    boost::property_tree::ptree base_ptree = pt.get_child("base");
+    boost::property_tree::ptree base_ptree = pt.get_child(BaseClass::getTag());
     BaseClass::importFromPropertyTree(base_ptree);
 
     return true;
@@ -43,12 +43,12 @@ bool DerivedClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
 
 
 
-bool DerivedClass::exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const
+bool DerivedClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
 {
-    std::string local_path (buildLocalPath(path, DerivedClass::getTag()));
+    boost::property_tree::ptree& node (pt.add(DerivedClass::getTag(), ""));
 
-    BaseClass::exportToPropertyTree(local_path, pt);
-    pt.put(local_path + "string", string_);
+    BaseClass::exportToPropertyTree(node);
+    node.put("string", string_);
 
     return true;
 }
@@ -59,7 +59,7 @@ bool AggregationClass::importFromPropertyTree(const boost::property_tree::ptree&
 {
     string_ = pt.get<std::string>("string");
 
-    boost::property_tree::ptree base_ptree = pt.get_child("base");
+    boost::property_tree::ptree base_ptree = pt.get_child(base_class_.getTag());
     base_class_.importFromPropertyTree(base_ptree);
 
     return true;
@@ -67,13 +67,52 @@ bool AggregationClass::importFromPropertyTree(const boost::property_tree::ptree&
 
 
 
-bool AggregationClass::exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const
+bool AggregationClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
 {
-    std::string local_path (buildLocalPath(path, AggregationClass::getTag()));
+    boost::property_tree::ptree& node (pt.add(AggregationClass::getTag(), ""));
 
-    pt.put(local_path + "string", string_);
-    base_class_.exportToPropertyTree(local_path, pt);
+    node.put("string", string_);
+    base_class_.exportToPropertyTree(node);
 
     return true;
 }
+
+
+
+bool ContainerClass::importFromPropertyTree(const boost::property_tree::ptree& pt)
+{
+    string_ = pt.get<std::string>("string");
+
+    boost::property_tree::ptree children = pt.get_child("bases");
+    for (boost::property_tree::ptree::const_iterator node_iter = children.begin(); node_iter != children.end(); ++node_iter)
+    {
+        BaseClass object;
+        object.importFromPropertyTree(node_iter->second);
+        vBase_.push_back(object);
+    }
+
+
+    return true;
+}
+
+
+
+bool ContainerClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
+{
+    boost::property_tree::ptree& node = pt.add(ContainerClass::getTag(), "");
+
+    node.put("string", string_);
+
+    // Add node for "bases"
+    boost::property_tree::ptree& new_node = node.add("bases", "");
+
+    for (std::vector<BaseClass>::const_iterator iter = vBase_.begin(); iter != vBase_.end(); ++iter)
+    {
+        iter->exportToPropertyTree(new_node);
+    }
+
+
+    return true;
+}
+
 

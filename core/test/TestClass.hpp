@@ -22,8 +22,12 @@ class BaseClass : public JU::PropertyTree
         virtual ~BaseClass() {}
 
     public:
+        // It returns the [XML,JSON] tag of object
+        virtual const char* getTag() const { return "base" ;}
+        // Given a property tree, it imports its contents into the object
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
-        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
+        // It exports the contents of the object to a property tree
+        virtual bool exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const;
 
     public:
         int     integer_;
@@ -33,14 +37,18 @@ class BaseClass : public JU::PropertyTree
 
 
 
-class DerivedClass
+class DerivedClass : public BaseClass
 {
     public:
         virtual ~DerivedClass() {}
 
     public:
+        // It returns the [XML,JSON] tag of object
+        virtual const char* getTag() const { return "derived"; }
+        // Given a property tree, it imports its contents into the object
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
-        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
+        // It exports the contents of the object to a property tree
+        virtual bool exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const;
 
     public:
         std::string string_;
@@ -54,8 +62,12 @@ class AggregationClass : public JU::PropertyTree
         virtual ~AggregationClass() {}
 
     public:
+        // It returns the [XML,JSON] tag of object
+        virtual const char* getTag() const { return "aggregate"; }
+        // Given a property tree, it imports its contents into the object
         virtual bool importFromPropertyTree(const boost::property_tree::ptree& pt);
-        virtual bool exportToPropertyTree(boost::property_tree::ptree& pt) const;
+        // It exports the contents of the object to a property tree
+        virtual bool exportToPropertyTree(const std::string& path, boost::property_tree::ptree& pt) const;
 
     public:
         std::string string_;

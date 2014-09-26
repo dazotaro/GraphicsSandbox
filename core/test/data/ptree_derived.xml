@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<aggregate>
+<derived>
     <string>jorgito</string>
     <base>
         <int>17</int>
         <float>2.141516</float>
         <bool>true</bool>
     </base>
-</aggregate>
+</derived>

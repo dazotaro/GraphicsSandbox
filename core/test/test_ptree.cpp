@@ -11,41 +11,72 @@
 
 void testBaseClass()
 {
-    const char* filename = "data/ptree_base.xml";
+    const char* input_filename = "data/ptree_base.xml";
+    const char* output_filename = "ptree_base_after.xml";
 
     boost::property_tree::ptree pt;
     boost::property_tree::ptree pt2;
 
-    JU::XMLHandler::load(filename, pt);
+    JU::XMLHandler::load(input_filename, pt);
 
     BaseClass object;
-    object.importFromPropertyTree(pt);
-    object.exportToPropertyTree(pt2);
+    pt = pt.get_child(object.getTag());
 
-    JU::XMLHandler::save("ptree_base_after.xml", pt2);
+    object.importFromPropertyTree(pt);
+    object.exportToPropertyTree("", pt2);
+
+    JU::XMLHandler::save(output_filename, pt2);
 }
+
 
 
 void testAggregationClass()
 {
-    const char* filename = "data/ptree_aggregation.xml";
+    const char* input_filename  = "data/ptree_aggregation.xml";
+    const char* output_filename = "ptree_aggregation_after.xml";
 
     boost::property_tree::ptree pt;
     boost::property_tree::ptree pt2;
 
-    JU::XMLHandler::load(filename, pt);
+    JU::XMLHandler::load(input_filename, pt);
 
     AggregationClass object;
-    object.importFromPropertyTree(pt);
-    object.exportToPropertyTree(pt2);
+    pt = pt.get_child(object.getTag());
 
-    JU::XMLHandler::save("ptree_aggregation_after.xml", pt2);
+    object.importFromPropertyTree(pt);
+    object.exportToPropertyTree("", pt2);
+
+    JU::XMLHandler::save(output_filename, pt2);
 }
+
+
+
+void testDerivedClass()
+{
+    const char* input_filename  = "data/ptree_derived.xml";
+    const char* output_filename = "ptree_derived_after.xml";
+
+    boost::property_tree::ptree pt;
+    boost::property_tree::ptree pt2;
+
+    JU::XMLHandler::load(input_filename, pt);
+
+    DerivedClass object;
+    pt = pt.get_child(object.getTag());
+
+    object.importFromPropertyTree(pt);
+    object.exportToPropertyTree("", pt2);
+
+    JU::XMLHandler::save(output_filename, pt2);
+}
+
 
 
 int main(void)
 {
     testBaseClass();
+    testAggregationClass();
+    testDerivedClass();
 
     return 0;
 }

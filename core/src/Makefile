@@ -17,7 +17,7 @@ LIBS_DIR = -L.
 INC =
 MACROS =
 OPTS = -g
-OBJS = XMLHandler.o
+OBJS = XMLHandler.o JSONHandler.o
 
 # TARGETS
 # -------

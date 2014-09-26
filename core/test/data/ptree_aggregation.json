@@ -1,0 +1,12 @@
+{
+    "aggregate":
+    {
+        "string": "jorgito",
+        "base":
+        {
+            "int": "17",
+            "float": "2.141516",
+            "bool": "true"
+        }
+    }
+}

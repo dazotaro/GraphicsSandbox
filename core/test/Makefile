@@ -23,4 +23,4 @@ $(TARGET): $(OBJS) ../src/$(LIBNAME)
 	$(CC) -c $< $(OPTS) $(INC)
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) *.xml *.json

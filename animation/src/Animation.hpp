@@ -9,7 +9,7 @@
 #define ANIMATION_HPP_
 
 // Global includes
-#include <JU/Defs.hpp>      // Basic types typedefs
+#include <JU/core/Defs.hpp>      // Basic types typedefs
 
 class Animation
 {

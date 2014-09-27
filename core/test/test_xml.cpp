@@ -7,7 +7,7 @@
 
 #include "XMLHandler.hpp"
 
-int main(void)
+int test_xml(void)
 {
     const char* filename = "data/debug.xml";
 

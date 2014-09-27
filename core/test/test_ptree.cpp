@@ -136,7 +136,7 @@ void testContainerClass()
 
 
 
-int main(void)
+int test_ptree(void)
 {
 
     testBaseClass();

@@ -1,2 +1,12 @@
+////
+CORE
+////
 
+Property Tree
+-------------
 - Work on templatizing the get/put/add functions to do something like 'pt.get<Sphere>()". Well explained with examples in http://akrzemi1.wordpress.com/2011/07/13/parsing-xml-with-boost/.
+
+Factory
+-------
+- Standarize the process of loading and creating objects (e.g. Meshes like spheres, cylinders; Textures; Animations...)
+

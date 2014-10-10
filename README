@@ -4,9 +4,15 @@ CORE
 
 Property Tree
 -------------
+- Add 'loadXML' templatize function that given a XML stream returns a PropertyTree. Or, that given a file name and a 
+object type (as a template), it calls 'loadXML' which returns a pointer to the object type.
+- This pointer does not need to belong to a newly created object: if an identical object already existed, return the 
+pointer to that one (Flyweight).
+- To support the previous functionality, we need to be able to tell whether an object needs to be created or not. If we 
+construct a PropertyTree with the parameters to build an object, we could get a hash-key from that PropertyTree (in a 
+generic way, and then decide.
 - Work on templatizing the get/put/add functions to do something like 'pt.get<Sphere>()". Well explained with examples in http://akrzemi1.wordpress.com/2011/07/13/parsing-xml-with-boost/.
 
 Factory
 -------
-- Standarize the process of loading and creating objects (e.g. Meshes like spheres, cylinders; Textures; Animations...)
-
+- Standarize the process of creating objects: for example, using the 'template'/'factory' patterns.

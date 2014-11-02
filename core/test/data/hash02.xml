@@ -1,0 +1,9 @@
+<test>
+    <filename>Admin</filename>
+    <modules>
+        <module>1</module>
+        <module>debug.log</module>
+        <module>HR</module>
+    </modules>
+    <level>2</level>
+</test>

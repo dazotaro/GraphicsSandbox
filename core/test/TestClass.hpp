@@ -9,14 +9,14 @@
 #define TESTCLASS_HPP_
 
 // Local includes
-#include "PropertyTree.hpp"
+#include "PropertyTreeInterface.hpp"
 
 // Global includes
 #include <string>           // std::string
 
 
 
-class BaseClass : public JU::PropertyTree
+class BaseClass : public JU::PropertyTreeInterface
 {
     public:
         virtual ~BaseClass() {}
@@ -56,7 +56,7 @@ class DerivedClass : public BaseClass
 
 
 
-class AggregationClass : public JU::PropertyTree
+class AggregationClass : public JU::PropertyTreeInterface
 {
     public:
         virtual ~AggregationClass() {}
@@ -76,7 +76,7 @@ class AggregationClass : public JU::PropertyTree
 
 
 
-class ContainerClass : public JU::PropertyTree
+class ContainerClass : public JU::PropertyTreeInterface
 {
     public:
         virtual ~ContainerClass() {}

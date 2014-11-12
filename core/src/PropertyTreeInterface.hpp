@@ -5,8 +5,8 @@
  *      Author: jusabiaga
  */
 
-#ifndef PROPERTYTREE_HPP_
-#define PROPERTYTREE_HPP_
+#ifndef PROPERTYTREEINTERFACE_HPP_
+#define PROPERTYTREEINTERFACE_HPP_
 
 // Global Includes
 #include <boost/property_tree/ptree.hpp>    // ptree
@@ -15,10 +15,10 @@
 namespace JU
 {
 
-class PropertyTree
+class PropertyTreeInterface
 {
     public:
-        virtual ~PropertyTree() {}
+        virtual ~PropertyTreeInterface() {}
 
     public:
         // Given a property tree, it imports its contents into the object
@@ -28,4 +28,4 @@ class PropertyTree
 };
 
 } /* namespace JU */
-#endif /* PROPERTYTREE_HPP_ */
+#endif /* PROPERTYTREEINTERFACE_HPP_ */

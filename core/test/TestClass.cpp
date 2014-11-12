@@ -91,7 +91,6 @@ bool ContainerClass::importFromPropertyTree(const boost::property_tree::ptree& p
         vBase_.push_back(object);
     }
 
-
     return true;
 }
 
@@ -110,7 +109,6 @@ bool ContainerClass::exportToPropertyTree(boost::property_tree::ptree& pt) const
     {
         iter->exportToPropertyTree(new_node);
     }
-
 
     return true;
 }

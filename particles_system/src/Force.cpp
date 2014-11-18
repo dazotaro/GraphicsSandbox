@@ -61,24 +61,24 @@ std::string Force::getInfoString() const
 
 	switch (type_)
 	{
-	case Force::PERSISTENT:
-		out << "PERSISTENT)" << std::endl;
-		break;
+		case Force::PERSISTENT:
+			out << "PERSISTENT)" << std::endl;
+			break;
 
-	case Force::TRANSIENT_ON_PARTICLES:
-		out << "TRANSIENT_ON_PARTICLES)" << std::endl;
-		out << "\tLife: "	<< particle_map_.size()	<< "(particles)" << std::endl;
+		case Force::TRANSIENT_ON_PARTICLES:
+			out << "TRANSIENT_ON_PARTICLES)" << std::endl;
+			out << "\tLife: "	<< particle_map_.size()	<< " (particles)" << std::endl;
 
-		break;
+			break;
 
-	case Force::TRANSIENT_ON_TIME:
-		out << "TRANSIENT_ON_TIME)" << std::endl;
-		out << "\tLife: " << lifetime_ << "(ms)" << std::endl;
-		break;
+		case Force::TRANSIENT_ON_TIME:
+			out << "TRANSIENT_ON_TIME)" << std::endl;
+			out << "\tLife: " << lifetime_ << " (milliseconds)" << std::endl;
+			break;
 
-	default:
-		out << "UNKNOWN TYPE)";
-		break;
+		default:
+			out << "UNKNOWN TYPE)";
+			break;
 	}
 
 
@@ -107,6 +107,7 @@ std::ostream& operator<<(std::ostream& out, const Force& force)
 
 	return out;
 }
+
 
 
 GravityForce::GravityForce(f32 g) : Force(PERSISTENT), g_(g)

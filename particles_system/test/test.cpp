@@ -10,7 +10,7 @@
 #include "Force.hpp"
 #include "Particle.hpp"
 #include "ParticleSystem.hpp"
-#include <JU/Defs.hpp>
+#include <JU/core/Defs.hpp>
 
 // Global includes
 #include <iostream>

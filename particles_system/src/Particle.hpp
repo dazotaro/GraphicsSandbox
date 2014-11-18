@@ -9,7 +9,7 @@
 #define PARTICLE_HPP_
 
 // Local includes
-#include <JU/Defs.hpp>			// Custom basic types
+#include <JU/core/Defs.hpp>			// Custom basic types
 #include "ParticleSystemDefs.hpp"	// ParticleId
 
 // Global includes
@@ -39,8 +39,6 @@ class Particle
 		void removeForce(Force* pForce);
 		void releaseForces();
 
-		//virtual void render() const = 0;
-
 		// Friend functions
 		friend std::ostream& operator<<(std::ostream& out, const Particle& particle);
 
@@ -48,7 +46,7 @@ class Particle
 
 		ParticleId id_;					/**< particle id (for debugging purposes */
 
-		f32 mass_;
+		f32 	  mass_;
 		glm::vec3 position_;
 		glm::vec3 velocity_;
 		glm::vec3 force_acc_;		/**< Force accumulator*/

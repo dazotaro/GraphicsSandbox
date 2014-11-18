@@ -9,7 +9,7 @@
 #define FORCE_HPP_
 
 // Local includes
-#include <JU/Defs.hpp>				// custom types
+#include <JU/core/Defs.hpp>				// custom types
 #include "ParticleSystemDefs.hpp"		// ParticleList, ForceList
 
 // Global includes

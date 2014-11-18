@@ -35,9 +35,6 @@ class Particle
 		virtual ~Particle();
 
 		void resetForceAcc();
-		void addForce(Force* pForce);
-		void removeForce(Force* pForce);
-		void releaseForces();
 
 		// Friend functions
 		friend std::ostream& operator<<(std::ostream& out, const Particle& particle);
@@ -52,8 +49,6 @@ class Particle
 		glm::vec3 force_acc_;		/**< Force accumulator*/
 
 		f32 lifetime_;					/**< Life left of the force (in milliseconds) */
-
-		ForceSet force_set_;	/**< To store pointer to forces acting on this particle */
 };
 
 } /* namespace JU */

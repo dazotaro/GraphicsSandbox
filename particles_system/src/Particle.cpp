@@ -7,7 +7,6 @@
 
 // Local includes
 #include "Particle.hpp"
-#include "Force.hpp"
 
 namespace JU
 {
@@ -51,46 +50,6 @@ inline void Particle::resetForceAcc()
 
 
 /**
-* Add force acting on this particle
-*
-* #param pForce Pointer to new acting force
-*
-*/
-void Particle::addForce(Force* pForce)
-{
-	force_set_.insert(pForce);
-}
-
-
-
-/**
-* Remove force acting on this particle
-*
-* #param pForce Pointer to the force to be deleted
-*
-*/
-void Particle::removeForce(Force* pForce)
-{
-	force_set_.erase(pForce);
-}
-
-
-
-/**
-* Notify all forces acting on this particle that it is not longer under their influence
-*
-*/
-void Particle::releaseForces()
-{
-	for (ForceSetIter iter = force_set_.begin(); iter != force_set_.end(); iter++)
-	{
-		(*iter)->removeParticle(id_);
-	}
-}
-
-
-
-/**
 * Overloaded output operator
 *
 * @param out output ostream
@@ -114,14 +73,6 @@ std::ostream& operator<<(std::ostream& out, const Particle& particle)
 	out << "\tForce:    (" 	<< particle.force_acc_.x << ", "
 							<< particle.force_acc_.y << ", "
 							<< particle.force_acc_.z << ")" << std::endl;
-
-	out << "\tLinked forces: ";
-	ForceSetIter force_iter = particle.force_set_.begin();
-	for (; force_iter != particle.force_set_.end(); force_iter++)
-	{
-		out << (*force_iter)->id_ << ", ";
-	}
-	out << std::endl;
 
 	return out;
 }

@@ -74,27 +74,6 @@ ParticleId ParticleSystem::addParticle(Particle* pParticle)
 
 
 /**
-* Add particle to the system
-*
-* @param particle	Pointer to the new particle
-*
-* @return Return this particle's id
-*
-*/
-ParticleId ParticleSystem::addParticle(Particle* pParticle, const ForceIdVector& force_vector)
-{
-	for(ForceIdVectorConstIter iter = force_vector.begin(); iter != force_vector.end(); iter++)
-	{
-		linkForceAndParticle(force_map_[*iter], pParticle);
-	}
-
-	return addParticle(pParticle);
-}
-
-
-
-
-/**
 * Add force to the system
 *
 * @param force	Pointer to the new force
@@ -102,27 +81,30 @@ ParticleId ParticleSystem::addParticle(Particle* pParticle, const ForceIdVector&
 * @return Return this force's id
 *
 */
-ForceId ParticleSystem::addForce(Force* pForce)
+void ParticleSystem::addForce(const std::string& name, Force* pForce)
 {
 	pForce->id_ = force_id_++;
-	force_map_[pForce->id_] =  pForce;
-
-	return pForce->id_;
+	force_map_[name] =  pForce;
 }
 
 
 
 /**
-* Connect a force and a particle
+* Get force pointer
 *
-* @param pForce		Pointer to force
-* @param pParticle	Pointer to particle
+* @param name	Get pointer to this force
+*
+* @return Return this force pointer. Null if it does not exist
 *
 */
-void ParticleSystem::linkForceAndParticle(Force* pForce, Particle* pParticle)
+Force* ParticleSystem::getForce(const std::string& name) const
 {
-	pParticle->addForce(pForce);
-	pForce->addParticle(pParticle);
+	ForceMapConstIter iter = force_map_.find(name);
+
+	if (iter != force_map_.end())
+		return iter->second;
+
+	return 0;
 }
 
 
@@ -145,8 +127,11 @@ void ParticleSystem::cleanupParticles(f32 time)
 		// Erase it: it's dead
 		if ((*particle_iter)->lifetime_ <= 0.0f)
 		{
-			// Disconnect forces from this particle
-			(*particle_iter)->releaseForces();
+			ForceMapIter force_iter = force_map_.begin();
+			for (; force_iter != force_map_.end(); force_iter++)
+			{
+				force_iter->second->removeParticle((*particle_iter));
+			}
 
 			// Delete the particle's data
 			if (*particle_iter != 0)
@@ -198,7 +183,7 @@ void ParticleSystem::cleanupForces(f32 time)
 
 			case Force::TRANSIENT_ON_PARTICLES:
 				{
-					if ((force_iter->second)->particle_map_.size() == 0)
+					if ((force_iter->second)->particle_set_.size() == 0)
 					{
 						delete_force = true;
 					}

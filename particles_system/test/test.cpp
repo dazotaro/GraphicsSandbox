@@ -34,9 +34,6 @@ void testForce01()
 	glm::vec3 pos(1.1f, 2.2f, 3.3f);
 	glm::vec3 vel(7.1f, 7.2f, 7.3f);
 	JU::Particle particle(333.3, pos, vel, 13);
-	particle.addForce(force_map["spring01"]);
-	particle.addForce(force_map["gravity"]);
-	particle.addForce(force_map["friction"]);
 
 	force_map["spring01"]->addParticle(&particle);
 	force_map["gravity"]->addParticle(&particle);
@@ -53,7 +50,7 @@ void testForce01()
 	}
 
 	std::cout << "Detach particle and gravity" << std::endl;
-	force_map["gravity"]->removeParticle(particle.id_);
+	force_map["gravity"]->removeParticle(&particle);
 	std::cout << *force_map["gravity"] << std::endl;
 
 	// Delete forces
@@ -78,32 +75,25 @@ void testForce02()
 {
 	JU::ParticleSystem particle_system;
 
-	std::map<std::string, JU::Force*> force_map;
-
-	force_map["spring01"] = new JU::GravityForce();
-	force_map["gravity"]  = new JU::GravityForce();
-	force_map["friction"] = new JU::DragForce(427.2f);
-	force_map["spring02"] = new JU::GravityForce();
-
 	glm::vec3 pos (1.1f, 2.2f, 3.3f);
 	glm::vec3 vel (7.1f, 7.2f, 7.3f);
 	JU::Particle* particle = new JU::Particle(333.3, pos, vel, 13);
-	particle->addForce(force_map["spring01"]);
-	particle->addForce(force_map["gravity"]);
-	particle->addForce(force_map["spring02"]);
-
-	force_map["spring01"]->addParticle(particle);
-	force_map["gravity"]->addParticle(particle);
-	force_map["friction"]->addParticle(particle);
 
 	// Add FORCES to the system
-	particle_system.addForce(force_map["spring01"]);
-	particle_system.addForce(force_map["gravity"]);
-	particle_system.addForce(force_map["friction"]);
-	particle_system.addForce(force_map["spring02"]);
+	particle_system.addForce("spring01", new JU::SpringForce(0.8f, 2.0f));
+	particle_system.addForce("gravity",  new JU::GravityForce());
+	particle_system.addForce("friction", new JU::DragForce(427.2f));
+	particle_system.addForce("spring02", new JU::SpringForce(0.3f, 2.0f));
+	particle_system.addForce("thrust", 	 new JU::ThrustForce(glm::vec3(1.0f, 200.0f, 3.0f), 5.0f));
 
 	// Add particles to the system
 	particle_system.addParticle(particle);
+
+	// Link particles and forces
+	JU::Force* pForce = particle_system.getForce("spring01");
+	pForce->addParticle(particle);
+	pForce = particle_system.getForce("gravity");
+	pForce->addParticle(particle);
 
 	std::cout << "Printing the whole particle system" << std::endl;
 	std::cout << particle_system << std::endl;
@@ -126,55 +116,61 @@ void testForce03()
 	// ---------------------------
 	std::map<std::string, JU::ForceId> force_map;
 
-	force_map["spring01"] = particle_system.addForce(new JU::SpringForce(0.8f, 2.0f));
-	force_map["gravity"]  = particle_system.addForce(new JU::GravityForce());
-	force_map["friction"] = particle_system.addForce(new JU::DragForce(427.2f));
-	force_map["spring02"] = particle_system.addForce(new JU::SpringForce(0.3f, 2.0f));
-	force_map["thrust"]   = particle_system.addForce(new JU::ThrustForce(glm::vec3(1.0f, 200.0f, 3.0f), 5.0f));
+	particle_system.addForce("spring01", new JU::SpringForce(0.8f, 2.0f));
+	particle_system.addForce("gravity",  new JU::GravityForce());
+	particle_system.addForce("friction", new JU::DragForce(427.2f));
+	particle_system.addForce("spring02", new JU::SpringForce(0.3f, 2.0f));
+	particle_system.addForce("thrust", 	 new JU::ThrustForce(glm::vec3(1.0f, 200.0f, 3.0f), 5.0f));
 
 	// PARTICLE SYSTEM: add particles
 	// ------------------------------
-	JU::Particle* particle;
-	JU::ForceIdVector force_vec(4);
 
 	// PARTICLE 01
 	// -----------
 	glm::vec3 pos1 (1.1f, 2.2f, 3.3f);
 	glm::vec3 vel1 (7.1f, 7.2f, 7.3f);
-	particle = new JU::Particle(111.1, pos1, vel1, 1000);
+	JU::Particle* particle1 = new JU::Particle(111.1, pos1, vel1, 1000);
 
-	// Compile list of force ids that control this particle
-	force_vec.clear();
-	force_vec.push_back(force_map["gravity"]);
-	force_vec.push_back(force_map["friction"]);
-	force_vec.push_back(force_map["spring01"]);
-	force_vec.push_back(force_map["thrust"]);
-
-	particle_system.addParticle(particle, force_vec);
+	particle_system.addParticle(particle1);
 
 	// PARTICLE 02
 	// -----------
 	glm::vec3 pos2 (4.1f, 5.2f, 6.3f);
 	glm::vec3 vel2 (9.1f, 9.2f, 9.3f);
-	particle = new JU::Particle(222.2, pos2, vel2, 5000);
+	JU::Particle* particle2 = new JU::Particle(222.2, pos2, vel2, 5000);
 
-	// Compile list of force ids that control this particle
-	force_vec.clear();
-	force_vec.push_back(force_map["gravity"]);
-	force_vec.push_back(force_map["friction"]);
-	force_vec.push_back(force_map["spring02"]);
-	force_vec.push_back(force_map["thrust"]);
+	particle_system.addParticle(particle2);
 
-	particle_system.addParticle(particle, force_vec);
+	// Connect FORCES to PARTICLES
+	// ---------------------------
+	JU::Force* pForce = particle_system.getForce("spring01");
+	pForce->addParticle(particle1);
+	pForce->addParticle(particle2);
 
+	// OUTPUT
 	std::cout << "Printing the whole particle system" << std::endl;
 	std::cout << particle_system << std::endl;
+
+	// Delete Particle 1
+	pForce = particle_system.getForce("spring01");
+	std::cout << "Detach particle 1 and spring force" << std::endl;
+	pForce->removeParticle(particle1);
+	std::cout << *pForce << std::endl;
+	// Delete Particle 2
+	std::cout << "Detach particle 2 and spring force" << std::endl;
+	pForce->removeParticle(particle2);
+	std::cout << *pForce << std::endl;
+	// Updated particle system to make sure spring force with no particles gets deleted
+	particle_system.update(20);
+	pForce = particle_system.getForce("spring01");
+	std::cout << "Pointer to spring force = " << pForce << std::endl;
 }
 
 
 
 int main(void)
 {
+	testForce01();
 	testForce03();
 
 	return 0;

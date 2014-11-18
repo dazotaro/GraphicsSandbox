@@ -29,26 +29,16 @@ Force::~Force()
 
 void Force::addParticle(Particle* pParticle)
 {
-	particle_map_[pParticle->id_] = pParticle;
+	particle_set_.insert(pParticle);
 }
 
 
 
-void Force::removeParticle(ParticleId particle_id)
+void Force::removeParticle(Particle* pParticle)
 {
-	particle_map_.erase(particle_id);
+	particle_set_.erase(pParticle);
 }
 
-
-
-void Force::releaseParticles()
-{
-	ParticleMapIter particle_iter = particle_map_.begin();
-	for ( ; particle_iter != particle_map_.end(); particle_iter++)
-	{
-		(particle_iter->second)->removeForce(this);
-	}
-}
 
 
 std::string Force::getInfoString() const
@@ -57,22 +47,21 @@ std::string Force::getInfoString() const
 
 	out << "Force id: " 	<< id_ 		<< std::endl;
 	out << "\tAddress: " 	<< this		<< std::endl;
-	out << "\tType: " 		<< type_	<< " (";
 
 	switch (type_)
 	{
 		case Force::PERSISTENT:
-			out << "PERSISTENT)" << std::endl;
+			out << "\tType: " << type_	<< " (PERSISTENT)" << std::endl;
 			break;
 
 		case Force::TRANSIENT_ON_PARTICLES:
-			out << "TRANSIENT_ON_PARTICLES)" << std::endl;
-			out << "\tLife: "	<< particle_map_.size()	<< " (particles)" << std::endl;
+			out << "\tType: " << type_	<< " (TRANSIENT_ON_PARTICLES)" << std::endl;
+			out << "\tLife: " << particle_set_.size()	<< " (particles)" << std::endl;
 
 			break;
 
 		case Force::TRANSIENT_ON_TIME:
-			out << "TRANSIENT_ON_TIME)" << std::endl;
+			out << "\tType: " << type_	<< " (TRANSIENT_ON_TIME)" << std::endl;
 			out << "\tLife: " << lifetime_ << " (milliseconds)" << std::endl;
 			break;
 
@@ -83,10 +72,10 @@ std::string Force::getInfoString() const
 
 
 	out << "\tLinked particles: ";
-	ParticleMapConstIter particle_iter = particle_map_.begin();
-	for (; particle_iter != particle_map_.end(); particle_iter++)
+	ParticleSetConstIter particle_iter = particle_set_.begin();
+	for (; particle_iter != particle_set_.end(); particle_iter++)
 	{
-		out << particle_iter->first << ", ";
+		out << *particle_iter << ", ";
 	}
 	out << std::endl;
 
@@ -124,10 +113,10 @@ GravityForce::~GravityForce()
 
 void GravityForce::apply(f32 time) const
 {
-	ParticleMapConstIter particle_iter = particle_map_.begin();
-	for (; particle_iter != particle_map_.end(); particle_iter++)
+	ParticleSetConstIter particle_iter = particle_set_.begin();
+	for (; particle_iter != particle_set_.end(); particle_iter++)
 	{
-		(particle_iter->second)->force_acc_ += glm::vec3(0.0f, -g_, 0.0f);
+		(*particle_iter)->force_acc_ += glm::vec3(0.0f, -g_, 0.0f);
 	}
 }
 
@@ -159,10 +148,10 @@ DragForce::~DragForce()
 
 void DragForce::apply(f32 time) const
 {
-	ParticleMapConstIter particle_iter = particle_map_.begin();
-	for (; particle_iter != particle_map_.end(); particle_iter++)
+	ParticleSetConstIter particle_iter = particle_set_.begin();
+	for (; particle_iter != particle_set_.end(); particle_iter++)
 	{
-		(particle_iter->second)->force_acc_ += -drag_ * (particle_iter->second)->velocity_;
+		(*particle_iter)->force_acc_ += -drag_ * (*particle_iter)->velocity_;
 	}
 }
 
@@ -194,10 +183,10 @@ ThrustForce::~ThrustForce()
 
 void ThrustForce::apply(f32 time) const
 {
-	ParticleMapConstIter particle_iter = particle_map_.begin();
-	for (; particle_iter != particle_map_.end(); particle_iter++)
+	ParticleSetConstIter particle_iter = particle_set_.begin();
+	for (; particle_iter != particle_set_.end(); particle_iter++)
 	{
-		(particle_iter->second)->force_acc_ += force_;
+		(*particle_iter)->force_acc_ += force_;
 	}
 }
 

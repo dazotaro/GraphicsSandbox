@@ -13,6 +13,7 @@
 #include <map>		// std::map
 #include <set>		// std::unordered_set
 #include <vector>	// std::vector
+#include <string>	// std::string
 
 namespace JU
 {
@@ -32,11 +33,15 @@ namespace JU
 	typedef ParticleMap::const_iterator 	ParticleMapConstIter;
 	typedef ParticleMap::iterator 			ParticleMapIter;
 
+	typedef std::set<Particle*> 			ParticleSet;
+	typedef ParticleSet::const_iterator 	ParticleSetConstIter;
+	typedef ParticleSet::iterator 			ParticleSetIter;
+
 	typedef std::list<Force*> 				ForceList;
 	typedef ForceList::const_iterator 		ForceListConstIter;
 	typedef ForceList::iterator 			ForceListIter;
 
-	typedef std::map<ForceId, Force*> 		ForceMap;
+	typedef std::map<std::string, Force*> 	ForceMap;
 	typedef ForceMap::const_iterator 		ForceMapConstIter;
 	typedef ForceMap::iterator 				ForceMapIter;
 

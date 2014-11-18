@@ -40,8 +40,7 @@ class Force
 		virtual void addParticle(Particle* pParticle);
 		virtual void apply(f32 time) const = 0;
 
-		void removeParticle(ParticleId particle_id);
-		void releaseParticles();
+		void removeParticle(Particle* pParticle);
 
 		virtual std::string getInfoString() const;
 
@@ -53,7 +52,7 @@ class Force
 		TerminationType type_;				/**< Is force transient or eternal */
 		f32 			lifetime_;			/**< Life left of the force (in milliseconds)*/
 
-		ParticleMap 	particle_map_;		/**< Particle subject to this force */
+		ParticleSet 	particle_set_;		/**< Particles subject to this force */
 };
 
 

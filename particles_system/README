@@ -1,2 +1,24 @@
+GOAL:
+----
 Implements a particle system with physics
+
+DESCRIPTION:
+-----------
+It has circular dependencies: as a programming exercise I included within a particle, 
+references to the forces acting on it; I also kept track within each force of the particles it affected. 
+This allowed for the forces to know whether one of their 'customer particles' ceesed to exist,
+and viceversa. In the case of binary (n-ary) this could mean that the force was no longer needed, 
+so I introduced a link to the particles in the force. Example
+
+Force A is a Spring force and it acts on particles 1 and 2. If particle 1 ceased to exist, then 
+Force A will not produce any effect on particle 2, so we can delete the force. Since we introduced 
+a reference to Force A in particle 2, we need to notify this particle (so it deletes this reference) 
+before completely deleting Force A.
+
+THOUGHTS:
+--------
+These circular dependencies over complicate things. Maybe I should start with a simpler design where 
+the ParticleSystem is in charge of linking particles and forces, and it is also in charge of mantaining these 
+links.
+
 

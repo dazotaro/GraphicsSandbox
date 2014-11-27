@@ -8,6 +8,11 @@
 // Local includes
 #include "Particle.hpp"
 
+// Global includes
+#include <iostream>		// std::cout, std::endl
+
+
+
 namespace JU
 {
 
@@ -19,8 +24,8 @@ namespace JU
 * @param mass		Mass of the particle
 * @param lifetime	Life (in seconds) of this particle
 */
-Particle::Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, f32 lifetime)
-					: id_(0), mass_ (mass), position_(position), velocity_(velocity), force_acc_(glm::vec3(0.0f)), lifetime_(lifetime)
+Particle::Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, bool is_inmortal,  JU::f32 lifetime)
+			: id_(0), mass_ (mass), position_(position), velocity_(velocity), force_acc_(glm::vec3(0.0f)), is_inmortal_(is_inmortal), lifetime_(lifetime)
 {
 }
 

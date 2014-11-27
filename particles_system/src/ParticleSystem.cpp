@@ -121,28 +121,33 @@ void ParticleSystem::cleanupParticles(f32 time)
 	ParticleListIter particle_iter = particle_list_.begin();
 	for (; particle_iter != particle_list_.end() ; particle_iter++)
 	{
-		// Update the life left
-		(*particle_iter)->lifetime_ -= time;
-
-		// Erase it: it's dead
-		if ((*particle_iter)->lifetime_ <= 0.0f)
+		if (!(*particle_iter)->is_inmortal_)
 		{
-			ForceMapIter force_iter = force_map_.begin();
-			for (; force_iter != force_map_.end(); force_iter++)
+			// Update the life left
+			(*particle_iter)->lifetime_ -= time;
+
+			// Erase it: it's dead
+			if ((*particle_iter)->lifetime_ <= 0.0f)
 			{
-				force_iter->second->removeParticle((*particle_iter));
+				ForceMapIter force_iter = force_map_.begin();
+				for (; force_iter != force_map_.end(); force_iter++)
+				{
+					force_iter->second->removeParticle((*particle_iter));
+				}
+
+				// Delete the particle's data
+				if (*particle_iter != 0)
+				{
+					delete *particle_iter;
+				}
+
+				// Remove the pointer to the particle from the list
+				particle_list_.erase(particle_iter);
+
+				num_particles_--;
+
+				return;
 			}
-
-			// Delete the particle's data
-			if (*particle_iter != 0)
-			{
-				delete *particle_iter;
-			}
-
-			// Remove the pointer to the particle from the list
-			particle_list_.erase(particle_iter);
-
-			num_particles_--;
 		}
 		else
 		{

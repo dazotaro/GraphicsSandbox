@@ -13,7 +13,6 @@
 #include "ParticleSystemDefs.hpp"	// ParticleId
 
 // Global includes
-#include <iostream>			// std:;ostream, std::endl
 #include <glm/glm.hpp>          	// glm::vec3
 
 namespace JU
@@ -31,7 +30,7 @@ class Particle
 {
 	public:
 
-		Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, f32 lifetime);
+		Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, bool is_inmortal = true,  JU::f32 lifetime = 0.0f);
 		virtual ~Particle();
 
 		void resetForceAcc();
@@ -48,6 +47,7 @@ class Particle
 		glm::vec3 velocity_;
 		glm::vec3 force_acc_;		/**< Force accumulator*/
 
+		bool is_inmortal_;
 		f32 lifetime_;					/**< Life left of the force (in milliseconds) */
 };
 

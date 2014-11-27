@@ -59,7 +59,6 @@ void testForce01()
 	{
 		delete force_map_iter->second;
 	}
-
 }
 
 

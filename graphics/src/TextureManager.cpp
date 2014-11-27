@@ -91,6 +91,8 @@ bool TextureManager::registerTexture(const std::string &texture_name, JU::uint32
     {
         texture_map_[texture_name] = tex_id;
     }
+
+    return true;
 }
 
 void TextureManager::bindTexture(const std::string &texture_name)

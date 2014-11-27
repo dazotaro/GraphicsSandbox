@@ -9,8 +9,11 @@
 #define ARCBALLCONTROLLER_HPP_
 
 // GlobalIncludes
-#include "Defs.hpp"      // JU::uint32
-#include <glm/glm.hpp>      // glm::vec3
+#include <glm/glm.hpp>              // glm::vec3
+
+// Local includes
+#include <JU/core/Defs.hpp>  // JU::uint32
+
 
 /**
  * @brief   Arc-ball (spherical) camera controller

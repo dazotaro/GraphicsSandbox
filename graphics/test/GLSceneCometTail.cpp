@@ -6,9 +6,9 @@
 
 // Local includes
 #include "GLSceneCometTail.hpp"         // GLSceneCometTail
-#include <JU/Object3D.hpp>              // Object3D
-#include <JU/CameraInterface.hpp>       // camera_Interface
-#include <JU/CameraThirdPerson.hpp>     // CameraThirdPerson
+#include <JU/graphics/Object3D.hpp>              // Object3D
+#include <JU/graphics/CameraInterface.hpp>       // camera_Interface
+#include <JU/graphics/CameraThirdPerson.hpp>     // CameraThirdPerson
 
 // Global includes
 #include <GL/freeglut.h>                // GLUT_LEFT_BUTTON

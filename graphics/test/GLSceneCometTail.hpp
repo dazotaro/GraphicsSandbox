@@ -14,7 +14,7 @@
 #include "GLParticleSystem.hpp"  // GLParticleSystem
 
 // Global includes
-#include "Defs.hpp"              // uint16
+#include <JU/core/Defs.hpp>              // uint16
 #include <vector>                   // std::vector
 
 // Forward Declarations

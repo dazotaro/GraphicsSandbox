@@ -9,7 +9,7 @@
 #define OBJECT3D_HPP_
 
 // Global includes
-#include "Defs.hpp"      // JU::f32
+#include <JU/core/Defs.hpp>      // JU::f32
 #include <iostream>         // std::ostream
 #include <glm/glm.hpp>      // glm::vec3
 

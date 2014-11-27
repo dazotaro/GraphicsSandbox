@@ -4,11 +4,11 @@
 
 // Local Includes
 #include "gl_core_4_2.h"                // glLoadGen generated header file
+#include <JU/core/Defs.hpp>  // JU::uint32
 
 // Global Includes
 #include <string>               // std::string
 #include <glm/glm.hpp>          // glm::vecX
-#include "Defs.hpp"          // JU::int32
 #include <unordered_map>        // std::unordered_map
 
 

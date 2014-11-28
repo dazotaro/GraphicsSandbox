@@ -23,7 +23,7 @@
 
 GLSceneParticles::GLSceneParticles(int width, int height) : GLScene(width, height),
                                      camera_gps_(0), camera_target_(0), camera_(0),
-                                     camera_controller_(width, height, M_PI/4.0f, M_PI/4.0f, 0.2f),
+                                     camera_controller_(width, height, 0.5f),
                                      gl_particle_system_(0)
 {
 }
@@ -44,10 +44,7 @@ void GLSceneParticles::init(void)
 {
     // GLSL PROGRAMS
     // -------------
-    glsl_program_map_["simple"]  = compileAndLinkShader("shaders/simple.vert", "shaders/simple.frag");
-    //glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
-    //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
-    //glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+    glsl_program_map_["simple"]  = compileAndLinkShader("shaders/simpleMVP.vert", "shaders/simple.frag");
 
     current_program_iter_ = glsl_program_map_.find("simple");
     
@@ -73,7 +70,7 @@ void GLSceneParticles::init(void)
                                   glm::vec3(1.f, 0.f, 0.f), // target's X axis
                                   glm::vec3(0.f, 1.f, 0.f), // target's X axis
                                   glm::vec3(0.f, 0.f, 1.f)); // target's X axis
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_target_);
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f), *camera_target_);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 
     // PARTICLES: Initial positions
@@ -113,11 +110,18 @@ void GLSceneParticles::init(void)
 void GLSceneParticles::update(float time)
 {
 	static JU::f32 speed = 0.0001f;
+	static Object3D look_at(glm::vec3(0.0f, 0.0f, 0.0f),
+							glm::vec3(1.0f, 0.0f, 0.0f),
+							glm::vec3(0.0f, 1.0f, 0.0f),
+							glm::vec3(0.0f, 0.0f, 1.0f));
 
-	float radius_delta, inclination_delta, azimuth_delta;
-	camera_controller_.update(radius_delta, inclination_delta, azimuth_delta);
+    float radius_delta, angle;
+    glm::vec3 axis;
+    camera_controller_.update(radius_delta, angle, axis);
 
-	tp_camera_->update(*camera_target_, radius_delta, inclination_delta, azimuth_delta);
+    // Convert the axis from the camera to the world coordinate system
+    axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(axis, 0.0f));
+    tp_camera_->update(look_at, radius_delta, angle, axis);
 
 	// PARTICLES:
 	if (positions_[0].x > 0.0f)
@@ -166,7 +170,8 @@ void GLSceneParticles::render(void)
 void GLSceneParticles::resize(int width, int height)
 {
     GLScene::resize(width, height);
-    camera_->setAspectRatio(static_cast<float>(width)/height);
+    tp_camera_->setAspectRatio(static_cast<float>(width)/height);
+    camera_controller_.windowResize(width, height);
 }
 
 

@@ -56,5 +56,15 @@ void print(const char* string, const glm::vec4& vec)
 
 
 
+void print(const char* string, const glm::mat4& mat)
+{
+    std::printf("%s = \n", string);
+
+	std::printf("(%f, %f, %f, %f\n",  mat[0][0], mat[1][0], mat[2][0], mat[3][0]);
+	std::printf(" %f, %f, %f, %f\n",  mat[0][1], mat[1][1], mat[2][1], mat[3][1]);
+	std::printf(" %f, %f, %f, %f\n",  mat[0][2], mat[1][2], mat[2][2], mat[3][2]);
+	std::printf(" %f, %f, %f, %f)\n", mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
+}
+
 }
 

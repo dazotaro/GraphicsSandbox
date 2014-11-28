@@ -46,8 +46,8 @@ std::ostream& operator<<(std::ostream &out, const glm::mat4 &rhs)
 
 
 void print(const char* string, const glm::vec3& vec);
-
 void print(const char* string, const glm::vec4& vec);
+void print(const char* string, const glm::mat4& mat);
 
 
 }

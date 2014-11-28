@@ -149,10 +149,6 @@ void ParticleSystem::cleanupParticles(f32 time)
 				return;
 			}
 		}
-		else
-		{
-			// Numerically integrate this particle
-		}
 	}
 }
 
@@ -223,11 +219,32 @@ void ParticleSystem::cleanupForces(f32 time)
 */
 void ParticleSystem::accumulateForces(f32 time)
 {
+	// Reset all particle force accumulators
+	// PARTICLES: for all particles
+	ParticleListIter particle_iter = particle_list_.begin();
+	for (; particle_iter != particle_list_.end() ; particle_iter++)
+	{
+		(*particle_iter)->force_acc_ = glm::vec3(0.0f);
+	}
+
 	// FORCES: for all forces
 	ForceMapConstIter force_iter = force_map_.begin();
 	for (; force_iter != force_map_.end(); force_iter++)
 	{
+		force_iter->second->apply(time);
 	}
+}
+
+
+
+/**
+* Numerically integrate to compute the next state for each particle
+*
+* @param time	Elapsed time since the last update (in milliseconds)
+*
+*/
+void ParticleSystem::integrate(f32 time)
+{
 }
 
 
@@ -245,10 +262,10 @@ void ParticleSystem::update(f32 time)
 	cleanupParticles(time);
 	// Delete expired forces
 	cleanupForces(time);
-
 	// Accumulate forces for all the particles involved
 	accumulateForces(time);
-
+	// Numerically integrate
+	integrate(time);
 
 }
 

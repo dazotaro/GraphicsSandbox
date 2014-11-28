@@ -39,6 +39,7 @@ class ParticleSystem
 		void cleanupForces(f32 time);
 
 		void accumulateForces(f32 time);
+		void integrate(f32 time);
 
 	public:
 

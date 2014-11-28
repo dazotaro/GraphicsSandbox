@@ -71,8 +71,11 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.995253181.1508398523" name="GLSceneParticles.cpp" rcbsApplicability="disable" resourcePath="test/GLSceneParticles.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1390570886.961024136">
+						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1390570886.961024136" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1390570886"/>
+					</fileInfo>
 					<sourceEntries>
-						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneParticles.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -148,8 +151,11 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.exe.release.1416206640.1862660982" name="GLSceneParticles.cpp" rcbsApplicability="disable" resourcePath="test/GLSceneParticles.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1496145453.1415089824">
+						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1496145453.1415089824" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1496145453"/>
+					</fileInfo>
 					<sourceEntries>
-						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneShadow.cpp|test/GLSceneParticles.cpp|test/GLSceneNormal.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneShadow.cpp|test/GLSceneNormal.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

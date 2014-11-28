@@ -193,9 +193,6 @@ void GLParticleSystem::draw(const GLSLProgram &program, const glm::mat4 & model,
 
     glBindVertexArray(vao_handle_);
     glDrawArrays(GL_POINTS, 0, positions_.size());
-
-    // Deactivate Shader Program
-    //glUseProgram(0);
 }
 
 

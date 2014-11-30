@@ -12,6 +12,11 @@
 #include <JU/core/Defs.hpp>				// custom types
 #include "ParticleSystemDefs.hpp"		// ParticleList, ForceList
 
+// Global includes
+#include <glm/glm.hpp>			// glm::vec3
+
+
+
 namespace JU
 {
 

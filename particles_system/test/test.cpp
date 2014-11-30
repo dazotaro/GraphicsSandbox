@@ -163,6 +163,10 @@ void testForce03()
 	particle_system.update(20);
 	pForce = particle_system.getForce("spring01");
 	std::cout << "Pointer to spring force = " << pForce << std::endl;
+
+	std::cout << "Particle system after" << std::endl;
+	std::cout << particle_system << std::endl;
+
 }
 
 

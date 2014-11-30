@@ -11,6 +11,7 @@
 
 // Global Includes
 #include <sstream>		// std::ostringstream
+#include <glm/gtx/norm.hpp>
 
 namespace JU
 {
@@ -113,10 +114,10 @@ GravityForce::~GravityForce()
 
 void GravityForce::apply(f32 time) const
 {
-	ParticleSetConstIter particle_iter = particle_set_.begin();
+	ParticleSetIter particle_iter = particle_set_.begin();
 	for (; particle_iter != particle_set_.end(); particle_iter++)
 	{
-		(*particle_iter)->force_acc_ += glm::vec3(0.0f, -g_, 0.0f);
+		(*particle_iter)->force_acc_ += glm::vec3(0.0f, -g_, 0.0f) * (*particle_iter)->mass_;
 	}
 }
 
@@ -221,7 +222,22 @@ SpringForce::~SpringForce()
 
 void SpringForce::apply(f32 time) const
 {
+	if (particle_set_.size() != 2)
+		std::printf("Spring forces with more than two particles not yet supported\n");
 
+	ParticleSetConstIter iter = particle_set_.begin();
+	ParticleSetConstIter particle1 = iter++;
+	ParticleSetConstIter particle2 = iter;
+
+	glm::vec3 P1toP2 ((*particle2)->position_ - (*particle1)->position_);
+	JU::f32 P1toP2distance = glm::l2Norm(P1toP2);
+
+	glm::vec3 P1toP2normalized = glm::normalize(P1toP2);
+
+	glm::vec3 force (-stiffness_ * (P1toP2distance - equilibrium_distance_) * P1toP2normalized);
+
+	(*particle1)->force_acc_ -= force;
+	(*particle2)->force_acc_ += force;
 }
 
 

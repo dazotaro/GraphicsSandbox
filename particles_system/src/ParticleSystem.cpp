@@ -245,6 +245,11 @@ void ParticleSystem::accumulateForces(f32 time)
 */
 void ParticleSystem::integrate(f32 time)
 {
+	for(ParticleListIter iter = particle_list_.begin(); iter != particle_list_.end(); ++iter)
+	{
+		(*iter)->position_ += time * (*iter)->velocity_;
+		(*iter)->velocity_ += time * (*iter)->force_acc_ / (*iter)->mass_;
+	}
 }
 
 
@@ -264,7 +269,7 @@ void ParticleSystem::update(f32 time)
 	cleanupForces(time);
 	// Accumulate forces for all the particles involved
 	accumulateForces(time);
-	// Numerically integrate
+	// Update the state via numerical integration
 	integrate(time);
 
 }

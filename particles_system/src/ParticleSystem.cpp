@@ -110,6 +110,26 @@ Force* ParticleSystem::getForce(const std::string& name) const
 
 
 /**
+* Get vector of positions
+*
+* @param vPositions	Get all the positions
+*
+*/
+void ParticleSystem::getPositions(std::vector<glm::vec3>& vPositions) const
+{
+	JU::uint32 size = particle_list_.size();
+	vPositions.resize(size);
+	JU::uint32 index = 0;
+
+	for (ParticleListConstIter iter = particle_list_.begin(); iter != particle_list_.end(); ++iter)
+	{
+		vPositions[index++] = (*iter)->position_;
+	}
+}
+
+
+
+/**
 * Check all particles to see if they have expired
 *
 * @param time	Elapsed time since the last update (in milliseconds)

@@ -31,6 +31,8 @@ class ParticleSystem
 		void addForce(const std::string& name, Force* pForce);
 		Force* getForce(const std::string& name) const;
 
+		void getPositions(std::vector<glm::vec3>& vPositions) const;
+
 		void update(f32 time);
 
 	private:

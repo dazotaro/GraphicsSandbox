@@ -167,6 +167,10 @@ void testForce03()
 	std::cout << "Particle system after" << std::endl;
 	std::cout << particle_system << std::endl;
 
+	std::vector<glm::vec3> vPositions;
+	particle_system.getPositions(vPositions);
+	printf("Position 0 = (%f, %f, %f)\n", vPositions[0].x, vPositions[0].y, vPositions[0].z);
+	printf("Position 1 = (%f, %f, %f)\n", vPositions[1].x, vPositions[1].y, vPositions[1].z);
 }
 
 

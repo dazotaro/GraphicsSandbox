@@ -266,12 +266,14 @@ void ParticleSystem::accumulateForces(f32 time)
 void ParticleSystem::integrate(f32 time)
 {
 	// DEBUG start
+	/*
 	JU::ParticleListConstIter iter = particle_list_.begin();
 	glm::vec3 vel = (*iter)->velocity_;
 	glm::vec3 acc = (*iter)->force_acc_ / (*iter)->mass_;
 	std::printf ("Time     	   = %f\n", time);
 	std::printf ("Velocity     = (%f, %f, %f)\n", vel.x, vel.y, vel.z);
 	std::printf ("Acceleration = (%f, %f, %f)\n", acc.x, acc.y, acc.z);
+	*/
 	// DEBUG end
 
 	for(ParticleListIter iter = particle_list_.begin(); iter != particle_list_.end(); ++iter)

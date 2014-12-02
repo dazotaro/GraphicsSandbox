@@ -207,8 +207,8 @@ std::string ThrustForce::getInfoString() const
 
 
 
-SpringForce::SpringForce(f32 stiffness, f32 equilibrium_distance)
-				: Force(TRANSIENT_ON_PARTICLES), stiffness_(stiffness), equilibrium_distance_(equilibrium_distance)
+SpringForce::SpringForce(f32 ks, f32 equilibrium_distance)
+				: Force(TRANSIENT_ON_PARTICLES), ks_(ks), equilibrium_distance_(equilibrium_distance)
 {
 }
 
@@ -234,7 +234,7 @@ void SpringForce::apply(f32 time) const
 
 	glm::vec3 P1toP2normalized = glm::normalize(P1toP2);
 
-	glm::vec3 force (-stiffness_ * (P1toP2distance - equilibrium_distance_) * P1toP2normalized);
+	glm::vec3 force (-ks_ * (P1toP2distance - equilibrium_distance_) * P1toP2normalized);
 
 	(*particle1)->force_acc_ -= force;
 	(*particle2)->force_acc_ += force;
@@ -247,7 +247,56 @@ std::string SpringForce::getInfoString() const
 	std::ostringstream out;
 
 	out << "\tDescription: Spring Force" << std::endl;
-	out << "\tStiffness coefficient: " << stiffness_ << std::endl;
+	out << "\tStiffness coefficient: " << ks_ << std::endl;
+	out << "\tEquilibrium distance: " << equilibrium_distance_ << std::endl;
+
+	return Force::getInfoString() + out.str();
+}
+
+
+
+DampedSpringForce::DampedSpringForce(f32 ks, f32 kd, f32 equilibrium_distance)
+				: Force(TRANSIENT_ON_PARTICLES), ks_(ks), kd_(kd), equilibrium_distance_(equilibrium_distance)
+{
+}
+
+
+
+DampedSpringForce::~DampedSpringForce()
+{
+}
+
+
+
+void DampedSpringForce::apply(f32 time) const
+{
+	if (particle_set_.size() != 2)
+		std::printf("Spring forces with more than two particles not yet supported\n");
+
+	ParticleSetConstIter iter = particle_set_.begin();
+	ParticleSetConstIter particle1 = iter++;
+	ParticleSetConstIter particle2 = iter;
+
+	glm::vec3 P1toP2 ((*particle2)->position_ - (*particle1)->position_);
+	JU::f32 P1toP2distance = glm::l2Norm(P1toP2);
+	glm::vec3 P1toP2normalized = glm::normalize(P1toP2);
+
+	glm::vec3 V1toV2 ((*particle2)->velocity_ - (*particle1)->velocity_);
+
+	glm::vec3 force ((-ks_ * (P1toP2distance - equilibrium_distance_) - kd_ * V1toV2 * P1toP2normalized) * P1toP2normalized);
+
+	(*particle1)->force_acc_ -= force;
+	(*particle2)->force_acc_ += force;
+}
+
+
+
+std::string DampedSpringForce::getInfoString() const
+{
+	std::ostringstream out;
+
+	out << "\tDescription: Damped Spring Force" << std::endl;
+	out << "\tStiffness coefficient: " << ks_ << std::endl;
 	out << "\tEquilibrium distance: " << equilibrium_distance_ << std::endl;
 
 	return Force::getInfoString() + out.str();

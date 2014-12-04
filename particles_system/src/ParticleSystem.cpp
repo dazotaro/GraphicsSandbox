@@ -130,6 +130,26 @@ void ParticleSystem::getPositions(std::vector<glm::vec3>& vPositions) const
 
 
 /**
+* Get vector of colors
+*
+* @param vColors	Vector with color for each particle
+*
+*/
+void ParticleSystem::getColors(std::vector<glm::vec4>& vColors) const
+{
+	JU::uint32 size = particle_list_.size();
+	vColors.resize(size);
+	JU::uint32 index = 0;
+
+	for (ParticleListConstIter iter = particle_list_.begin(); iter != particle_list_.end(); ++iter)
+	{
+		vColors[index++] = (*iter)->color_;
+	}
+}
+
+
+
+/**
 * Check all particles to see if they have expired
 *
 * @param time	Elapsed time since the last update (in milliseconds)
@@ -278,8 +298,11 @@ void ParticleSystem::integrate(f32 time)
 
 	for(ParticleListIter iter = particle_list_.begin(); iter != particle_list_.end(); ++iter)
 	{
-		(*iter)->position_ += time * (*iter)->velocity_ * 0.001f;
-		(*iter)->velocity_ += time * (*iter)->force_acc_ / (*iter)->mass_  * 0.001f;
+		if ((*iter)->update_)
+		{
+			(*iter)->position_ += time * (*iter)->velocity_ * 0.001f;
+			(*iter)->velocity_ += time * (*iter)->force_acc_ / (*iter)->mass_  * 0.001f;
+		}
 	}
 }
 

@@ -24,8 +24,22 @@ namespace JU
 * @param mass		Mass of the particle
 * @param lifetime	Life (in seconds) of this particle
 */
-Particle::Particle(f32 mass, const glm::vec3& position, const glm::vec3& velocity, bool is_inmortal,  JU::f32 lifetime)
-			: id_(0), mass_ (mass), position_(position), velocity_(velocity), force_acc_(glm::vec3(0.0f)), is_inmortal_(is_inmortal), lifetime_(lifetime)
+Particle::Particle(f32 mass,
+				   const glm::vec3& position,
+				   const glm::vec3& velocity,
+				   const glm::vec4& color,
+				   bool update,
+				   bool is_inmortal,
+				   JU::f32 lifetime)
+			: id_(0),
+			  mass_ (mass),
+			  position_(position),
+			  velocity_(velocity),
+			  force_acc_(glm::vec3(0.0f)),
+			  color_(color),
+			  update_(update),
+			  is_inmortal_(is_inmortal),
+			  lifetime_(lifetime)
 {
 }
 
@@ -67,6 +81,7 @@ std::ostream& operator<<(std::ostream& out, const Particle& particle)
 
 	out << "Particle id: " 	<< particle.id_ << std::endl;
 	out << "\tAddress: " 	<< &particle << std::endl;
+	out << "\tUpdate: " 	<< particle.update_ << std::endl;
 	out << "\tMass: " 		<< particle.mass_ << std::endl;
 	out << "\tLife: " 		<< particle.lifetime_ << std::endl;
 	out << "\tPosition: (" 	<< particle.position_.x << ", "
@@ -78,6 +93,10 @@ std::ostream& operator<<(std::ostream& out, const Particle& particle)
 	out << "\tForce:    (" 	<< particle.force_acc_.x << ", "
 							<< particle.force_acc_.y << ", "
 							<< particle.force_acc_.z << ")" << std::endl;
+	out << "\tColor:    (" 	<< particle.color_.r << ", "
+							<< particle.color_.g << ", "
+							<< particle.color_.b << ", "
+							<< particle.color_.a << ")" << std::endl;
 
 	return out;
 }

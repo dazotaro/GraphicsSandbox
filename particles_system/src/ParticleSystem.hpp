@@ -37,6 +37,7 @@ class ParticleSystem
 		Force* getForce(const std::string& name) const;
 
 		void getPositions(std::vector<glm::vec3>& vPositions) const;
+		void getColors(std::vector<glm::vec4>& vColors) const;
 
 		void update(f32 time);
 

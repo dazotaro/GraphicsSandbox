@@ -38,7 +38,7 @@ class Force
 		virtual ~Force();
 
 		virtual void addParticle(Particle* pParticle);
-		virtual void apply(f32 time) const = 0;
+		virtual void apply(const glm::mat4& model, f32 time) const = 0;
 
 		void removeParticle(Particle* pParticle);
 
@@ -63,7 +63,7 @@ class GravityForce : public Force
 		GravityForce(f32 g = 9.80665);
 		virtual ~GravityForce();
 
-		void apply(f32 time) const;
+		void apply(const glm::mat4& model, f32 time) const;
 
 		std::string getInfoString() const;
 
@@ -80,7 +80,7 @@ class DragForce: public Force
 		DragForce(f32 drag = 9.80665);
 		virtual ~DragForce();
 
-		void apply(f32 time) const;
+		void apply(const glm::mat4& model, f32 time) const;
 
 		std::string getInfoString() const;
 
@@ -97,7 +97,7 @@ class ThrustForce : public Force
 		ThrustForce(const glm::vec3& force, f32 time);
 		virtual ~ThrustForce();
 
-		void apply(f32 time) const;
+		void apply(const glm::mat4& model, f32 time) const;
 
 		std::string getInfoString() const;
 
@@ -114,7 +114,7 @@ class SpringForce : public Force
 		SpringForce(f32 ks, f32 equilibrium_distance);
 		virtual ~SpringForce();
 
-		void apply(f32 time) const;
+		void apply(const glm::mat4& model, f32 time) const;
 
 		std::string getInfoString() const;
 
@@ -132,7 +132,7 @@ class DampedSpringForce : public Force
 		DampedSpringForce(f32 ks, f32 kd, f32 equilibrium_distance);
 		virtual ~DampedSpringForce();
 
-		void apply(f32 time) const;
+		void apply(const glm::mat4& model, f32 time) const;
 
 		std::string getInfoString() const;
 

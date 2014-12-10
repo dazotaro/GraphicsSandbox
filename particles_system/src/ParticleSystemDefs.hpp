@@ -14,6 +14,7 @@
 #include <set>		// std::unordered_set
 #include <vector>	// std::vector
 #include <string>	// std::string
+#include <glm/glm.hpp>			// glm::vec3
 
 namespace JU
 {
@@ -51,6 +52,19 @@ namespace JU
 	typedef std::vector<ForceId>			ForceIdVector;
 	typedef ForceIdVector::const_iterator	ForceIdVectorConstIter;
 	typedef ForceIdVector::iterator			ForceIdVectorIter;
+
+	struct Plane
+	{
+		Plane() {}
+		Plane(const glm::vec3& point, const glm::vec3 normal) : point_(point), normal_(normal) {}
+
+		glm::vec3 point_;
+		glm::vec3 normal_;
+	};
+	typedef std::map<std::string, Plane> 	PlaneMap;
+	typedef PlaneMap::const_iterator 		PlaneMapConstIter;
+	typedef PlaneMap::iterator 				PlaneMapIter;
+
 } /* namespace JU */
 
 

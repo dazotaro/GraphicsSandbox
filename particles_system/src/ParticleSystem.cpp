@@ -111,6 +111,19 @@ Force* ParticleSystem::getForce(const std::string& name) const
 
 
 /**
+* Add collision plane
+*
+* @param plane	Plane to test collisions with
+*
+*/
+void ParticleSystem::addCollisionPlane(const std::string name, const Plane& plane)
+{
+	collion_plane_map_[name] = plane;
+}
+
+
+
+/**
 * Get vector of positions
 *
 * @param vPositions	Get all the positions
@@ -269,10 +282,12 @@ void ParticleSystem::accumulateForces(f32 time)
 	}
 
 	// FORCES: for all forces
+	glm::mat4 model (getTransformToParent());
+
 	ForceMapConstIter force_iter = force_map_.begin();
 	for (; force_iter != force_map_.end(); force_iter++)
 	{
-		force_iter->second->apply(time);
+		force_iter->second->apply(model, time);
 	}
 }
 
@@ -310,6 +325,42 @@ void ParticleSystem::integrate(f32 time)
 
 
 /**
+* Handle possible collisions
+*
+*/
+void ParticleSystem::handleCollisions()
+{
+	static const JU::f32 EPSILON = 0.001f;
+
+	for(ParticleListIter particle_iter = particle_list_.begin(); particle_iter != particle_list_.end(); ++particle_iter)
+	{
+		if ((*particle_iter)->update_)
+		{
+			for (PlaneMapConstIter plane_iter = collion_plane_map_.begin(); plane_iter != collion_plane_map_.end(); ++plane_iter)
+			{
+				// If the particle is on the back side of the plane
+				glm::vec3 plane2particle ((*particle_iter)->position_ - plane_iter->second.point_);
+				if (glm::dot(plane2particle, plane_iter->second.normal_) < EPSILON)
+				{
+					// and if it is moving away from the front side
+					JU::f32 vnorm_proj (glm::dot((*particle_iter)->velocity_, plane_iter->second.normal_));
+					if (vnorm_proj < 0.0f)
+					{
+						glm::vec3 vnorm  (vnorm_proj * plane_iter->second.normal_);
+						glm::vec3 vparal ((*particle_iter)->velocity_ - vnorm);
+
+						// To compute the new velocity we keep the component parallel to the plane and we reverse the normal one
+						(*particle_iter)->velocity_ = vparal - vnorm;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+/**
 * Update all particles
 *
 * @param time	Elapsed time since the last update (in milliseconds)
@@ -320,6 +371,8 @@ void ParticleSystem::update(f32 time)
 {
 	// Delete expired particles
 	cleanupParticles(time);
+	// Handle possible collisions (only for non-excluded particles and if collision planes are available)
+	handleCollisions();
 	// Delete expired forces
 	cleanupForces(time);
 	// Accumulate forces for all the particles involved

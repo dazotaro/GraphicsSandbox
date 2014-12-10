@@ -37,6 +37,8 @@ class ParticleSystem : public Object3D
 		void addForce(const std::string& name, Force* pForce);
 		Force* getForce(const std::string& name) const;
 
+		void addCollisionPlane(const std::string name, const Plane& plane);
+
 		void getPositions(std::vector<glm::vec3>& vPositions) const;
 		void getColors(std::vector<glm::vec4>& vColors) const;
 
@@ -49,6 +51,7 @@ class ParticleSystem : public Object3D
 
 		void accumulateForces(f32 time);
 		void integrate(f32 time);
+		void handleCollisions();
 
 	public:
 
@@ -65,6 +68,9 @@ class ParticleSystem : public Object3D
 		// Force Storage
 		ForceMap 		force_map_;
 		ForceId 		force_id_;
+
+		// Collision Planes
+		JU::PlaneMap	collion_plane_map_;
 };
 
 } /* namespace JU */

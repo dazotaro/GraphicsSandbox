@@ -112,7 +112,7 @@ GravityForce::~GravityForce()
 
 
 
-void GravityForce::apply(f32 time) const
+void GravityForce::apply(const glm::mat4& model, f32 time) const
 {
 	ParticleSetIter particle_iter = particle_set_.begin();
 	for (; particle_iter != particle_set_.end(); particle_iter++)
@@ -147,7 +147,7 @@ DragForce::~DragForce()
 
 
 
-void DragForce::apply(f32 time) const
+void DragForce::apply(const glm::mat4& model, f32 time) const
 {
 	ParticleSetConstIter particle_iter = particle_set_.begin();
 	for (; particle_iter != particle_set_.end(); particle_iter++)
@@ -182,7 +182,7 @@ ThrustForce::~ThrustForce()
 
 
 
-void ThrustForce::apply(f32 time) const
+void ThrustForce::apply(const glm::mat4& model, f32 time) const
 {
 	ParticleSetConstIter particle_iter = particle_set_.begin();
 	for (; particle_iter != particle_set_.end(); particle_iter++)
@@ -220,7 +220,7 @@ SpringForce::~SpringForce()
 
 
 
-void SpringForce::apply(f32 time) const
+void SpringForce::apply(const glm::mat4& model, f32 time) const
 {
 	if (particle_set_.size() != 2)
 		std::printf("Spring forces with more than two particles not yet supported\n");
@@ -268,7 +268,7 @@ DampedSpringForce::~DampedSpringForce()
 
 
 
-void DampedSpringForce::apply(f32 time) const
+void DampedSpringForce::apply(const glm::mat4& model, f32 time) const
 {
 	if (particle_set_.size() != 2)
 		std::printf("Spring forces with more than two particles not yet supported\n");

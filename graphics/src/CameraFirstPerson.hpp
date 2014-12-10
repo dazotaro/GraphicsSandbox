@@ -10,7 +10,7 @@
 
 #include "CameraInterface.hpp"      // CameraInterface parent class
 #include "CameraIntrinsic.hpp"      // CameraIntrinsic object contained
-#include "Object3D.hpp"             // Object3D
+#include <JU/core/Object3D.hpp>     // Object3D
 
 /**
  * @brief   First-person camera type

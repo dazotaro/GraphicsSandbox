@@ -10,7 +10,6 @@
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
-#include "Object3D.hpp"             // Object3D
 #include "CameraInterface.hpp"      // CameraInterface
 #include "CameraFirstPerson.hpp"    // CameraFirstPerson
 #include "CameraThirdPerson.hpp"    // CameraThirdPerson
@@ -20,6 +19,7 @@
 #include "DebugGlm.hpp"             // debug::print
 
 // Global includes
+#include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform.hpp>	// glm::rotate
 
 GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),

@@ -8,8 +8,8 @@
 #ifndef NODE3D_HPP_
 #define NODE3D_HPP_
 
-#include <vector>               // std::vector
-#include "Object3D.hpp"             // Object3D
+#include <vector>                   // std::vector
+#include <JU/core/Object3D.hpp>     // Object3D
 #include "DrawInterface.hpp"    // DrawInterface
 
 // FORWARD DECLARATIONS

@@ -10,7 +10,6 @@
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
-#include "Object3D.hpp"             // Object3D
 #include "CameraInterface.hpp"      // CameraInterface
 #include "CameraFirstPerson.hpp"    // CameraFirstPerson
 #include "CameraThirdPerson.hpp"    // CameraThirdPerson
@@ -20,6 +19,7 @@
 #include "DebugGlm.hpp"             // debug::print
 
 // Global includes
+#include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform.hpp>	// glm::rotate
 
 
@@ -114,6 +114,15 @@ void GLSceneLighting::init(void)
 
 	node_map_["sphere"] = sphere_node;
 
+    // SPHERE
+    // ------
+    // Create Mesh
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
+    //mesh.computeTangents();
+    gl_sphere_ = new GLMesh(mesh);
+    // Load the Mesh into VBO and VAO
+    gl_sphere_->init();
+
     // PLANE
     // ------
     // Create Mesh
@@ -191,34 +200,6 @@ void GLSceneLighting::loadLights(void) const
     // WARNING: The shader expects the light position in eye coordinates
 	(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
     (current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
-
-    /*
-    // 0
-    (current_program_iter_->second).setUniform("lights[0].Position",  glm::vec4(5.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[0].Intensity", glm::vec3(0.8f,0.8f,0.8f));
-    // 1
-    (current_program_iter_->second).setUniform("lights[1].Position",  glm::vec4(0.0f,5.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[1].Intensity", glm::vec3(0.8f,0.8f,0.8f));
-    // 2
-    (current_program_iter_->second).setUniform("lights[2].Position",  glm::vec4(-5.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[2].Intensity", glm::vec3(0.8f,0.8f,0.8f));
-    // 3
-    (current_program_iter_->second).setUniform("lights[3].Position",  glm::vec4(0.0f,-5.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[3].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 4
-    (current_program_iter_->second).setUniform("lights[4].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[4].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 5
-    (current_program_iter_->second).setUniform("lights[5].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[5].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 6
-    (current_program_iter_->second).setUniform("lights[6].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[6].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 7
-    (current_program_iter_->second).setUniform("lights[7].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[7].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    */
-    //}
 }
 
 

@@ -5,13 +5,13 @@
  *      Author: jusabiaga
  */
 
+// Local includes
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "GLSceneShadow.hpp"      // GLSceneShadow
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
-#include "Object3D.hpp"             // Object3D
 #include "CameraInterface.hpp"      // camera_Interface
 #include "CameraFirstPerson.hpp"    // camera_FirstPerson
 #include "CameraThirdPerson.hpp"    // camera_FirstPerson
@@ -21,6 +21,11 @@
 #include "DebugGlm.hpp"				// operator<<
 #include <SOIL.h>                   // SOIL_save_image
 #include "Material.hpp"				// MaterialManager
+
+// Global includes
+#include <JU/core/Object3D.hpp>     // Object3D
+
+
 
 GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
 									 camera_gps_(0), camera_(0),

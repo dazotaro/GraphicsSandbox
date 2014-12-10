@@ -7,18 +7,12 @@
 
 // Local includes
 #include "GLSceneParticles.hpp"         // GLSceneParticles
-//#include "GLMesh.hpp"                 // GLMesh
-//#include "GLMeshInstance.hpp"         // GLMeshInstance
-//#include "Node3D.hpp"                 // Node3D
-#include "Object3D.hpp"              // Object3D
 #include "CameraInterface.hpp"       // camera_Interface
-//#include "CameraFirstPerson.hpp"      // CameraFirstPerson
 #include "CameraThirdPerson.hpp"     // CameraThirdPerson
-//#include "ShapeHelper.hpp"            // build Mesh helper funtions
-//#include "TextureManager.hpp"         // loadTexture()
 #include "GLParticleSystem.hpp"			// GLParticleSystem
 
 // Global includes
+#include <JU/core/Object3D.hpp>     // Object3D
 #include <JU/core/Defs.hpp>					// uint32
 
 GLSceneParticles::GLSceneParticles(int width, int height) : GLScene(width, height),

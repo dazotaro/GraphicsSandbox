@@ -11,7 +11,7 @@
 // Local includes
 #include "CameraInterface.hpp"      // CameraInterface parent class
 #include "CameraIntrinsic.hpp"      // CamneraIntrinsic object contained
-#include "Object3D.hpp"             // Object3D
+#include <JU/core/Object3D.hpp>     // Object3D
 
 // Global includes
 #define _USE_MATH_DEFINES

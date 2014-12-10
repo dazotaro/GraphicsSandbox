@@ -8,7 +8,6 @@
 // Local includes
 #include "GraphicsDefs.hpp"                         // MIDDLE_BUTTON_SCROLL_DOWN/UP
 #include "CameraThirdPerson.hpp"
-#include "Object3D.hpp"                     // Object3D
 #include "CoordinateHelper.hpp"             // spherical2cartesian()
 #include "DebugGlm.hpp"                     // debug::print()
 

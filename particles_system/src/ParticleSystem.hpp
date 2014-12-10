@@ -9,10 +9,11 @@
 #define PARTICLESYSTEM_HPP_
 
 // Local includes
-#include <JU/core/Defs.hpp>				// custom types
 #include "ParticleSystemDefs.hpp"		// ParticleList, ForceList
 
 // Global includes
+#include <JU/core/Defs.hpp>				// custom types
+#include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/glm.hpp>			// glm::vec3
 
 
@@ -24,11 +25,11 @@ namespace JU
 class Particle;
 class Force;
 
-class ParticleSystem
+class ParticleSystem : public Object3D
 {
 	public:
 
-		ParticleSystem();
+		ParticleSystem(const Object3D &object3d);
 		virtual ~ParticleSystem();
 
 		ParticleId addParticle(Particle* pParticle);

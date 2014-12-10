@@ -16,7 +16,8 @@ namespace JU
 /**
 * Constructor
 */
-ParticleSystem::ParticleSystem() : num_particles_(0), particle_id_(0), force_id_(0)
+ParticleSystem::ParticleSystem(const Object3D &object3d)
+						: Object3D(object3d), num_particles_(0), particle_id_(0), force_id_(0)
 {
 }
 

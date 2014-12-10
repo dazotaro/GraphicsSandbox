@@ -6,14 +6,14 @@
  */
 
 // Local includes
-#include "GLSceneParticles.hpp"         // GLSceneParticles
-#include "CameraInterface.hpp"       // camera_Interface
-#include "CameraThirdPerson.hpp"     // CameraThirdPerson
-#include "GLParticleSystem.hpp"			// GLParticleSystem
+#include "GLSceneParticles.hpp"     // GLSceneParticles
+#include "CameraInterface.hpp"      // camera_Interface
+#include "CameraThirdPerson.hpp"    // CameraThirdPerson
+#include "GLParticleSystem.hpp"		// GLParticleSystem
 
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
-#include <JU/core/Defs.hpp>					// uint32
+#include <JU/core/Defs.hpp>			// uint32
 
 GLSceneParticles::GLSceneParticles(int width, int height) : GLScene(width, height),
                                      camera_gps_(0), camera_target_(0), camera_(0),

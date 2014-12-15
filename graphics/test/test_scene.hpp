@@ -1,4 +1,7 @@
+// Global includes
 #include <stdio.h>                      // printf
+
+// Local includes
 #include "gl_core_4_2.h"                // glLoadGen generated header file
 #include "GL/freeglut.h"                // Glut
 #include "GLSceneSprite.hpp"            // GLSceneSprite
@@ -14,12 +17,28 @@
 #endif
 #include <iostream>
 
+// -----------
+// DEFINITIONS
+// -----------
+#define DEBUG_MEM
+#ifdef DEBUG_MEM
+    #define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
+    #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+    #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+    #define GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX 0x904A
+    #define GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX 0x904B
+#endif
+
 #ifdef _WIN32
     #define ESC_KEY VK_ESCAPE
 #elif __linux__ || __CYGWIN__
     #define ESC_KEY 27
 #endif
 
+
+// -------------
+// GLOBAL/STATIC
+// -------------
 static int winID;
 static GLsizei WIDTH  = 800;
 static GLsizei HEIGHT = 450;
@@ -67,7 +86,22 @@ static void mouseMotion(int x, int y)
 //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
 static void display()
 {
-	#ifndef WIN32
+#ifdef DEBUG_MEM
+    GLint cur_avail_mem_kb = 0;
+    glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+    std::printf("Currently available Memory = %i (KB)\n", cur_avail_mem_kb);
+
+    GLint num_evictions = 0;
+    glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX, &num_evictions);
+    std::printf("Number of evictions since OS or application started = %i\n", num_evictions);
+
+    GLint evicted_mem_kb = 0;
+    glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX, &evicted_mem_kb);
+    std::printf("Amount of evicted memory since OS or application started = %i (KB)\n", evicted_mem_kb);
+#endif
+
+
+    #ifndef WIN32
 		static float last_time = timer.getElapsedMilliseconds();
 		float time = timer.getElapsedMilliseconds();
 		float time_diff = time - last_time;
@@ -101,8 +135,19 @@ static void display()
 
 static void init(void)
 {
-    //scene = new GLSceneNormal(WIDTH, HEIGHT);
-    scene = new GLSceneLighting(WIDTH, HEIGHT);
+#ifdef DEBUG_MEM
+    GLint gpu_mem_kb = 0;
+    glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &gpu_mem_kb);
+    std::printf("Total Available DedicatedMemory = %i (KB)\n", gpu_mem_kb);
+
+    GLint total_mem_kb = 0;
+    glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+    std::printf("Maximum Available Dedicated Memory = %i (KB)\n", total_mem_kb);
+#endif
+
+
+    scene = new GLSceneNormal(WIDTH, HEIGHT);
+    //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);

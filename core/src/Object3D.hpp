@@ -9,9 +9,13 @@
 #define OBJECT3D_HPP_
 
 // Global includes
-#include <JU/core/Defs.hpp>      // JU::f32
 #include <iostream>         // std::ostream
 #include <glm/glm.hpp>      // glm::vec3
+
+// Local includes
+#include "Defs.hpp"         // JU::f32
+
+
 
 /*!
   This class represents an object in 3D: its position and orientation.

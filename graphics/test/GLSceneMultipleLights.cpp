@@ -45,27 +45,11 @@ GLSceneMultipleLights::~GLSceneMultipleLights()
 */
 void GLSceneMultipleLights::init(void)
 {
-    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
+    glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
-    //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
-    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
-    glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
-                                                               "shaders/normal_drawing.gs",
-                                                               "shaders/simple.frag");
 
-    glsl_program_map_["ntb_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
-                                                            "shaders/ntb_drawing.gs",
-                                                            "shaders/simple.frag");
 
-    glsl_program_map_["normal_drawing_face"] = compileAndLinkShader("shaders/normal_drawing.vs",
-                                                                    "shaders/normal_drawing_face.gs",
-                                                                    "shaders/simple.frag");
-
-    glsl_program_map_["wireframe"] = compileAndLinkShader("shaders/wireframe.vs",
-                                                          "shaders/wireframe.gs",
-                                                          "shaders/simple.frag");
-
-    current_program_iter_ = glsl_program_map_.find("perfragment_texture");
+    current_program_iter_ = glsl_program_map_.find("multilight");
     
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
@@ -198,9 +182,11 @@ void GLSceneMultipleLights::loadMaterial(void) const
 
 void GLSceneMultipleLights::loadLights(void) const
 {
+	light_manager_.transferToShader(current_program_iter_->second, tp_camera_->getViewMatrix());
+
     // WARNING: The shader expects the light position in eye coordinates
-	(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
-    (current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
+	//(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
+    //(current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
 }
 
 
@@ -233,6 +219,7 @@ void GLSceneMultipleLights::update(float time)
     static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+    /*
     for (LightPositionalIterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
@@ -242,6 +229,7 @@ void GLSceneMultipleLights::update(float time)
 
         node_map_["light"]->setPosition(light->position_);
     }
+    */
 }
 
 

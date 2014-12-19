@@ -28,59 +28,6 @@ const std::string LightSpotlight::SHININESS_STRING              ("shininess");
 const std::string LightSpotlight::CUTOFF_STRING                 ("cutoff");
 
 
-
-
-/**
- * @brief Send uniform data to the shaders
- *
- * @param glsl_program      GLSLProgram active
- * @param uniform_prefix    Shaders' uniform variable prefix
- *
- */
-void LightPositional::transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const
-{
-    // LOAD UNIFORMS
-    glsl_program.setUniform((uniform_prefix + POSITION_STRING).c_str(), position_);
-    glsl_program.setUniform((uniform_prefix + INTENSITY_STRING).c_str(), intensity_);
-}
-
-
-
-/**
- * @brief Send uniform data to the shaders
- *
- * @param glsl_program      GLSLProgram active
- * @param uniform_prefix    Shaders' uniform variable prefix
- *
- */
-void LightDirectional::transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const
-{
-    // LOAD UNIFORMS
-    glsl_program.setUniform((uniform_prefix + DIRECTION_STRING).c_str(), direction_);
-    glsl_program.setUniform((uniform_prefix + INTENSITY_STRING).c_str(), intensity_);
-}
-
-
-
-/**
- * @brief Send uniform data to the shaders
- *
- * @param glsl_program      GLSLProgram active
- * @param uniform_prefix    Shaders' uniform variable prefix
- *
- */
-void LightSpotlight::transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const
-{
-    // LOAD UNIFORMS
-    glsl_program.setUniform((uniform_prefix + POSITION_STRING).c_str(),  position_);
-    glsl_program.setUniform((uniform_prefix + DIRECTION_STRING).c_str(), direction_);
-    glsl_program.setUniform((uniform_prefix + INTENSITY_STRING).c_str(), intensity_);
-    glsl_program.setUniform((uniform_prefix + SHININESS_STRING).c_str(), shininess_);
-    glsl_program.setUniform((uniform_prefix + CUTOFF_STRING).c_str(),    cutoff_);
-}
-
-
-
 void LightManager::addPositionalLight(const std::string& name, const LightPositional* plight)
 {
     mPositional_[name] = plight;
@@ -126,44 +73,70 @@ void LightManager::deleteSpotlight(const std::string& name)
 
 
 
-void LightManager::transferToShader(const GLSLProgram& glsl_program) const
+void LightManager::transferToShader(const GLSLProgram& glsl_program, const glm::mat4& transform) const
 {
-    JU::uint32 counter = 0;
+	std::string prefix;
+	JU::uint32 counter = 0;
 
     // POSITIONAL
     // ----------
     glsl_program.setUniform(NUM_POSITIONAL_LIGHTS_STRING.c_str(), static_cast<int>(mPositional_.size()));
 
-    counter = 0;
-    std::string prefix (POSITIONAL_ARRAY_PREFIX_STRING + std::string("["));
-    for (LightPositionalMapConstIterator iter = mPositional_.begin(); iter != mPositional_.end(); ++iter)
+    if (mPositional_.size())
     {
-        iter->second->transferToShader(glsl_program, prefix  + std::to_string(counter) + "]");
-        ++counter;
+		counter = 0;
+		prefix = POSITIONAL_ARRAY_PREFIX_STRING + std::string("[");
+		for (LightPositionalMapConstIterator iter = mPositional_.begin(); iter != mPositional_.end(); ++iter)
+		{
+			glm::vec4 new_position = transform * glm::vec4(iter->second->position_, 1.0f);
+
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightPositional::POSITION_STRING).c_str(), new_position);
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightPositional::INTENSITY_STRING).c_str(), iter->second->intensity_);
+
+			++counter;
+		}
     }
 
     // DIRECTIONAL
     // ----------
-    glsl_program.setUniform(NUM_POSITIONAL_LIGHTS_STRING.c_str(), static_cast<int>(mPositional_.size()));
+    glsl_program.setUniform(NUM_POSITIONAL_LIGHTS_STRING.c_str(), static_cast<int>(mDirectional_.size()));
 
-    counter = 0;
-    prefix = DIRECTIONAL_ARRAY_PREFIX_STRING + std::string("[");
-    for (LightDirectionalMapConstIterator iter = mDirectional_.begin(); iter != mDirectional_.end(); ++iter)
+    if (mDirectional_.size())
     {
-        iter->second->transferToShader(glsl_program, prefix  + std::to_string(counter) + "]");
-        ++counter;
-    }
+		counter = 0;
+		prefix = DIRECTIONAL_ARRAY_PREFIX_STRING + std::string("[");
+		for (LightDirectionalMapConstIterator iter = mDirectional_.begin(); iter != mDirectional_.end(); ++iter)
+		{
+			glm::vec4 new_direction = transform * glm::vec4(iter->second->direction_, 1.0f);
+
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightDirectional::DIRECTION_STRING).c_str(), new_direction);
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightDirectional::INTENSITY_STRING).c_str(), iter->second->intensity_);
+
+		    ++counter;
+		}
+	}
 
     // SPOTLIGHT
     // ----------
-    glsl_program.setUniform(NUM_POSITIONAL_LIGHTS_STRING.c_str(), static_cast<int>(mPositional_.size()));
+    glsl_program.setUniform(NUM_POSITIONAL_LIGHTS_STRING.c_str(), static_cast<int>(mSpotlight_.size()));
 
-    counter = 0;
-    prefix = SPOTLIGHT_ARRAY_PREFIX_STRING + std::string("[");
-    for (LightSpotlightMapConstIterator iter = mSpotlight_.begin(); iter != mSpotlight_.end(); ++iter)
+    if (mSpotlight_.size())
     {
-        iter->second->transferToShader(glsl_program, prefix  + std::to_string(counter) + "]");
-        ++counter;
+		counter = 0;
+		prefix = SPOTLIGHT_ARRAY_PREFIX_STRING + std::string("[");
+		for (LightSpotlightMapConstIterator iter = mSpotlight_.begin(); iter != mSpotlight_.end(); ++iter)
+		{
+			glm::vec4 new_position = transform * glm::vec4(iter->second->position_, 1.0f);
+			glm::vec4 new_direction = transform * glm::vec4(iter->second->direction_, 1.0f);
+
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightSpotlight::POSITION_STRING).c_str(),  new_position);
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightSpotlight::DIRECTION_STRING).c_str(), new_direction);
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightSpotlight::INTENSITY_STRING).c_str(), iter->second->intensity_);
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightSpotlight::SHININESS_STRING).c_str(), iter->second->shininess_);
+		    glsl_program.setUniform((prefix  + std::to_string(counter) + "]." + LightSpotlight::CUTOFF_STRING).c_str(),    iter->second->cutoff_);
+
+			++counter;
+		}
     }
 }
 

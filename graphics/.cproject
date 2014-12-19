@@ -34,12 +34,12 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.414937681" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.384359573" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1497892340" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="GLEW"/>
 									<listOptionValue builtIn="false" value="SOIL"/>
 									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="Timing"/>
 									<listOptionValue builtIn="false" value="rt"/>
 									<listOptionValue builtIn="false" value="glut"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="core"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1508866009" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -71,9 +71,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.995253181.1508398523" name="GLSceneParticles.cpp" rcbsApplicability="disable" resourcePath="test/GLSceneParticles.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1390570886.961024136">
-						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1390570886.961024136" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1390570886"/>
-					</fileInfo>
 					<sourceEntries>
 						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
@@ -120,6 +117,7 @@
 									<listOptionValue builtIn="false" value="Timing"/>
 									<listOptionValue builtIn="false" value="rt"/>
 									<listOptionValue builtIn="false" value="glut"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="core"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.171009149" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -151,9 +149,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.release.1416206640.1862660982" name="GLSceneParticles.cpp" rcbsApplicability="disable" resourcePath="test/GLSceneParticles.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1496145453.1415089824">
-						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1496145453.1415089824" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1496145453"/>
-					</fileInfo>
 					<sourceEntries>
 						<entry excluding="test/GLSceneSprite.cpp|test/GLSceneShadow.cpp|test/GLSceneNormal.cpp|test/GLSceneCometTail.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
@@ -202,4 +197,5 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 </cproject>

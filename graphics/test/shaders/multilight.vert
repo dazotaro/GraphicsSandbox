@@ -1,4 +1,4 @@
-#version 400
+#version 420
 
 layout(location = 0) in vec3 VertexPosition;
 layout(location = 1) in vec4 VertexColor;
@@ -7,13 +7,14 @@ layout(location = 3) in vec3 VertexNormal;
 
 out vec3 Color;
 
-struct LightInfo
+struct LightPositional
 {
-  vec4 Position;  // Light position in eye coords.
-  vec3 Intensity; // Light intensity (amb., diff., and spec.)
+  vec4 position;  // Light position in eye coords.
+  vec3 intensity; // Light intensity (amb., diff., and spec.)
 };
 
-uniform LightInfo lights[8];
+uniform LightPositional light_pos[8];
+uniform int num_pos_lights;
 
 // Material parameters
 uniform vec3 Kd;            // Diffuse reflectivity
@@ -28,10 +29,10 @@ uniform mat4 MVP;
 
 vec3 ads(int lightIndex, vec4 position, vec3 norm)
 {
-    vec3 s = normalize( vec3(lights[lightIndex].Position - position) );
+    vec3 s = normalize( vec3(light_pos[lightIndex].position - position) );
     vec3 v = normalize(vec3(-position));
     vec3 r = reflect( -s, norm );
-    vec3 I = lights[lightIndex].Intensity;
+    vec3 I = light_pos[lightIndex].intensity;
 
     return I * (Ka + Kd * max(dot(s, norm), 0.0) + Ks * pow(max(dot(r,v), 0.0), Shininess));
 }
@@ -43,7 +44,7 @@ void main()
 
     // Evaluate the lighting equation, for each light
     Color = vec3(0.0);
-    for( int i = 0; i < 8; i++ )
+    for( int i = 0; i < num_pos_lights; i++ )
         Color += ads( i, eyePosition, eyeNorm );
 
     gl_Position = MVP * vec4(VertexPosition,1.0);

@@ -21,25 +21,11 @@ class GLSLProgram;
 
 
 /**
- * @brief GLLightInterface
- *
- * @details Interface to transfer light data to the shaders
- */
-class GLLightInterface
-{
-    public:
-        virtual ~GLLightInterface() {};
-        virtual void transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const = 0;
-};
-
-
-
-/**
  * @brief Positional Light
  *
  * @details Data to represent a positional light (it emanates light in all directions). For example, an ideal bulb.
  */
-struct LightPositional : public GLLightInterface
+struct LightPositional
 {
     // CONSTANTS
     static const std::string POSITION_STRING;
@@ -47,8 +33,6 @@ struct LightPositional : public GLLightInterface
 
     LightPositional(glm::vec3 position, glm::vec3 intensity)
             : position_(position), intensity_(intensity) {}
-
-    void transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const;
 
     glm::vec3 position_;
     glm::vec3 intensity_;
@@ -61,7 +45,7 @@ struct LightPositional : public GLLightInterface
  *
  * @details Data to represent a directional light. For example, the sun.
  */
-struct LightDirectional : public GLLightInterface
+struct LightDirectional
 {
     // CONSTANTS
     static const std::string DIRECTION_STRING;
@@ -69,8 +53,6 @@ struct LightDirectional : public GLLightInterface
 
     LightDirectional(glm::vec3 direction, glm::vec3 intensity)
             : direction_(direction), intensity_(intensity) {}
-
-    void transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const;
 
     glm::vec3 direction_;
     glm::vec3 intensity_;
@@ -83,7 +65,7 @@ struct LightDirectional : public GLLightInterface
  *
  * @details Data to represent a spotlight.
  */
-struct LightSpotlight : public GLLightInterface
+struct LightSpotlight
 {
     // CONSTANTS
     static const std::string POSITION_STRING;
@@ -94,8 +76,6 @@ struct LightSpotlight : public GLLightInterface
 
     LightSpotlight(glm::vec3 position, glm::vec3 direction, glm::vec3 intensity, float shinniness, float cutoff)
             : position_(position), direction_(direction), intensity_(intensity), shininess_(shinniness), cutoff_(cutoff) {}
-
-    void transferToShader(const GLSLProgram& glsl_program, const std::string& uniform_prefix) const;
 
     glm::vec3 position_;
     glm::vec3 direction_;
@@ -139,7 +119,7 @@ class LightManager
         void addSpotlight(const std::string& name, const LightSpotlight* plight);
         void deleteSpotlight(const std::string& name);
 
-        void transferToShader(const GLSLProgram& glsl_program, const glm::mat4& transformation) const;
+        void transferToShader(const GLSLProgram& glsl_program, const glm::mat4& transform) const;
 
     private:
         LightPositionalMap  mPositional_;

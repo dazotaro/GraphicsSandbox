@@ -10,6 +10,7 @@
 #include "GLSceneShadow.hpp"            // GLSceneShadow
 #include "GLSceneParticles.hpp"			// GLSceneParticles
 #include "GLSceneCometTail.hpp"         // GLSceneCometTail
+#include "GLSceneMultipleLights.hpp"	// GLSceneMultipleLights
 #include "glm/gtc/matrix_transform.hpp" // glm::perspective
 #ifndef WIN32
 	#include <JU/Timer.hpp>                 // Timer
@@ -20,7 +21,7 @@
 // -----------
 // DEFINITIONS
 // -----------
-#define DEBUG_MEM
+//#define DEBUG_MEM
 #ifdef DEBUG_MEM
     #define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
     #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
@@ -147,10 +148,12 @@ static void init(void)
 
 
     //scene = new GLSceneNormal(WIDTH, HEIGHT);
-    scene = new GLSceneLighting(WIDTH, HEIGHT);
+    //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
+    scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
+
     scene->init();
 
 	#ifndef WIN32

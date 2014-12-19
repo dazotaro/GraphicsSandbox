@@ -12,7 +12,7 @@
 
 
 // MACROS
-#define DEBUG 0
+#define DEBUG 1
 
 
 // CONST AND STATIC

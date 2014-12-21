@@ -25,10 +25,7 @@
 
 
 GLSceneMultipleLights::GLSceneMultipleLights(int width, int height) : GLScene(width, height),
-									 gl_sphere_(0), gl_sphere_instance_(0),
-                                     gl_plane_(0), gl_plane_instance_(0),
-                                     camera_gps_(0), camera_(0), control_camera_(true),
-                                     camera_controller_(width, height, 0.2f)
+									 camera_(0), control_camera_(true), camera_controller_(width, height, 0.2f)
 {
 }
 
@@ -46,28 +43,6 @@ GLSceneMultipleLights::~GLSceneMultipleLights()
 */
 void GLSceneMultipleLights::init(void)
 {
-    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
-    glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
-    //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
-    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
-    glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
-                                                               "shaders/normal_drawing.gs",
-                                                               "shaders/simple.frag");
-
-    glsl_program_map_["ntb_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
-                                                            "shaders/ntb_drawing.gs",
-                                                            "shaders/simple.frag");
-
-    glsl_program_map_["normal_drawing_face"] = compileAndLinkShader("shaders/normal_drawing.vs",
-                                                                    "shaders/normal_drawing_face.gs",
-                                                                    "shaders/simple.frag");
-
-    glsl_program_map_["wireframe"] = compileAndLinkShader("shaders/wireframe.vs",
-                                                          "shaders/wireframe.gs",
-                                                          "shaders/simple.frag");
-
-    current_program_iter_ = glsl_program_map_.find("perfragment_texture");
-    
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
@@ -76,115 +51,145 @@ void GLSceneMultipleLights::init(void)
     glEnable(GL_CULL_FACE); // enables face culling
     glCullFace(GL_BACK); // tells OpenGL to cull back faces (the sane default setting)
 
-    // TEXTURES
-    // --------
+    initializePrograms();
+    initializeMaterials();
+    initializeTextures();
+    initializeObjects();
+    initializeCameras();
+    initializeLights();
+}
+
+
+
+void GLSceneMultipleLights::initializePrograms()
+{
+    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
+    glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
+    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+
+    current_program_iter_ = glsl_program_map_.find("perfragment_texture");
+}
+
+
+
+void GLSceneMultipleLights::initializeMaterials()
+{
+	Material* pmat;
+
+    MaterialManager::init();
+
+    pmat = new Material;
+    if (!MaterialManager::getMaterial("ruby", *pmat))
+        exit(EXIT_FAILURE);
+    material_map["ruby"] = pmat;
+
+    pmat = new Material;
+    if (!MaterialManager::getMaterial("green_rubber", *pmat))
+        exit(EXIT_FAILURE);
+    material_map["green_rubber"] = pmat;
+}
+
+
+
+void GLSceneMultipleLights::initializeTextures()
+{
     TextureManager::loadTexture("test",  "texture/test.tga");
     TextureManager::loadTexture("brick", "texture/brick1.jpg");
     TextureManager::loadTexture("pool",  "texture/pool.png");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
+}
 
-    // MATERIALS
-    // ---------
-    MaterialManager::init();
-    Material mat_sphere;
-    if (!MaterialManager::getMaterial("ruby", mat_sphere))
-        exit(EXIT_FAILURE);
-    Material mat_plane;
-    if (!MaterialManager::getMaterial("green_rubber", mat_plane))
-        exit(EXIT_FAILURE);
 
-     // SPHERE
-    // ------
-    // Create Mesh
-    Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
-    mesh.computeTangents();
-    gl_sphere_ = new GLMesh(mesh);
-    // Load the Mesh into VBO and VAO
-    gl_sphere_->init();
-    // Create instance of GLMesh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
-    gl_sphere_instance_->addColorTexture("pool");
-    // Give the sphere a position and a orientation
-    Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
-                    glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
-                    glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
-                    glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
-    NodePointerList no_children;
-    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
 
-	node_map_["sphere"] = sphere_node;
+void GLSceneMultipleLights::initializeObjects()
+{
+	GLMesh* 		pmesh;
+	GLMeshInstance* pmesh_instance;
+	Node3D*			pnode;
 
-    // SPHERE
-    // ------
-    // Create Mesh
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
-    //mesh.computeTangents();
-    gl_sphere_ = new GLMesh(mesh);
-    // Load the Mesh into VBO and VAO
-    gl_sphere_->init();
+	// SPHERE
+	// ------
+	// MESH
+	Mesh2 mesh;
+	ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
+	mesh.computeTangents();
+	pmesh = new GLMesh(mesh);
+	// Load the Mesh into VBO and VAO
+	pmesh->init();
+	mesh_map_["sphere_64_32"] = pmesh;
+	// MESH INSTANCE
+	pmesh_instance = new GLMeshInstance(pmesh, 5.0f, 5.0f, 5.0f, material_map["ruby"]);
+	pmesh_instance->addColorTexture("pool");
+	mesh_instance_map_["sphere_ruby"] = pmesh_instance;
+	// NODE
+	// Give the sphere a position and a orientation
+	Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
+				   glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
+				   glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
+				   glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
+	NodePointerList no_children;
+	pnode = new Node3D(sphere, pmesh_instance, no_children, true);
+	node_map_["sphere"] = pnode;
 
     // PLANE
     // ------
-    // Create Mesh
+    // MESH
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
-    gl_plane_ = new GLMesh(mesh);
+    pmesh = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
-    gl_plane_->init();
-    // Create instance of GLMEsh (there could be more than one)
-    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
-    gl_plane_instance_->addColorTexture("brick");
+    pmesh->init();
+    mesh_map_["plane"] = pmesh;
+    // MESH INSTANCE
+    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 1.0f, material_map["green_rubber"]);
+    pmesh_instance->addColorTexture("brick");
+    mesh_instance_map_["plane_green"];
+    // NODE
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, no_children, true);
+    pnode = new Node3D(plane, pmesh_instance, no_children, true);
+	node_map_["plane"] = pnode;
 
-	node_map_["plane"] = plane_node;
+}
 
 
-    // Create the Camera    // Create the camera_
-    glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
-    glm::vec3 camera_z = glm::normalize(camera_position);
-    glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
-    glm::vec3 camera_y = glm::normalize(glm::cross(camera_z, camera_x));
-    camera_gps_ = new Object3D(camera_position, // camera_'s position (eye's coordinates)
-                               camera_x, // camera_'s X axis
-                               camera_y, // camera_'s Y axis
-                               camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
-    //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
+
+void GLSceneMultipleLights::initializeCameras()
+{
     tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
-    								   static_cast<Object3D>(*sphere_node),
+    								   static_cast<Object3D>(*node_map_["sphere"]),
     								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
+}
 
-    /*
-    prog.setUniform("Kd", 0.9f, 0.5f, 0.3f);
-    prog.setUniform("Ld", 1.0f, 1.0f, 1.0f);
-    prog.setUniform("LightPosition", view * vec4(5.0f,5.0f,2.0f,1.0f) );
-    */
 
-    // LIGHTS
-    //---------
+
+void GLSceneMultipleLights::initializeLights()
+{
     glm::vec3 light_position (0.0f, 20.0f, 10.0f);
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
+    GLMeshInstance* pmesh_instance = new GLMeshInstance(mesh_map_["sphere_64_32"], 0.5f, 0.5f, 0.5f);
     // Color texture for light object
-    gl_sphere_instance_->addColorTexture("light");
+    pmesh_instance->addColorTexture("light");
+    mesh_instance_map_["light_sphere"] = pmesh_instance;
+
 
     Object3D root_sphere(light_position,
                          glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
                          glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
                          glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
     NodePointerList light_children;
-    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
+    Node3D *pnode = new Node3D(root_sphere, pmesh_instance, light_children, true);
 
-    node_map_["light"] = light_node;
+    node_map_["light"] = pnode;
 
     lights_positional_.push_back(LightPositional(light_position, light_intensity));
 }
+
+
 
 void GLSceneMultipleLights::loadMaterial(void) const
 {
@@ -270,7 +275,7 @@ void GLSceneMultipleLights::render(void)
     // Perspective Matrix
     glm::mat4 P(tp_camera_->getPerspectiveMatrix());
     // Draw each object
-    for (NodeMapIterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
+    for (NodeMap::const_iterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
     {
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
@@ -408,13 +413,17 @@ void GLSceneMultipleLights::mouseMotion(int x, int y)
 
 void GLSceneMultipleLights::cleanup(void)
 {
-    delete gl_sphere_;
-    delete gl_sphere_instance_;
-    delete gl_plane_;
-    delete gl_plane_instance_;
-    delete camera_gps_;
-    //delete fp_camera_;
     delete tp_camera_;
+
+    for (MeshMap::iterator iter = mesh_map_.begin(); iter != mesh_map_.end(); ++iter)
+    {
+    	delete iter->second;
+    }
+
+    for (MeshInstanceMap::iterator iter = mesh_instance_map_.begin(); iter != mesh_instance_map_.end(); ++iter)
+    {
+    	delete iter->second;
+    }
 
     std::map<std::string, Node3D *>::const_iterator iter;
     for (iter = node_map_.begin(); iter != node_map_.end(); ++iter)

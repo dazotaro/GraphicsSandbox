@@ -45,7 +45,8 @@ void main()
     // Evaluate the lighting equation, for each light
     Color = vec3(0.0);
     for( int i = 0; i < num_pos_lights; i++ )
-        Color += ads( i, eyePosition, eyeNorm );
+        //Color += ads( i, eyePosition, eyeNorm );
+        Color = vec3(0.0f, 1.0f, 1.0f);
 
     gl_Position = MVP * vec4(VertexPosition,1.0);
 }

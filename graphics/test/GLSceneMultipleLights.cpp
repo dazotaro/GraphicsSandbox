@@ -45,7 +45,7 @@ GLSceneMultipleLights::~GLSceneMultipleLights()
 */
 void GLSceneMultipleLights::init(void)
 {
-    glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
+    glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vs", "shaders/multilight.fs");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
 
 
@@ -126,8 +126,8 @@ void GLSceneMultipleLights::init(void)
 
 	node_map_["plane"] = plane_node;
 
-
-    // Create the Camera    // Create the camera_
+    // CAMERA
+	// ------
     glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
     glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
@@ -155,16 +155,16 @@ void GLSceneMultipleLights::init(void)
     // Color texture for light object
     gl_sphere_instance_->addColorTexture("light");
 
-    Object3D root_sphere(glm::vec3(1.0f, 0.0f,  0.0f), // initial light position to be updated before rendering
-                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    Object3D root_sphere(glm::vec3(1.0f, 20.0f, 10.0f), // initial light position to be updated before rendering
+                         glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
+                         glm::vec3(0.0f,  1.0f,  0.0f), // Model's Y axis
+                         glm::vec3(0.0f,  0.0f,  1.0f));// Model's Z axis
     NodePointerList light_children;
     Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
 
     node_map_["light"] = light_node;
 
-    LightPositional* light_pos = new LightPositional(glm::vec3(0.0f, 20.0f, 10.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    LightPositional* light_pos = new LightPositional(root_sphere.getPosition(), glm::vec3(1.0f, 1.0f, 1.0f));
 
     // Create positional lights
     light_manager_.addPositionalLight("zero", light_pos);
@@ -172,9 +172,9 @@ void GLSceneMultipleLights::init(void)
 
 void GLSceneMultipleLights::loadMaterial(void) const
 {
-    (current_program_iter_->second).setUniform("Kd", 0.8f, 0.1f, 0.1f);
-    (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
-    (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
+    (current_program_iter_->second).setUniform("Kd", glm::vec3(0.8f, 0.1f, 0.1f));
+    (current_program_iter_->second).setUniform("Ks", glm::vec3(0.9f, 0.9f, 0.9f));
+    (current_program_iter_->second).setUniform("Ka", glm::vec3(0.1f, 0.1f, 0.1f));
     (current_program_iter_->second).setUniform("Shininess", 10.0f);
 }
 

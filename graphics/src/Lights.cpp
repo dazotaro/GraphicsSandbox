@@ -9,25 +9,7 @@
 #include "Lights.hpp"       // Header class for this source file
 #include "GLSLProgram.hpp"  // GLSLProgram
 
-
-// STATIC CONST variable initialization
-const std::string LightManager::NUM_POSITIONAL_LIGHTS_STRING    ("num_pos_lights");
-const std::string LightManager::NUM_DIRECTIONAL_LIGHTS_STRING   ("num_dir_lights");
-const std::string LightManager::NUM_SPOTLIGHT_LIGHTS_STRING     ("num_spot_lights");
-const std::string LightManager::POSITIONAL_ARRAY_PREFIX_STRING  ("light_pos");
-const std::string LightManager::DIRECTIONAL_ARRAY_PREFIX_STRING ("light_dir");
-const std::string LightManager::SPOTLIGHT_ARRAY_PREFIX_STRING   ("light_spot");
-const std::string LightPositional::POSITION_STRING              ("position");
-const std::string LightPositional::INTENSITY_STRING             ("intensity");
-const std::string LightDirectional::DIRECTION_STRING            ("direction");
-const std::string LightDirectional::INTENSITY_STRING            ("intensity");
-const std::string LightSpotlight::POSITION_STRING               ("position");
-const std::string LightSpotlight::DIRECTION_STRING              ("direction");
-const std::string LightSpotlight::INTENSITY_STRING              ("intensity");
-const std::string LightSpotlight::SHININESS_STRING              ("shininess");
-const std::string LightSpotlight::CUTOFF_STRING                 ("cutoff");
-
-
+/*
 void LightManager::addPositionalLight(const std::string& name, const LightPositional* plight)
 {
     mPositional_[name] = plight;
@@ -163,5 +145,5 @@ LightManager::~LightManager()
         delete iter->second;
     }
 }
-
+*/
 

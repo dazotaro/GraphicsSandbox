@@ -432,7 +432,7 @@ void GLSceneShadow::update(float time)
         main_iter->second->rotate(glm::degrees(angle), axis);
     }
 
-	static float delta_theta = M_PI * 0.02f;
+	static float delta_theta = M_PI * 0.02f * 0.001f; // radians/millisecond
 	glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), delta_theta * time, glm::vec3(0.0f, 1.0f, 0.0f));
 	light_position = rotation * light_position;

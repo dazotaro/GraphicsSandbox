@@ -27,10 +27,6 @@ class GLSLProgram;
  */
 struct LightPositional
 {
-    // CONSTANTS
-    static const std::string POSITION_STRING;
-    static const std::string INTENSITY_STRING;
-
     LightPositional(glm::vec3 position, glm::vec3 intensity)
             : position_(position), intensity_(intensity) {}
 
@@ -47,10 +43,6 @@ struct LightPositional
  */
 struct LightDirectional
 {
-    // CONSTANTS
-    static const std::string DIRECTION_STRING;
-    static const std::string INTENSITY_STRING;
-
     LightDirectional(glm::vec3 direction, glm::vec3 intensity)
             : direction_(direction), intensity_(intensity) {}
 
@@ -67,13 +59,6 @@ struct LightDirectional
  */
 struct LightSpotlight
 {
-    // CONSTANTS
-    static const std::string POSITION_STRING;
-    static const std::string DIRECTION_STRING;
-    static const std::string INTENSITY_STRING;
-    static const std::string SHININESS_STRING;
-    static const std::string CUTOFF_STRING;
-
     LightSpotlight(glm::vec3 position, glm::vec3 direction, glm::vec3 intensity, float shinniness, float cutoff)
             : position_(position), direction_(direction), intensity_(intensity), shininess_(shinniness), cutoff_(cutoff) {}
 
@@ -87,6 +72,10 @@ struct LightSpotlight
 
 
 // TYPEDEFS
+typedef std::vector<LightPositional>                LightPositionalVector;
+typedef std::vector<LightDirectional>               LightDirectionalVector;
+typedef std::vector<LightSpotlight>                 LightSpotlightVector;
+
 typedef std::map<std::string, const LightPositional*>     LightPositionalMap;
 typedef LightPositionalMap::const_iterator                LightPositionalMapConstIterator;
 typedef LightPositionalMap::iterator                      LightPositionalMapIterator;
@@ -98,16 +87,9 @@ typedef LightSpotlightMap::const_iterator                 LightSpotlightMapConst
 typedef LightSpotlightMap::iterator                       LightSpotlightMapIterator;
 
 
+/*
 class LightManager
 {
-    public:
-        static const std::string NUM_POSITIONAL_LIGHTS_STRING;
-        static const std::string NUM_DIRECTIONAL_LIGHTS_STRING;
-        static const std::string NUM_SPOTLIGHT_LIGHTS_STRING;
-        static const std::string POSITIONAL_ARRAY_PREFIX_STRING;
-        static const std::string DIRECTIONAL_ARRAY_PREFIX_STRING;
-        static const std::string SPOTLIGHT_ARRAY_PREFIX_STRING;
-
     public:
         ~LightManager();
 
@@ -126,15 +108,7 @@ class LightManager
         LightDirectionalMap mDirectional_;
         LightSpotlightMap   mSpotlight_;
 };
-
-
-typedef std::vector<LightPositional>                LightPositionalVector;
-typedef std::vector<LightDirectional>               LightDirectionalVector;
-typedef std::vector<LightSpotlight>                 LightSpotlightVector;
-typedef LightPositionalVector::const_iterator       LightPositionalConstIterator;
-typedef LightPositionalVector::iterator             LightPositionalIterator;
-typedef LightDirectionalVector::const_iterator      LightDirectionalIterator;
-typedef LightSpotlightVector::const_iterator        LightSpotlightIterator;
+*/
 
 
 #endif /* LIGHTS_HPP_ */

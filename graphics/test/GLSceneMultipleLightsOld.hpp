@@ -60,14 +60,11 @@ class GLSceneMultipleLights : public GLScene
         Object3D*       camera_gps_;
         NodeMap			node_map_;
         //CameraFirstPerson *fp_camera_;
-        CameraThirdPerson* tp_camera_;
-        CameraInterface* camera_;
-
+        CameraThirdPerson*  tp_camera_;
+        CameraInterface*    camera_;
         bool control_camera_;
 
-        LightPositionalVector  lights_positional_;
-        LightDirectionalVector lights_directional_;
-        LightSpotlightVector   lights_spotlight_;
+        LightManager  light_manager_;
 
         ArcBallController camera_controller_;
 };

@@ -233,7 +233,7 @@ void GLSceneLighting::update(float time)
     static const float angle_speed = (2.0 * M_PI * 0.1f) * 0.001f ; // 10 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
-    for (LightPositionalIterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
+    for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
         light->position_.x = position.x;

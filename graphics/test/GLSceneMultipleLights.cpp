@@ -21,6 +21,7 @@
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform.hpp>	// glm::rotate
+#include <math.h>					// M_PI
 
 
 GLSceneMultipleLights::GLSceneMultipleLights(int width, int height) : GLScene(width, height),
@@ -45,11 +46,27 @@ GLSceneMultipleLights::~GLSceneMultipleLights()
 */
 void GLSceneMultipleLights::init(void)
 {
-    glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vs", "shaders/multilight.fs");
+    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
+    //glsl_program_map_["perfragment_halfway"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag_halfway.fs");
+    glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+    glsl_program_map_["normal_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
+                                                               "shaders/normal_drawing.gs",
+                                                               "shaders/simple.frag");
 
+    glsl_program_map_["ntb_drawing"] = compileAndLinkShader("shaders/normal_drawing.vs",
+                                                            "shaders/ntb_drawing.gs",
+                                                            "shaders/simple.frag");
 
-    current_program_iter_ = glsl_program_map_.find("multilight");
+    glsl_program_map_["normal_drawing_face"] = compileAndLinkShader("shaders/normal_drawing.vs",
+                                                                    "shaders/normal_drawing_face.gs",
+                                                                    "shaders/simple.frag");
+
+    glsl_program_map_["wireframe"] = compileAndLinkShader("shaders/wireframe.vs",
+                                                          "shaders/wireframe.gs",
+                                                          "shaders/simple.frag");
+
+    current_program_iter_ = glsl_program_map_.find("perfragment_texture");
     
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
@@ -126,8 +143,8 @@ void GLSceneMultipleLights::init(void)
 
 	node_map_["plane"] = plane_node;
 
-    // CAMERA
-	// ------
+
+    // Create the Camera    // Create the camera_
     glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
     glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
@@ -150,31 +167,30 @@ void GLSceneMultipleLights::init(void)
 
     // LIGHTS
     //---------
+    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
     // Color texture for light object
     gl_sphere_instance_->addColorTexture("light");
 
-    Object3D root_sphere(glm::vec3(1.0f, 20.0f, 10.0f), // initial light position to be updated before rendering
-                         glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
-                         glm::vec3(0.0f,  1.0f,  0.0f), // Model's Y axis
-                         glm::vec3(0.0f,  0.0f,  1.0f));// Model's Z axis
+    Object3D root_sphere(light_position,
+                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
     NodePointerList light_children;
     Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
 
     node_map_["light"] = light_node;
 
-    LightPositional* light_pos = new LightPositional(root_sphere.getPosition(), glm::vec3(1.0f, 1.0f, 1.0f));
-
-    // Create positional lights
-    light_manager_.addPositionalLight("zero", light_pos);
+    lights_positional_.push_back(LightPositional(light_position, light_intensity));
 }
 
 void GLSceneMultipleLights::loadMaterial(void) const
 {
-    (current_program_iter_->second).setUniform("Kd", glm::vec3(0.8f, 0.1f, 0.1f));
-    (current_program_iter_->second).setUniform("Ks", glm::vec3(0.9f, 0.9f, 0.9f));
-    (current_program_iter_->second).setUniform("Ka", glm::vec3(0.1f, 0.1f, 0.1f));
+    (current_program_iter_->second).setUniform("Kd", 0.8f, 0.1f, 0.1f);
+    (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
+    (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
     (current_program_iter_->second).setUniform("Shininess", 10.0f);
 }
 
@@ -182,11 +198,9 @@ void GLSceneMultipleLights::loadMaterial(void) const
 
 void GLSceneMultipleLights::loadLights(void) const
 {
-	light_manager_.transferToShader(current_program_iter_->second, tp_camera_->getViewMatrix());
-
     // WARNING: The shader expects the light position in eye coordinates
-	//(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
-    //(current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
+	(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
+    (current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
 }
 
 
@@ -194,7 +208,7 @@ void GLSceneMultipleLights::loadLights(void) const
 /**
 * @brief Update everything that needs to be updated in the scene
 *
-* @param time Time elapsed since the last update
+* @param time Time elapsed since the last update (in milliseconds)
 */
 void GLSceneMultipleLights::update(float time)
 {
@@ -216,11 +230,10 @@ void GLSceneMultipleLights::update(float time)
     }
 
 	// LIGHTS: update position
-    static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
+    static const float angle_speed = (2.0 * M_PI * 0.1f) * 0.001f ; // 10 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
-    /*
-    for (LightPositionalIterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
+    for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
         light->position_.x = position.x;
@@ -229,7 +242,6 @@ void GLSceneMultipleLights::update(float time)
 
         node_map_["light"]->setPosition(light->position_);
     }
-    */
 }
 
 

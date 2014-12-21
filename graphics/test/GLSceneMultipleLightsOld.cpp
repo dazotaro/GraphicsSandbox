@@ -6,7 +6,7 @@
  */
 
 // Local includes
-#include "GLSceneNormal.hpp"      	// GLSceneNormal
+#include "GLSceneMultipleLights.hpp"      // GLSceneMultipleLights
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
@@ -22,7 +22,8 @@
 #include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform.hpp>	// glm::rotate
 
-GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
+
+GLSceneMultipleLights::GLSceneMultipleLights(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
                                      camera_gps_(0), camera_(0), control_camera_(true),
@@ -32,7 +33,7 @@ GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 
 
 
-GLSceneNormal::~GLSceneNormal()
+GLSceneMultipleLights::~GLSceneMultipleLights()
 {
     // TODO Auto-generated destructor stub
 }
@@ -42,10 +43,14 @@ GLSceneNormal::~GLSceneNormal()
 /**
 * @brief Initialized the Scene
 */
-void GLSceneNormal::init(void)
+void GLSceneMultipleLights::init(void)
 {
-    // OPENGL SETUP
-    // --------------
+    glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vs", "shaders/multilight.fs");
+    glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
+
+
+    current_program_iter_ = glsl_program_map_.find("multilight");
+    
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
@@ -54,20 +59,12 @@ void GLSceneNormal::init(void)
     glEnable(GL_CULL_FACE); // enables face culling
     glCullFace(GL_BACK); // tells OpenGL to cull back faces (the sane default setting)
 
-	// SHADERS: load, compile and link them
-    // --------------
-	glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
-    glsl_program_map_["normal_mapping"] = compileAndLinkShader("shaders/normalmap.vs", "shaders/normalmap.fs");
-
-    current_program_iter_ = glsl_program_map_.find("normal_mapping");
-
-    // TEXTURE LOADING
-    // --------------
-    TextureManager::loadTexture("normal_map", "texture/multi_normal_map.tga");
+    // TEXTURES
+    // --------
+    TextureManager::loadTexture("test",  "texture/test.tga");
+    TextureManager::loadTexture("brick", "texture/brick1.jpg");
+    TextureManager::loadTexture("pool",  "texture/pool.png");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
-    TextureManager::loadTexture("test", "texture/test.tga");
-    TextureManager::loadTexture("rusted", "texture/rusted_metal.jpg");
-
 
     // MATERIALS
     // ---------
@@ -79,21 +76,18 @@ void GLSceneNormal::init(void)
     if (!MaterialManager::getMaterial("green_rubber", mat_plane))
         exit(EXIT_FAILURE);
 
-    // OBJECT LOADING
-    // --------------
-    // SPHERE
+     // SPHERE
     // ------
     // Create Mesh
     Mesh2 mesh;
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE, 48, 48);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
     mesh.computeTangents();
     gl_sphere_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
-    // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);//, &mat_sphere);
-    gl_sphere_instance_->addColorTexture("rusted");
-    gl_sphere_instance_->addNormalTexture("normal_map");
+    // Create instance of GLMesh (there could be more than one)
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f, &mat_sphere);
+    gl_sphere_instance_->addColorTexture("pool");
     // Give the sphere a position and a orientation
     Object3D sphere(glm::vec3(0.0f, 10.0f,  0.0f), // Model's position
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
@@ -104,6 +98,15 @@ void GLSceneNormal::init(void)
 
 	node_map_["sphere"] = sphere_node;
 
+    // SPHERE
+    // ------
+    // Create Mesh
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
+    //mesh.computeTangents();
+    gl_sphere_ = new GLMesh(mesh);
+    // Load the Mesh into VBO and VAO
+    gl_sphere_->init();
+
     // PLANE
     // ------
     // Create Mesh
@@ -112,9 +115,8 @@ void GLSceneNormal::init(void)
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f);//, &mat_plane);
-    gl_plane_instance_->addColorTexture("test");
-    gl_plane_instance_->addNormalTexture("normal_map");
+    gl_plane_instance_ = new GLMeshInstance(gl_plane_, 50.0f, 50.0f, 1.0f, &mat_plane);
+    gl_plane_instance_->addColorTexture("brick");
     // Give the plane a position and a orientation
     Object3D plane(glm::vec3(0.0f, 0.0f, 0.0f), // Model's position
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
@@ -124,8 +126,8 @@ void GLSceneNormal::init(void)
 
 	node_map_["plane"] = plane_node;
 
-
-    // Create the Camera    // Create the camera_
+    // CAMERA
+	// ------
     glm::vec3 camera_position (0.0f, 20.0f, 10.0f);
     glm::vec3 camera_z = glm::normalize(camera_position);
     glm::vec3 camera_x = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camera_z));
@@ -148,74 +150,53 @@ void GLSceneNormal::init(void)
 
     // LIGHTS
     //---------
-    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
-    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
     // Color texture for light object
     gl_sphere_instance_->addColorTexture("light");
 
-    Object3D root_sphere(light_position,
-                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    Object3D root_sphere(glm::vec3(1.0f, 20.0f, 10.0f), // initial light position to be updated before rendering
+                         glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
+                         glm::vec3(0.0f,  1.0f,  0.0f), // Model's Y axis
+                         glm::vec3(0.0f,  0.0f,  1.0f));// Model's Z axis
     NodePointerList light_children;
     Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
 
     node_map_["light"] = light_node;
 
-    lights_positional_.push_back(LightPositional(light_position, light_intensity));
+    LightPositional* light_pos = new LightPositional(root_sphere.getPosition(), glm::vec3(1.0f, 1.0f, 1.0f));
+
+    // Create positional lights
+    light_manager_.addPositionalLight("zero", light_pos);
 }
 
-void GLSceneNormal::loadMaterial(void) const
+void GLSceneMultipleLights::loadMaterial(void) const
 {
-    (current_program_iter_->second).setUniform("Kd", 0.4f, 0.4f, 0.4f);
-    (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
-    (current_program_iter_->second).setUniform("Ka", 0.2f, 0.2f, 0.2f);
+    (current_program_iter_->second).setUniform("Kd", glm::vec3(0.8f, 0.1f, 0.1f));
+    (current_program_iter_->second).setUniform("Ks", glm::vec3(0.9f, 0.9f, 0.9f));
+    (current_program_iter_->second).setUniform("Ka", glm::vec3(0.1f, 0.1f, 0.1f));
     (current_program_iter_->second).setUniform("Shininess", 10.0f);
 }
 
-void GLSceneNormal::loadLights(void) const
-{
-    // WARNING: The shader expects the light position in eye coordinates
-	(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
-    (current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
 
-    /*
-    // 0
-    (current_program_iter_->second).setUniform("lights[0].Position",  glm::vec4(5.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[0].Intensity", glm::vec3(0.8f,0.8f,0.8f));
-    // 1
-    (current_program_iter_->second).setUniform("lights[1].Position",  glm::vec4(0.0f,5.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[1].Intensity", glm::vec3(0.8f,0.8f,0.8f));
-    // 2
-    (current_program_iter_->second).setUniform("lights[2].Position",  glm::vec4(-5.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[2].Intensity", glm::vec3(0.8f,0.8f,0.8f));
-    // 3
-    (current_program_iter_->second).setUniform("lights[3].Position",  glm::vec4(0.0f,-5.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[3].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 4
-    (current_program_iter_->second).setUniform("lights[4].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[4].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 5
-    (current_program_iter_->second).setUniform("lights[5].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[5].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 6
-    (current_program_iter_->second).setUniform("lights[6].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[6].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    // 7
-    (current_program_iter_->second).setUniform("lights[7].Position",  glm::vec4(0.0f,0.0f,0.0f,1.0f));
-    (current_program_iter_->second).setUniform("lights[7].Intensity", glm::vec3(0.0f,0.0f,0.0f));
-    */
-    //}
+
+void GLSceneMultipleLights::loadLights(void) const
+{
+	light_manager_.transferToShader(current_program_iter_->second, tp_camera_->getViewMatrix());
+
+    // WARNING: The shader expects the light position in eye coordinates
+	//(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
+    //(current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
 }
+
+
 
 /**
 * @brief Update everything that needs to be updated in the scene
 *
-* @param time Time elapsed since the last update (in milliseconds)
+* @param time Time elapsed since the last update
 */
-void GLSceneNormal::update(float time)
+void GLSceneMultipleLights::update(float time)
 {
     float radius_delta, angle;
     glm::vec3 axis;
@@ -238,7 +219,8 @@ void GLSceneNormal::update(float time)
     static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
-    for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
+    /*
+    for (LightPositionalIterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
         light->position_.x = position.x;
@@ -247,6 +229,7 @@ void GLSceneNormal::update(float time)
 
         node_map_["light"]->setPosition(light->position_);
     }
+    */
 }
 
 
@@ -254,7 +237,7 @@ void GLSceneNormal::update(float time)
 /**
 * @brief Render all the renderable objects in the scene
 */
-void GLSceneNormal::render(void)
+void GLSceneMultipleLights::render(void)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -262,8 +245,6 @@ void GLSceneNormal::render(void)
 
     current_program_iter_->second.use();
 
-    // LOAD MATERIAL
-    loadMaterial();
     // LOAD LIGHTS
     loadLights();
     
@@ -293,7 +274,7 @@ void GLSceneNormal::render(void)
 * @param width  Width of the window
 * @param height Height of the window
 */
-void GLSceneNormal::resize(int width, int height)
+void GLSceneMultipleLights::resize(int width, int height)
 {
     GLScene::resize(width, height);
     camera_->setAspectRatio(static_cast<float>(width)/height);
@@ -309,7 +290,7 @@ void GLSceneNormal::resize(int width, int height)
 * @param x      Location of the mouse when the key was pressed
 * @param y      Location of the mouse when the key was pressed
 */
-void GLSceneNormal::keyboard(unsigned char key, int x, int y)
+void GLSceneMultipleLights::keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
@@ -353,72 +334,75 @@ void GLSceneNormal::keyboard(unsigned char key, int x, int y)
             node_map_["cubes"]->rotateZ(1.0f);
             break;
 
+        /*
         case 'k':
         case 'K':
-            camera_gps_->rotateY(1.0f);  // Yaw
+            fp_camera_->rotateY(1.0f);  // Yaw
             break;
 
         case ';':
         case ':':
-            camera_gps_->rotateY(-1.0f);  // Yaw
+            fp_camera_->rotateY(-1.0f);  // Yaw
             break;
 
         case 'i':
         case 'I':
-            camera_gps_->rotateZ(1.0f);  // Roll
+            fp_camera_->rotateZ(1.0f);  // Roll
             break;
 
         case 'p':
         case 'P':
-            camera_gps_->rotateZ(-1.0f); // Roll
+            fp_camera_->rotateZ(-1.0f); // Roll
             break;
 
         case 'o':
         case 'O':
-            camera_gps_->rotateX(-1.0f);  // Pitch
-            //tp_camera_->addHeightToTarget(0.1f);
+            fp_camera_->rotateX(-1.0f);  // Pitch
             break;
 
         case 'l':
         case 'L':
-            camera_gps_->rotateX(1.0f); // Pitch
-            //tp_camera_->addHeightToTarget(-0.1f);
+            fp_camera_->rotateX(1.0f); // Pitch
             break;
 
         case 'u':
         case 'U':
-            camera_gps_->translate(glm::vec3(0.0f, 0.0f, -0.1f));
-            //tp_camera_->addDistanceToTarget(0.1f);
+            fp_camera_->translate(glm::vec3(0.0f, 0.0f, -0.1f));
             break;
 
         case 'j':
         case 'J':
-            camera_gps_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
-            //tp_camera_->addDistanceToTarget(-0.1f);
+            fp_camera_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
             break;
+        */
     }
 }
 
 
 
-void GLSceneNormal::mouseClick(int button, int state, int x, int y)
+void GLSceneMultipleLights::mouseClick(int button, int state, int x, int y)
 {
 	camera_controller_.mouseClick(button, state, x, y);
 }
 
-void GLSceneNormal::mouseMotion(int x, int y)
+
+
+void GLSceneMultipleLights::mouseMotion(int x, int y)
 {
 	camera_controller_.mouseMotion(x, y);
 }
 
-void GLSceneNormal::cleanup(void)
+
+
+void GLSceneMultipleLights::cleanup(void)
 {
-    delete gl_plane_instance_;
-    delete gl_plane_;
-    delete camera_gps_;
-    delete camera_;
-    delete gl_sphere_instance_;
     delete gl_sphere_;
+    delete gl_sphere_instance_;
+    delete gl_plane_;
+    delete gl_plane_instance_;
+    delete camera_gps_;
+    //delete fp_camera_;
+    delete tp_camera_;
 
     std::map<std::string, Node3D *>::const_iterator iter;
     for (iter = node_map_.begin(); iter != node_map_.end(); ++iter)

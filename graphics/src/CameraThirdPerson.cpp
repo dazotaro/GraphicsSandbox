@@ -90,7 +90,7 @@ void CameraThirdPerson::update(const Object3D &target, JU::f32 distance_delta, J
 
 	glm::vec4 p1 (distance_to_target_ * z_axis_, 1.0f);
 
-    glm::mat4 rotation (glm::rotate(glm::degrees(angle), axis));
+    glm::mat4 rotation (glm::rotate(angle, axis));
 
     glm::vec3 op1 (glm::vec3(rotation * p1));
 

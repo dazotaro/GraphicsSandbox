@@ -21,6 +21,7 @@
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform.hpp>	// glm::rotate
+#include <math.h>					// M_PI
 
 GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
@@ -235,7 +236,7 @@ void GLSceneNormal::update(float time)
     }
 
 	// LIGHTS: update position
-    static const float angle_speed = (360 * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
+    static const float angle_speed = (2.0f * M_PI * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
     for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)

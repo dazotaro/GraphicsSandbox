@@ -210,8 +210,7 @@ void GLSceneShadow::initializeObjects()
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
                     glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
-    NodePointerList no_children;
-    Node3D* main_node = new Node3D(main, mesh_instance_map_["main"], no_children, true);
+    Node3D* main_node = new Node3D(main, mesh_instance_map_["main"], true);
 
     node_map_["main"] = main_node;
 
@@ -222,7 +221,7 @@ void GLSceneShadow::initializeObjects()
                     glm::vec3( 1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3( 0.0f,  0.0f, -1.0f), // Model's Y axis
                     glm::vec3( 0.0f,  1.0f,  0.0f));// Model's Z axis
-    Node3D* torus_node = new Node3D(torus, mesh_instance_map_["torus"], no_children, true);
+    Node3D* torus_node = new Node3D(torus, mesh_instance_map_["torus"], true);
 
     node_map_["torus"] = torus_node;
 
@@ -233,7 +232,7 @@ void GLSceneShadow::initializeObjects()
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    Node3D* plane_node = new Node3D(plane, mesh_instance_map_["plane"], no_children, true);
+    Node3D* plane_node = new Node3D(plane, mesh_instance_map_["plane"], true);
 
 	node_map_["plane"] = plane_node;
 
@@ -266,8 +265,7 @@ void GLSceneShadow::initializeShadowMap()
                          glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
                          glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
                          glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
-    NodePointerList light_children;
-    Node3D *light_node = new Node3D(root_sphere, mesh_instance_map_["light"], light_children, true);
+    Node3D *light_node = new Node3D(root_sphere, mesh_instance_map_["light"], true);
 
     node_map_["light"] = light_node;
 
@@ -280,8 +278,7 @@ void GLSceneShadow::initializeShadowMap()
                     glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis0
                     glm::vec3(0.0f, 1.0f, 0.0f), // Model's Y axis
                     glm::vec3(0.0f, 0.0f, 1.0f));// Model's Z axis
-    NodePointerList no_children;
-    shadow_plane_node_ = new Node3D(plane2, gl_plane_shadow_instance_, no_children, true);
+    shadow_plane_node_ = new Node3D(plane2, gl_plane_shadow_instance_, true);
 
     setupFBO();
 }

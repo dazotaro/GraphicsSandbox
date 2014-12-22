@@ -30,9 +30,10 @@ class Node3D : public Object3D, public DrawInterface
     public:
         Node3D(const Object3D &object3d,
                const DrawInterface *node_drawable,
-               const NodePointerList &children,
                bool visible = true);
         virtual ~Node3D();
+
+        void addChild(Node3D* node);
 
         virtual void draw(const GLSLProgram &program, const glm::mat4 & model, const glm::mat4 &view, const glm::mat4 &projection) const;
 

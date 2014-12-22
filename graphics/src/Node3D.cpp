@@ -20,9 +20,8 @@
 */
 Node3D::Node3D(const Object3D &object,
                const DrawInterface *node_drawable,
-               const NodePointerList &children,
                bool visible) :
-               Object3D(object), node_drawable_(node_drawable), children_(children), visible_(visible)
+               Object3D(object), node_drawable_(node_drawable), visible_(visible)
 {
 }
 
@@ -37,6 +36,20 @@ Node3D::~Node3D()
         delete *iter;
     }
 }
+
+
+
+/**
+* @brief Add new child node
+*
+* @param node  New node
+*/
+void Node3D::addChild(Node3D* node)
+{
+	children_.push_back(node);
+}
+
+
 
 /**
 * @brief Draw this node

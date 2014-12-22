@@ -110,8 +110,7 @@ void GLSceneLighting::init(void)
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
                     glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
-    NodePointerList no_children;
-    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, no_children, true);
+    Node3D* sphere_node = new Node3D(sphere, gl_sphere_instance_, true);
 
 	node_map_["sphere"] = sphere_node;
 
@@ -139,7 +138,7 @@ void GLSceneLighting::init(void)
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, no_children, true);
+    Node3D* plane_node = new Node3D(plane, gl_plane_instance_, true);
 
 	node_map_["plane"] = plane_node;
 
@@ -178,8 +177,7 @@ void GLSceneLighting::init(void)
                          glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
                          glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
                          glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
-    NodePointerList light_children;
-    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, light_children, true);
+    Node3D *light_node = new Node3D(root_sphere, gl_sphere_instance_, true);
 
     node_map_["light"] = light_node;
 

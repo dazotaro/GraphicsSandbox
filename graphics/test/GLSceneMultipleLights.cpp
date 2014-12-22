@@ -81,12 +81,20 @@ void GLSceneMultipleLights::initializeMaterials()
     pmat = new Material;
     if (!MaterialManager::getMaterial("ruby", *pmat))
         exit(EXIT_FAILURE);
-    material_map["ruby"] = pmat;
+    material_map_["ruby"] = pmat;
 
     pmat = new Material;
-    if (!MaterialManager::getMaterial("green_rubber", *pmat))
+    if (!MaterialManager::getMaterial("gray_rubber", *pmat))
         exit(EXIT_FAILURE);
-    material_map["green_rubber"] = pmat;
+    material_map_["gray_rubber"] = pmat;
+
+    pmat = new Material;
+    if (!MaterialManager::getMaterial("pearl", *pmat))
+        exit(EXIT_FAILURE);
+    material_map_["pearl"] = pmat;
+
+    pmat = new Material(1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+    material_map_["white_light"] = pmat;
 }
 
 
@@ -118,7 +126,7 @@ void GLSceneMultipleLights::initializeObjects()
 	pmesh->init();
 	mesh_map_["sphere_64_32"] = pmesh;
 	// MESH INSTANCE
-	pmesh_instance = new GLMeshInstance(pmesh, 5.0f, 5.0f, 5.0f, material_map["ruby"]);
+	pmesh_instance = new GLMeshInstance(pmesh, 5.0f, 5.0f, 5.0f, material_map_["ruby"]);
 	pmesh_instance->addColorTexture("pool");
 	mesh_instance_map_["sphere_ruby"] = pmesh_instance;
 	// NODE
@@ -127,8 +135,7 @@ void GLSceneMultipleLights::initializeObjects()
 				   glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
 				   glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
 				   glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
-	NodePointerList no_children;
-	pnode = new Node3D(sphere, pmesh_instance, no_children, true);
+	pnode = new Node3D(sphere, pmesh_instance, true);
 	node_map_["sphere"] = pnode;
 
     // PLANE
@@ -140,7 +147,7 @@ void GLSceneMultipleLights::initializeObjects()
     pmesh->init();
     mesh_map_["plane"] = pmesh;
     // MESH INSTANCE
-    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 1.0f, material_map["green_rubber"]);
+    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 1.0f, material_map_["gray_rubber"]);
     pmesh_instance->addColorTexture("brick");
     mesh_instance_map_["plane_green"];
     // NODE
@@ -149,7 +156,7 @@ void GLSceneMultipleLights::initializeObjects()
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    pnode = new Node3D(plane, pmesh_instance, no_children, true);
+    pnode = new Node3D(plane, pmesh_instance, true);
 	node_map_["plane"] = pnode;
 
 }
@@ -168,35 +175,27 @@ void GLSceneMultipleLights::initializeCameras()
 
 void GLSceneMultipleLights::initializeLights()
 {
-    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
-    glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
+    glm::vec3 light_ring_center (0.0f, 20.0f, 0.0f);
+    glm::vec3 light_intensity (0.3f, 0.3f, 0.3f);
     // Create instance of GLMEsh (there could be more than one)
-    GLMeshInstance* pmesh_instance = new GLMeshInstance(mesh_map_["sphere_64_32"], 0.5f, 0.5f, 0.5f);
+    GLMeshInstance* pmesh_instance = new GLMeshInstance(mesh_map_["sphere_64_32"],		// mesh
+    													0.5f, 0.5f, 0.5f,				// scale
+														material_map_["white_light"]);	// material
     // Color texture for light object
-    pmesh_instance->addColorTexture("light");
+    //pmesh_instance->addColorTexture("light");
     mesh_instance_map_["light_sphere"] = pmesh_instance;
 
 
-    Object3D root_sphere(light_position,
-                         glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-                         glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-                         glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
+    Object3D ring_center(light_ring_center,
+                         	  glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+							  glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+							  glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
     NodePointerList light_children;
-    Node3D *pnode = new Node3D(root_sphere, pmesh_instance, light_children, true);
+    Node3D *pnode = new Node3D(ring_center, pmesh_instance, true);
 
     node_map_["light"] = pnode;
 
-    lights_positional_.push_back(LightPositional(light_position, light_intensity));
-}
-
-
-
-void GLSceneMultipleLights::loadMaterial(void) const
-{
-    (current_program_iter_->second).setUniform("Kd", 0.8f, 0.1f, 0.1f);
-    (current_program_iter_->second).setUniform("Ks", 0.9f, 0.9f, 0.9f);
-    (current_program_iter_->second).setUniform("Ka", 0.1f, 0.1f, 0.1f);
-    (current_program_iter_->second).setUniform("Shininess", 10.0f);
+    lights_positional_.push_back(LightPositional(light_ring_center, light_intensity));
 }
 
 
@@ -421,6 +420,11 @@ void GLSceneMultipleLights::cleanup(void)
     }
 
     for (MeshInstanceMap::iterator iter = mesh_instance_map_.begin(); iter != mesh_instance_map_.end(); ++iter)
+    {
+    	delete iter->second;
+    }
+
+    for (MaterialMap::const_iterator iter = material_map_.begin(); iter != material_map_.end(); ++iter)
     {
     	delete iter->second;
     }

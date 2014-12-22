@@ -61,14 +61,13 @@ class GLSceneMultipleLights : public GLScene
         void initializeCameras();
         void initializeLights();
 
-        void loadMaterial(void) const;
         void loadLights(void) const;
 
     private:
         MeshMap 			mesh_map_;
         MeshInstanceMap 	mesh_instance_map_;
         NodeMap				node_map_;
-        MaterialMap			material_map;
+        MaterialMap			material_map_;
 
         CameraThirdPerson* tp_camera_;
         CameraInterface* camera_;

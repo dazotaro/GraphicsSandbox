@@ -269,6 +269,7 @@ void GLSceneLighting::render(void)
     glm::mat4 V(tp_camera_->getViewMatrix());
     // Perspective Matrix
     glm::mat4 P(tp_camera_->getPerspectiveMatrix());
+
     // Draw each object
     for (NodeMapIterator iter = node_map_.begin(); iter != node_map_.end(); ++iter)
     {

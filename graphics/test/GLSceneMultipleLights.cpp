@@ -67,7 +67,7 @@ void GLSceneMultipleLights::initializePrograms()
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
     glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
 
-    current_program_iter_ = glsl_program_map_.find("perfragment_texture");
+    current_program_iter_ = glsl_program_map_.find("perfragment");
 }
 
 

@@ -13,11 +13,15 @@ struct LightInfo
 
 uniform LightInfo Light;
 
-uniform vec3 Kd;            // Diffuse reflectivity
-uniform vec3 Ka;            // Ambient reflectivity
-uniform vec3 Ks;            // Specular reflectivity
-uniform float shininess;    // Specular shininess factor
+struct Material
+{
+	vec3 Kd;            // Diffuse reflectivity
+	vec3 Ka;            // Ambient reflectivity
+	vec3 Ks;            // Specular reflectivity
+	float shininess;    // Specular shininess factor
+};
 
+uniform Material material;
 uniform sampler2D ColorTex0;
 
 layout( location = 0 ) out vec4 FragColor;
@@ -36,7 +40,8 @@ vec3 ads(vec4 position, vec3 norm)
     vec3 diffuse = I * Kad.rgb * max(sDotN, 0.0);
     
     float rDotV = dot(r, v);
-    vec3 specular = I * Ks * pow(max(rDotV, 0.0), shininess);
+    //vec3 specular = I * material.Ks * pow(max(rDotV, 0.0), material.shininess);
+    vec3 specular = I * Kad.rgb * pow(max(rDotV, 0.0), material.shininess);
 
     //return I * (Ka + Kd * max(dot(s, norm), 0.0) + Ks * pow(max(dot(r,v), 0.0), Shininess));
     return ambient + diffuse + specular;

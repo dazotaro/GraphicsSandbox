@@ -18,6 +18,7 @@
 #include "DebugGlm.hpp"                     // overloaded operator<< for glm types
 #include "TextureManager.hpp"               // bindTexture
 #include "Material.hpp"						// Material
+#include "GLSLProgramExt.hpp"				// extended setUniform helper functions
 
 
 /**
@@ -149,10 +150,7 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
 
     if (material_)
     {
-    	program.setUniform("Ka", material_->ka_);
-    	program.setUniform("Kd", material_->kd_);
-    	program.setUniform("Ks", material_->ks_);
-    	program.setUniform("shininess", material_->shininess_);
+    	GLSLProgramExt::setUniform(program, *material_);
     }
 
     // Bind all COLOR TEXTURES

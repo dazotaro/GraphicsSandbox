@@ -7,10 +7,15 @@ struct LightInfo {
 
 uniform LightInfo Light;
 
-uniform vec3 Kd;            // Diffuse reflectivity
-uniform vec3 Ka;            // Ambient reflectivity
-uniform vec3 Ks;            // Specular reflectivity
-uniform float shininess;    // Specular shininess factor
+struct Material
+{
+	vec3 Kd;            // Diffuse reflectivity
+	vec3 Ka;            // Ambient reflectivity
+	vec3 Ks;            // Specular reflectivity
+	float shininess;    // Specular shininess factor
+};
+
+uniform Material material;
 
 uniform sampler2DShadow shadow_map;
 
@@ -30,10 +35,10 @@ vec3 phongModelDiffAndSpec()
     vec3 v = normalize(-Position.xyz);
     vec3 r = reflect( -s, n );
     float sDotN = max( dot(s,n), 0.0 );
-    vec3 diffuse = Light.Intensity * Kd * sDotN;
+    vec3 diffuse = Light.Intensity * material.Kd * sDotN;
     vec3 spec = vec3(0.0);
     if( sDotN > 0.0 )
-        spec = Light.Intensity * Ks * pow( max( dot(r,v), 0.0 ), shininess );
+        spec = Light.Intensity * material.Ks * pow( max( dot(r,v), 0.0 ), material.shininess );
 
     return diffuse + spec;
 }
@@ -44,7 +49,7 @@ subroutine uniform RenderPassType RenderPass;
 subroutine (RenderPassType)
 void shadeWithShadow()
 {
-    vec3 ambient = Light.Intensity * Ka;
+    vec3 ambient = Light.Intensity * material.Ka;
     vec3 diffAndSpec = phongModelDiffAndSpec();
     
     float shadow = 0.0;

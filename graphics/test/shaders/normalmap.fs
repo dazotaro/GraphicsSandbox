@@ -19,16 +19,21 @@ struct LightInfo
 
 uniform LightInfo Light;
 
-uniform vec3 Kd;            // Diffuse reflectivity
-uniform vec3 Ka;            // Ambient reflectivity
-uniform vec3 Ks;            // Specular reflectivity
-uniform float Shininess;    // Specular shininess factor
+struct Material
+{
+	vec3 Kd;            // Diffuse reflectivity
+	vec3 Ka;            // Ambient reflectivity
+	vec3 Ks;            // Specular reflectivity
+	float shininess;    // Specular shininess factor
+};
+
+uniform Material material;
 
 layout( location = 0 ) out vec4 FragColor;
 
 vec3 phongModel(vec3 norm, vec3 diffR)
 {
-    vec3 ambient = Light.Intensity * Ka * diffR;
+    vec3 ambient = Light.Intensity * 0.2f * diffR;
 
     float sDotN = max( dot(LightDir_tangent, norm), 0.0 );
     vec3 diffuse = Light.Intensity * diffR * sDotN;
@@ -39,7 +44,7 @@ vec3 phongModel(vec3 norm, vec3 diffR)
     {
         vec3 r = reflect(-LightDir_tangent, norm );
         rDotV = max(dot(r, ViewDir_tangent), 0.0);
-        spec = Light.Intensity * Ks * pow(max(dot(r,ViewDir_tangent), 0.0), Shininess);
+        spec = Light.Intensity * material.Ks * pow(max(dot(r,ViewDir_tangent), 0.0), material.shininess);
     }
 
     return ambient + diffuse;// + spec;

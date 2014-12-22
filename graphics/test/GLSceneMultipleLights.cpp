@@ -17,6 +17,7 @@
 #include "TextureManager.hpp"       // loadTexture()
 #include "Material.hpp"             // MaterialManager
 #include "DebugGlm.hpp"             // debug::print
+#include "GLSLProgramExt.hpp"		// GLSLProgramExt::setUniform
 
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
@@ -63,11 +64,11 @@ void GLSceneMultipleLights::init(void)
 
 void GLSceneMultipleLights::initializePrograms()
 {
-    //glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vert", "shaders/multilight.frag");
+    glsl_program_map_["multilight"]  = compileAndLinkShader("shaders/multilight.vs", "shaders/multilight.fs");
     glsl_program_map_["perfragment"] = compileAndLinkShader("shaders/perfrag.vs", "shaders/perfrag.fs");
     glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
 
-    current_program_iter_ = glsl_program_map_.find("perfragment");
+    current_program_iter_ = glsl_program_map_.find("multilight");
 }
 
 
@@ -175,8 +176,11 @@ void GLSceneMultipleLights::initializeCameras()
 
 void GLSceneMultipleLights::initializeLights()
 {
+	JU::uint8 num_lights = 4;
+	JU::f32 radius = 10.0f;
+
     glm::vec3 light_ring_center (0.0f, 20.0f, 0.0f);
-    glm::vec3 light_intensity (0.3f, 0.3f, 0.3f);
+    glm::vec3 light_intensity (0.5f, 0.5f, 0.5f);
     // Create instance of GLMEsh (there could be more than one)
     GLMeshInstance* pmesh_instance = new GLMeshInstance(mesh_map_["sphere_64_32"],		// mesh
     													0.5f, 0.5f, 0.5f,				// scale
@@ -186,25 +190,53 @@ void GLSceneMultipleLights::initializeLights()
     mesh_instance_map_["light_sphere"] = pmesh_instance;
 
 
-    Object3D ring_center(light_ring_center,
-                         	  glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
-							  glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
-							  glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
-    NodePointerList light_children;
-    Node3D *pnode = new Node3D(ring_center, pmesh_instance, true);
+    for (JU::uint8 index = 0; index < num_lights; ++index)
+    {
+    	JU::f32 z = radius * cosf(index * 2.0f * M_PI / num_lights);
+    	JU::f32 x = radius * sinf(index * 2.0f * M_PI / num_lights);
+        Object3D light_pos(glm::vec3(x, 20.f, z),
+                           glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
+    					   glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
+    					   glm::vec3(0.0f, 0.0f,  1.0f));// Model's Z axis
 
-    node_map_["light"] = pnode;
+        Node3D *pnode = new Node3D(light_pos, pmesh_instance, true);
 
-    lights_positional_.push_back(LightPositional(light_ring_center, light_intensity));
+        node_map_[std::string("light_pos") + std::to_string(index)] = pnode;
+
+        lights_positional_.push_back(LightPositional(glm::vec3(x, 20.f, z), light_intensity));
+    }
+
 }
 
 
 
 void GLSceneMultipleLights::loadLights(void) const
 {
+	glm::mat4 view_matrix = tp_camera_->getViewMatrix();
+
     // WARNING: The shader expects the light position in eye coordinates
-	(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
-    (current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
+	//(current_program_iter_->second).setUniform("Light.Position",  tp_camera_->getViewMatrix() * glm::vec4(lights_positional_[0].position_,1.0f));
+    //(current_program_iter_->second).setUniform("Light.Intensity", lights_positional_[0].intensity_);
+
+	LightPositionalVector eye_lights;
+	eye_lights.reserve(lights_positional_.size());
+    JU::uint32 index = 0;
+    for (LightPositionalVector::const_iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
+    {
+    	glm::vec4 eye_position = view_matrix * glm::vec4(light->position_, 1.0f);
+    	eye_lights.push_back(LightPositional(glm::vec3(eye_position), light->intensity_));
+        /*
+    	eye_lights[index].position_.x = eye_position.x;
+        eye_lights[index].position_.y = eye_position.y;
+        eye_lights[index].position_.z = eye_position.z;
+        eye_lights[index].intensity_ = light->intensity_;
+        */
+
+        ++index;
+    }
+
+    GLSLProgramExt::setUniform(current_program_iter_->second, eye_lights);
+
 }
 
 
@@ -237,6 +269,7 @@ void GLSceneMultipleLights::update(float time)
     static const float angle_speed = (2.0 * M_PI * 0.1f) * 0.001f ; // 10 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+    JU::uint32 index = 0;
     for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
@@ -244,7 +277,9 @@ void GLSceneMultipleLights::update(float time)
         light->position_.y = position.y;
         light->position_.z = position.z;
 
-        node_map_["light"]->setPosition(light->position_);
+        node_map_[std::string("light_pos") + std::to_string(index)]->setPosition(light->position_);
+
+        ++index;
     }
 }
 

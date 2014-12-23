@@ -87,10 +87,19 @@ typedef LightSpotlightMap::const_iterator                 LightSpotlightMapConst
 typedef LightSpotlightMap::iterator                       LightSpotlightMapIterator;
 
 
-/*
 class LightManager
 {
     public:
+		// ENUMERATION DEFINITIONS
+		enum LightType
+		{
+			POSITIONAL,
+			DIRECTIONAL,
+			SPOTLIGHT,
+		};
+
+
+/*
         ~LightManager();
 
     public:
@@ -107,8 +116,8 @@ class LightManager
         LightPositionalMap  mPositional_;
         LightDirectionalMap mDirectional_;
         LightSpotlightMap   mSpotlight_;
+        */
 };
-*/
 
 
 #endif /* LIGHTS_HPP_ */

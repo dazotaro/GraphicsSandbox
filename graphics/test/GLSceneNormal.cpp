@@ -409,7 +409,7 @@ void GLSceneNormal::mouseMotion(int x, int y)
 	camera_controller_.mouseMotion(x, y);
 }
 
-void GLSceneNormal::cleanup(void)
+void GLSceneNormal::clear(void)
 {
     delete gl_plane_instance_;
     delete gl_plane_;

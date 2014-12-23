@@ -41,7 +41,7 @@ class GLScene
         const char* getGLSLCurrentProgramString() const;
 
     protected:
-        virtual void cleanup(void) = 0;
+        virtual void clear(void) = 0;
         GLSLProgram compileAndLinkShader(const char* vertex, const char* fragment);
         GLSLProgram compileAndLinkShader(const char* vertex, const char* geometry, const char* fragment);
 

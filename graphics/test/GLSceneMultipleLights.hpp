@@ -52,7 +52,7 @@ class GLSceneMultipleLights : public GLScene
         void resize(int width, int height);
 
     private:
-        void cleanup(void);
+        void clear(void);
 
         void initializePrograms();
         void initializeMaterials();

@@ -207,7 +207,7 @@ void GLSceneParticles::mouseMotion(int x, int y)
 
 
 
-void GLSceneParticles::cleanup(void)
+void GLSceneParticles::clear(void)
 {
     delete camera_gps_;
     delete camera_target_;

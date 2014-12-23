@@ -762,7 +762,7 @@ void GLSceneShadow::mouseMotion(int x, int y)
 	camera_controller_.mouseMotion(x, y);
 }
 
-void GLSceneShadow::cleanup(void)
+void GLSceneShadow::clear(void)
 {
 	for (MeshMapIterator iter = mesh_map_.begin(); iter != mesh_map_.end(); ++iter)
 		delete iter->second;

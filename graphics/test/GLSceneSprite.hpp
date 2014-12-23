@@ -36,7 +36,7 @@ class GLSceneSprite : public GLScene
         void resize(int width, int height);
 
     private:
-        void cleanup(void);
+        void clear(void);
 
     private:
         GLMesh*          gl_plane_;

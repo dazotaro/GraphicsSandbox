@@ -405,7 +405,7 @@ void GLSceneLighting::mouseMotion(int x, int y)
 
 
 
-void GLSceneLighting::cleanup(void)
+void GLSceneLighting::clear(void)
 {
     delete gl_sphere_;
     delete gl_sphere_instance_;

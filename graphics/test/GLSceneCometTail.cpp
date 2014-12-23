@@ -219,7 +219,7 @@ void GLSceneCometTail::mouseMotion(int x, int y)
 
 
 
-void GLSceneCometTail::cleanup(void)
+void GLSceneCometTail::clear(void)
 {
     delete camera_gps_;
     delete camera_target_;

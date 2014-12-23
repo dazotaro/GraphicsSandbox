@@ -217,7 +217,7 @@ void GLSceneSprite::mouseClick(int button, int state, int x, int y)
 
 }
 
-void GLSceneSprite::cleanup(void)
+void GLSceneSprite::clear(void)
 {
     delete gl_plane_instance_;
     delete gl_plane_;

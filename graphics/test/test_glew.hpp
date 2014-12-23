@@ -219,7 +219,7 @@ void init(void)
     //camera = new CameraThirdPerson(CameraIntrinsic(90.f, WIDTH/(float)HEIGHT, 1.f, 1000.f), dynamic_cast<Object3D *>(cube_node));
 }
 
-void cleanup(void)
+void clear(void)
 {
     delete gl_cube_instance;
     delete gl_cube;
@@ -274,7 +274,7 @@ int main(int argc, char** argv)
     glutMainLoop();
 
     // Delete dynamically memory
-    cleanup();
+    clear();
     
     return 0;
 }

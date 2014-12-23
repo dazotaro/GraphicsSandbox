@@ -161,7 +161,7 @@ static void init(void)
 	#endif
 }
 
-static void cleanup(void)
+static void clear(void)
 {
     delete scene;
 }
@@ -217,7 +217,7 @@ int main(int argc, char** argv)
     glutMainLoop();
 
     // Delete dynamically memory
-    cleanup();
+    clear();
     
     return 0;
 }

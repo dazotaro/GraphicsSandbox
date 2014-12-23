@@ -53,7 +53,7 @@ class GLSceneParticles : public GLScene
         void resize(int width, int height);
 
     private:
-        void cleanup(void);
+        void clear(void);
 
     private:
         Object3D*        camera_gps_;

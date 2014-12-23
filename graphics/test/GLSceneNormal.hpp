@@ -48,7 +48,7 @@ class GLSceneNormal : public GLScene
         void resize(int width, int height);
 
     private:
-        void cleanup(void);
+        void clear(void);
         void loadMaterial(void) const;
         void loadLights(void) const;
 

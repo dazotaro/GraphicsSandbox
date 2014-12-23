@@ -45,7 +45,7 @@ class GLSceneCometTail : public GLScene
         void resize(int width, int height);
 
     private:
-        void cleanup(void);
+        void clear(void);
 
     private:
         // Comet tail particle system variables

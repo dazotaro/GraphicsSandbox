@@ -65,7 +65,7 @@ class GLSceneShadow : public GLScene
         void renderPerfragmentLighting(void) const;
         void renderShadow(void) const;
         void drawScene(const CameraInterface* camera) const;
-        void cleanup(void);
+        void clear(void);
         void loadLights(void) const;
         void spitOutDepthBuffer() const;
 

@@ -377,21 +377,21 @@ void GLSceneMultipleLights::keyboard(unsigned char key, int x, int y)
             case 'l':
 				if (num_pos_lights_ < MAX_POS_LIGHTS)
 					++num_pos_lights_;
-				cleanup();
+				clear();
             	init();
             	break;
 
             case 'L':
             	if (num_pos_lights_ > 0)
             		--num_pos_lights_;
-            	cleanup();
+            	clear();
             	init();
             	break;
 
             // RELOAD
 			case 'r':
 			case 'R':
-				cleanup();
+				clear();
 				init();
 				break;
 
@@ -414,7 +414,7 @@ void GLSceneMultipleLights::mouseMotion(int x, int y)
 
 
 
-void GLSceneMultipleLights::cleanup(void)
+void GLSceneMultipleLights::clear(void)
 {
     delete tp_camera_;
 

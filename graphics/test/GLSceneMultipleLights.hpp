@@ -44,7 +44,7 @@ class GLSceneMultipleLights : public GLScene
         virtual ~GLSceneMultipleLights();
 
         void init(void);
-        void update(float time);
+        void update(JU::f32 time);
         void render(void);
         void keyboard(unsigned char key, int x, int y);
         void mouseClick(int button, int state, int x, int y);
@@ -60,6 +60,9 @@ class GLSceneMultipleLights : public GLScene
         void initializeObjects();
         void initializeCameras();
         void initializeLights();
+
+        void updateCamera(JU::f32 time);
+        void updateLights(JU::f32 time);
 
         void loadLights(void) const;
 

@@ -166,7 +166,7 @@ void GLSceneMultipleLights::initializeObjects()
 
 void GLSceneMultipleLights::initializeCameras()
 {
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(JU::f32)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*node_map_["sphere"]),
     								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
@@ -241,14 +241,9 @@ void GLSceneMultipleLights::loadLights(void) const
 
 
 
-/**
-* @brief Update everything that needs to be updated in the scene
-*
-* @param time Time elapsed since the last update (in milliseconds)
-*/
-void GLSceneMultipleLights::update(float time)
+void GLSceneMultipleLights::updateCamera(JU::f32 time)
 {
-    float radius_delta, angle;
+    JU::f32 radius_delta, angle;
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
 
@@ -265,8 +260,14 @@ void GLSceneMultipleLights::update(float time)
         node_map_["sphere"]->rotate(glm::degrees(angle), axis);
     }
 
+}
+
+
+
+void GLSceneMultipleLights::updateLights(JU::f32 time)
+{
 	// LIGHTS: update position
-    static const float angle_speed = (2.0 * M_PI * 0.1f) * 0.001f ; // 10 seconds to complete a revolution
+    static const JU::f32 angle_speed = (2.0 * M_PI * 0.1f) * 0.001f ; // 10 seconds to complete a revolution
 
     glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
     JU::uint32 index = 0;
@@ -281,6 +282,20 @@ void GLSceneMultipleLights::update(float time)
 
         ++index;
     }
+}
+
+
+
+
+/**
+* @brief Update everything that needs to be updated in the scene
+*
+* @param time Time elapsed since the last update (in milliseconds)
+*/
+void GLSceneMultipleLights::update(JU::f32 time)
+{
+	updateCamera(time);
+	updateLights(time);
 }
 
 
@@ -328,7 +343,7 @@ void GLSceneMultipleLights::render(void)
 void GLSceneMultipleLights::resize(int width, int height)
 {
     GLScene::resize(width, height);
-    camera_->setAspectRatio(static_cast<float>(width)/height);
+    camera_->setAspectRatio(static_cast<JU::f32>(width)/height);
     camera_controller_.windowResize(width, height);
 }
 

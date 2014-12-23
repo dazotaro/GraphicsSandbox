@@ -377,22 +377,19 @@ void GLSceneMultipleLights::keyboard(unsigned char key, int x, int y)
             case 'l':
 				if (num_pos_lights_ < MAX_POS_LIGHTS)
 					++num_pos_lights_;
-				clear();
-            	init();
+				reload();
             	break;
 
             case 'L':
             	if (num_pos_lights_ > 0)
             		--num_pos_lights_;
-            	clear();
-            	init();
+            	reload();
             	break;
 
             // RELOAD
 			case 'r':
 			case 'R':
-				clear();
-				init();
+				reload();
 				break;
 
     }
@@ -410,6 +407,14 @@ void GLSceneMultipleLights::mouseClick(int button, int state, int x, int y)
 void GLSceneMultipleLights::mouseMotion(int x, int y)
 {
 	camera_controller_.mouseMotion(x, y);
+}
+
+
+
+void GLSceneMultipleLights::reload()
+{
+	clear();
+	init();
 }
 
 

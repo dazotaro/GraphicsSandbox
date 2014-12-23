@@ -6,8 +6,6 @@
  */
 
 // Local includes
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include "GLSceneShadow.hpp"      // GLSceneShadow
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
@@ -17,13 +15,14 @@
 #include "CameraThirdPerson.hpp"    // camera_FirstPerson
 #include "ShapeHelper2.hpp"          // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
-#include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
 #include "DebugGlm.hpp"				// operator<<
-#include <SOIL.h>                   // SOIL_save_image
 #include "Material.hpp"				// MaterialManager
 
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
+#include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
+#include <SOIL.h>                   // SOIL_save_image
+#include <math.h>					// M_PI
 
 
 
@@ -72,43 +71,37 @@ void GLSceneShadow::initializeMeshes()
     // ------
     Mesh2 mesh;
     GLMesh* pGlMesh;
-    // Plane
-    // -----
+
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
     pGlMesh->init();
     mesh_map_["plane"] = pGlMesh;
-    // Cube
-    // -----
+
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::CUBE);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
     pGlMesh->init();
     mesh_map_["cube"] = pGlMesh;
-    // Cylinder
-    // -----
+
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::CYLINDER, 64);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
     pGlMesh->init();
     mesh_map_["cylinder"] = pGlMesh;
-    // Cube
-    // -----
+
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::CONE, 64);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
     pGlMesh->init();
     mesh_map_["cone"] = pGlMesh;
-    // Cube
-    // -----
+
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 64);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
     pGlMesh->init();
     mesh_map_["sphere"] = pGlMesh;
-    // Cube
-    // -----
+
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 64, 64);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
@@ -125,7 +118,7 @@ void GLSceneShadow::initializeCameras()
 {
 	tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*node_map_["main"]),
-    								   10.0f, 0.0f, M_PI / 2.0f);
+    								   15.0f, 0.0f, M_PI / 4.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 }
 
@@ -188,7 +181,7 @@ void GLSceneShadow::initializeObjects()
     }
     mesh_instance = new GLMeshInstance;
     mesh_instance->setMesh(mesh_map_["plane"]);
-    mesh_instance->setScale(50.0f, 50.0f, 5.0f);
+    mesh_instance->setScale(100.0f, 100.0f, 2.0f);
     mesh_instance->setMaterial(&material);
     mesh_instance_map_["plane"] = mesh_instance;
 
@@ -196,13 +189,14 @@ void GLSceneShadow::initializeObjects()
     // LIGHT SPHERE
     mesh_instance = new GLMeshInstance;
     mesh_instance->setMesh(mesh_map_["sphere"]);
-    mesh_instance->setScale(1.0f, 1.0f, 1.0f);
+    mesh_instance->setScale(0.5f, 0.5f, 0.5f);
     TextureManager::loadTexture("light", "texture/light_texture.tga");
     mesh_instance->addColorTexture("light");
     mesh_instance_map_["light"] = mesh_instance;
 
     // NODES
     // ----------------------------------------------------------------
+    Node3D* pnode = 0;
     // Main
     // ----
     // Give the sphere a position and a orientation
@@ -210,20 +204,56 @@ void GLSceneShadow::initializeObjects()
                     glm::vec3(1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3(0.0f,  0.0f, -1.0f), // Model's Y axis
                     glm::vec3(0.0f,  1.0f,  0.0f));// Model's Z axis
-    Node3D* main_node = new Node3D(main, mesh_instance_map_["main"], true);
+    pnode = new Node3D(main, mesh_instance_map_["main"], true);
+    node_map_["main"] = pnode;
 
-    node_map_["main"] = main_node;
+    // Columns
+    // ---------
+    glm::vec3 ring_center (0.0f, 0.0f, 0.0f);
+    JU::f32 radius = 20.0f;
+    JU::uint32 num_columns = 10;
+    JU::f32 min_height = 5.0f , max_height = 30.0f;
+    JU::f32 height_delta = (max_height - min_height) / num_columns;
+    JU::f32 height = min_height;
+    std::string instance_prefix("cylinder_5_2_");
+    JU::f32 angle_delta = 2 * M_PI / num_columns;
+    JU::f32 angle = 0.0f;
+    for (JU::uint32 index = 0; index < num_columns; ++index)
+    {
+        // CYLINDER
+        // --------
+    	JU::f32 scale_y =  height;
+        mesh_instance = new GLMeshInstance;
+        mesh_instance->setMesh(mesh_map_["cylinder"]);
+        mesh_instance->setScale(5.0f, 2.0f, scale_y);
+        mesh_instance->setMaterial(&material);
+        mesh_instance_map_[instance_prefix + std::to_string(height)] = mesh_instance;
+
+        glm::vec3 position(radius * cosf(angle),
+        				   ring_center.y + scale_y * 0.5f,
+						   radius * sinf(angle));
+
+		// Give the sphere a position and a orientation
+		Object3D column_object (position, // Model's position
+								glm::vec3( 1.0f,  0.0f,  0.0f), // Model's X axis
+								glm::vec3( 0.0f,  0.0f, -1.0f), // Model's Y axis
+								glm::vec3( 0.0f,  1.0f,  0.0f));// Model's Z axis
+		pnode = new Node3D(column_object, mesh_instance, true);
+		node_map_[std::string("column") + std::to_string(index)] = pnode;
+
+		height += height_delta;
+		angle  += angle_delta;
+    }
 
     // Torus
     // ----
     // Give the sphere a position and a orientation
-    Object3D torus (glm::vec3( 5.0f, 20.0f,  0.0f), // Model's position
+    Object3D torus (glm::vec3( 5.0f, 10.0f,  0.0f), // Model's position
                     glm::vec3( 1.0f,  0.0f,  0.0f), // Model's X axis
-                    glm::vec3( 0.0f,  0.0f, -1.0f), // Model's Y axis
-                    glm::vec3( 0.0f,  1.0f,  0.0f));// Model's Z axis
-    Node3D* torus_node = new Node3D(torus, mesh_instance_map_["torus"], true);
-
-    node_map_["torus"] = torus_node;
+                    glm::vec3( 0.0f,  1.0f,  0.0f), // Model's Y axis
+                    glm::vec3( 0.0f,  0.0f,  1.0f));// Model's Z axis
+    pnode = new Node3D(torus, mesh_instance_map_["torus"], true);
+    node_map_["torus"] = pnode;
 
     // Plane
     // -----
@@ -232,10 +262,8 @@ void GLSceneShadow::initializeObjects()
                    glm::vec3(1.0f, 0.0f, 0.0f), // Model's X axis
                    glm::vec3(0.0f, 0.0f,-1.0f), // Model's Y axis
                    glm::vec3(0.0f, 1.0f, 0.0f));// Model's Z axis
-    Node3D* plane_node = new Node3D(plane, mesh_instance_map_["plane"], true);
-
-	node_map_["plane"] = plane_node;
-
+    pnode = new Node3D(plane, mesh_instance_map_["plane"], true);
+	node_map_["plane"] = pnode;
 }
 
 
@@ -248,7 +276,7 @@ void GLSceneShadow::initializeShadowMap()
     // Light
     // -----
     // LIGHT FRUSTUM
-    glm::vec3 frustum_position (10.0f, 30.0f, 0.0f);
+    glm::vec3 frustum_position (20.0f, 25.0f, 0.0f);
     glm::vec3 frustum_z = glm::normalize(frustum_position);
     glm::vec3 frustum_x = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), frustum_z));
     glm::vec3 frustum_y = glm::normalize(glm::cross(frustum_z, frustum_x));
@@ -429,7 +457,7 @@ void GLSceneShadow::update(float time)
         main_iter->second->rotate(glm::degrees(angle), axis);
     }
 
-	static float delta_theta = M_PI * 0.02f * 0.001f; // radians/millisecond
+	static float delta_theta = M_PI * 0.05f * 0.001f; // radians/millisecond
 	glm::vec4 light_position (light_frustum_->getPosition(), 1.0f);
 	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), delta_theta * time, glm::vec3(0.0f, 1.0f, 0.0f));
 	light_position = rotation * light_position;

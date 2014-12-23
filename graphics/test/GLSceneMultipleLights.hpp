@@ -30,7 +30,7 @@ class Material;
 class GLSceneMultipleLights : public GLScene
 {
     public:
-        static const int MAX_LIGHTS = 8;
+        static const int MAX_POS_LIGHTS = 20;
 
         // TYPEDEFS
         typedef std::map<std::string, Node3D *> 		NodeMap;
@@ -76,12 +76,14 @@ class GLSceneMultipleLights : public GLScene
         CameraInterface* camera_;
 
         bool control_camera_;
+        ArcBallController camera_controller_;
 
+        // LIGHT MANAGEMENT
+        // ----------------
+        JU::int32			   num_pos_lights_;
         LightPositionalVector  lights_positional_;
         LightDirectionalVector lights_directional_;
         LightSpotlightVector   lights_spotlight_;
-
-        ArcBallController camera_controller_;
 };
 
 #endif /* GLSCENEMULTIPLELIGHTS_HPP_ */

@@ -26,7 +26,8 @@
 
 
 GLSceneMultipleLights::GLSceneMultipleLights(int width, int height) : GLScene(width, height),
-									 camera_(0), control_camera_(true), camera_controller_(width, height, 0.2f)
+									 camera_(0), control_camera_(true), camera_controller_(width, height, 0.2f),
+									 num_pos_lights_(1)
 {
 }
 
@@ -168,7 +169,7 @@ void GLSceneMultipleLights::initializeCameras()
 {
     tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(JU::f32)height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*node_map_["sphere"]),
-    								   10.0f, 0.0f, M_PI / 2.0f);
+    								   15.0f, 0.0f, M_PI / 4.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
 }
 
@@ -176,11 +177,11 @@ void GLSceneMultipleLights::initializeCameras()
 
 void GLSceneMultipleLights::initializeLights()
 {
-	JU::uint8 num_lights = 4;
 	JU::f32 radius = 10.0f;
+	JU::f32 channel_intensity = 1.0f / num_pos_lights_;
 
     glm::vec3 light_ring_center (0.0f, 20.0f, 0.0f);
-    glm::vec3 light_intensity (0.5f, 0.5f, 0.5f);
+    glm::vec3 light_intensity (channel_intensity);
     // Create instance of GLMEsh (there could be more than one)
     GLMeshInstance* pmesh_instance = new GLMeshInstance(mesh_map_["sphere_64_32"],		// mesh
     													0.5f, 0.5f, 0.5f,				// scale
@@ -189,11 +190,14 @@ void GLSceneMultipleLights::initializeLights()
     //pmesh_instance->addColorTexture("light");
     mesh_instance_map_["light_sphere"] = pmesh_instance;
 
+    lights_positional_.resize(num_pos_lights_, LightPositional(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
 
-    for (JU::uint8 index = 0; index < num_lights; ++index)
+	JU::f32 angle_delta = 2.0f * M_PI / num_pos_lights_;
+    for (JU::uint8 index = 0; index < num_pos_lights_; ++index)
     {
-    	JU::f32 z = radius * cosf(index * 2.0f * M_PI / num_lights);
-    	JU::f32 x = radius * sinf(index * 2.0f * M_PI / num_lights);
+    	JU::f32 angle = index * angle_delta;
+    	JU::f32 z = radius * cosf(angle);
+    	JU::f32 x = radius * sinf(angle);
         Object3D light_pos(glm::vec3(x, 20.f, z),
                            glm::vec3(1.0f, 0.0f,  0.0f), // Model's X axis
     					   glm::vec3(0.0f, 1.0f,  0.0f), // Model's Y axis
@@ -203,9 +207,8 @@ void GLSceneMultipleLights::initializeLights()
 
         node_map_[std::string("light_pos") + std::to_string(index)] = pnode;
 
-        lights_positional_.push_back(LightPositional(glm::vec3(x, 20.f, z), light_intensity));
+        lights_positional_[index] = (LightPositional(glm::vec3(x, 20.f, z), light_intensity));
     }
-
 }
 
 
@@ -370,77 +373,28 @@ void GLSceneMultipleLights::keyboard(unsigned char key, int x, int y)
             control_camera_ = !control_camera_;
             break;
 
-        case 'a':
-        case 'A':
-            node_map_["cubes"]->rotateX(-1.0f);
-            break;
+    		// RELOAD
+            case 'l':
+				if (num_pos_lights_ < MAX_POS_LIGHTS)
+					++num_pos_lights_;
+				cleanup();
+            	init();
+            	break;
 
-        case 'd':
-        case 'D':
-            node_map_["cubes"]->rotateX(1.0f);
-            break;
+            case 'L':
+            	if (num_pos_lights_ > 0)
+            		--num_pos_lights_;
+            	cleanup();
+            	init();
+            	break;
 
-        case 'q':
-        case 'Q':
-            node_map_["cubes"]->rotateY(1.0f);
-            break;
+            // RELOAD
+			case 'r':
+			case 'R':
+				cleanup();
+				init();
+				break;
 
-        case 'e':
-        case 'E':
-            node_map_["cubes"]->rotateY(-1.0f);
-            break;
-
-        case 'w':
-        case 'W':
-            node_map_["cubes"]->rotateZ(-1.0f);
-            break;
-
-        case 's':
-        case 'S':
-            node_map_["cubes"]->rotateZ(1.0f);
-            break;
-
-        /*
-        case 'k':
-        case 'K':
-            fp_camera_->rotateY(1.0f);  // Yaw
-            break;
-
-        case ';':
-        case ':':
-            fp_camera_->rotateY(-1.0f);  // Yaw
-            break;
-
-        case 'i':
-        case 'I':
-            fp_camera_->rotateZ(1.0f);  // Roll
-            break;
-
-        case 'p':
-        case 'P':
-            fp_camera_->rotateZ(-1.0f); // Roll
-            break;
-
-        case 'o':
-        case 'O':
-            fp_camera_->rotateX(-1.0f);  // Pitch
-            break;
-
-        case 'l':
-        case 'L':
-            fp_camera_->rotateX(1.0f); // Pitch
-            break;
-
-        case 'u':
-        case 'U':
-            fp_camera_->translate(glm::vec3(0.0f, 0.0f, -0.1f));
-            break;
-
-        case 'j':
-        case 'J':
-            fp_camera_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
-            break;
-        */
     }
 }
 
@@ -464,26 +418,42 @@ void GLSceneMultipleLights::cleanup(void)
 {
     delete tp_camera_;
 
+    // GLSLProgram map
+    glsl_program_map_.clear();
+
+    // GLMesh map
     for (MeshMap::iterator iter = mesh_map_.begin(); iter != mesh_map_.end(); ++iter)
     {
     	delete iter->second;
     }
+    mesh_map_.clear();
 
+    // GLMeshInstance map
     for (MeshInstanceMap::iterator iter = mesh_instance_map_.begin(); iter != mesh_instance_map_.end(); ++iter)
     {
     	delete iter->second;
     }
+    mesh_instance_map_.clear();
 
+    // Material map
     for (MaterialMap::const_iterator iter = material_map_.begin(); iter != material_map_.end(); ++iter)
     {
     	delete iter->second;
     }
+    material_map_.clear();
 
+    // Node Map
     std::map<std::string, Node3D *>::const_iterator iter;
     for (iter = node_map_.begin(); iter != node_map_.end(); ++iter)
     {
         delete iter->second;
     }
+    node_map_.clear();
+
+    // Lights
+    lights_positional_.clear();
+    lights_directional_.clear();
+    lights_spotlight_.clear();
 }
 
 

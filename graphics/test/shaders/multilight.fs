@@ -10,7 +10,7 @@ struct LightPositional
 };
 
 uniform int num_pos_lights;
-uniform LightPositional light_pos[8];
+uniform LightPositional light_pos[20];
 
 struct Material
 {
@@ -38,7 +38,7 @@ vec3 ads(uint index, vec4 position, vec3 norm)
     float rDotV = dot(r, v);
     vec3 specular = light_pos[index].intensity * material.Ks * pow(max(rDotV, 0.0), material.shininess);
 
-    //return ambient + diffuse + specular;
+    //return specular;
     return ambient + diffuse + specular;
     //return glm::vec3(0.2f, 0.2f, 0.2f);
 }

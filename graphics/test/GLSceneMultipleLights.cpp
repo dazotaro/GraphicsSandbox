@@ -121,7 +121,7 @@ void GLSceneMultipleLights::initializeObjects()
 	// ------
 	// MESH
 	Mesh2 mesh;
-	ShapeHelper2::buildMesh(mesh, ShapeHelper2::SPHERE, 64, 32);
+	ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 64, 32);
 	mesh.computeTangents();
 	pmesh = new GLMesh(mesh);
 	// Load the Mesh into VBO and VAO
@@ -260,7 +260,7 @@ void GLSceneMultipleLights::updateCamera(JU::f32 time)
     else
     {
         axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
-        node_map_["sphere"]->rotate(glm::degrees(angle), axis);
+        node_map_["sphere"]->rotate(angle, axis);
     }
 
 }

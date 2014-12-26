@@ -454,7 +454,7 @@ void GLSceneShadow::update(float time)
     else
     {
         axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
-        main_iter->second->rotate(glm::degrees(angle), axis);
+        main_iter->second->rotate(angle, axis);
     }
 
 	static float delta_theta = M_PI * 0.05f * 0.001f; // radians/millisecond

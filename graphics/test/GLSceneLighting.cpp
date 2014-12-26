@@ -224,7 +224,7 @@ void GLSceneLighting::update(float time)
     else
     {
         axis = glm::vec3(tp_camera_->getTransformToParent() * glm::vec4(-axis, 0.0f));
-        node_map_["sphere"]->rotate(glm::degrees(angle), axis);
+        node_map_["sphere"]->rotate(angle, axis);
     }
 
 	// LIGHTS: update position

@@ -59,13 +59,12 @@ struct LightDirectional
  */
 struct LightSpotlight
 {
-    LightSpotlight(glm::vec3 position, glm::vec3 direction, glm::vec3 intensity, float shinniness, float cutoff)
-            : position_(position), direction_(direction), intensity_(intensity), shininess_(shinniness), cutoff_(cutoff) {}
+    LightSpotlight(glm::vec3 position, glm::vec3 direction, glm::vec3 intensity, float cutoff)
+            : position_(position), direction_(direction), intensity_(intensity), cutoff_(cutoff) {}
 
     glm::vec3 position_;
     glm::vec3 direction_;
     glm::vec3 intensity_;
-    float     shininess_;  //!< Shinniness coefficient
     float     cutoff_;      //!< Cutoff angle (between 0 and 90)
 };
 

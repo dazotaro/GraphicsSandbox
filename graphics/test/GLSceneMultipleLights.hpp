@@ -61,30 +61,43 @@ class GLSceneMultipleLights : public GLScene
         void initializeObjects();
         void initializeCameras();
         void initializeLights();
+        void initializePositionalLights();
+        void initializeDirectionalLights();
+        void initializeSpotlightLights();
 
         void updateCamera(JU::f32 time);
+
         void updateLights(JU::f32 time);
+        void updatePositionalLights(JU::f32 time);
+        void updateDirectionalLights(JU::f32 time);
+        void updateSpotlightLights(JU::f32 time);
 
         void loadLights(void) const;
+        void loadPositionalLights(void) const;
+        void loadDirectionalLights(void) const;
+        void loadSpotlightLights(void) const;
 
     private:
+        // ASSET MANAGEMENT
         MeshMap 			mesh_map_;
         MeshInstanceMap 	mesh_instance_map_;
         NodeMap				node_map_;
         MaterialMap			material_map_;
 
+        NodeMap::const_iterator main_node_iter;
+
+        // CAMERA CONTROLS
         CameraThirdPerson* tp_camera_;
         CameraInterface* camera_;
-
         bool control_camera_;
         ArcBallController camera_controller_;
 
         // LIGHT MANAGEMENT
-        // ----------------
-        JU::int32			   num_pos_lights_;
-        LightPositionalVector  lights_positional_;
-        LightDirectionalVector lights_directional_;
-        LightSpotlightVector   lights_spotlight_;
+        LightManager::LightType light_mode_;			//!< Light Mode
+        JU::int32			    num_lights_;			//!< Number of lights (only one type of light active at one time)
+        LightPositionalVector   lights_positional_;		//!< Vector holding all positional lights
+        LightDirectionalVector  lights_directional_;	//!< Vector holding all directional lights
+        LightSpotlightVector    lights_spotlight_;		//!< Vector holding all spotlights
 };
 
 #endif /* GLSCENEMULTIPLELIGHTS_HPP_ */

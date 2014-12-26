@@ -29,7 +29,6 @@ const char* GLSLProgramExt::SPOTLIGHT_ARRAY_PREFIX_STRING   = "light_spot";
 const char* GLSLProgramExt::LIGHT_POSITION_STRING			= "position";
 const char* GLSLProgramExt::LIGHT_DIRECTION_STRING			= "direction";
 const char* GLSLProgramExt::LIGHT_INTENSITY_STRING			= "intensity";
-const char* GLSLProgramExt::LIGHT_SHININESS_STRING			= "shininess";
 const char* GLSLProgramExt::LIGHT_CUTOFF_STRING		 		= "cutoff";
 // Material
 const char* GLSLProgramExt::KA_STRING						= "material.Ka";
@@ -102,7 +101,6 @@ void GLSLProgramExt::setUniform(const GLSLProgram& program, const LightSpotlight
 		    program.setUniform((prefix + std::to_string(counter) + "]." + LIGHT_POSITION_STRING).c_str(),  iter->position_);
 		    program.setUniform((prefix + std::to_string(counter) + "]." + LIGHT_DIRECTION_STRING).c_str(), iter->direction_);
 		    program.setUniform((prefix + std::to_string(counter) + "]." + LIGHT_INTENSITY_STRING).c_str(), iter->intensity_);
-		    program.setUniform((prefix + std::to_string(counter) + "]." + LIGHT_SHININESS_STRING).c_str(), iter->shininess_);
 		    program.setUniform((prefix + std::to_string(counter) + "]." + LIGHT_CUTOFF_STRING).c_str(),    iter->cutoff_);
 
 			++counter;

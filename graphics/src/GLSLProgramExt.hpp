@@ -41,7 +41,6 @@ class GLSLProgramExt
 		static const char* LIGHT_POSITION_STRING;
 		static const char* LIGHT_DIRECTION_STRING;
 		static const char* LIGHT_INTENSITY_STRING;
-		static const char* LIGHT_SHININESS_STRING;
 		static const char* LIGHT_CUTOFF_STRING;
 		// Material
 		static const char* KA_STRING;

@@ -72,15 +72,29 @@ void GLSceneDeferred::initializePrograms()
     glsl_program_map_["deferred"]  = compileAndLinkShader("shaders/deferred.vs", "shaders/deferred.fs");
 
     current_program_iter_ = glsl_program_map_.find("deferred");
+    current_program_iter_->second.use();
 
     // Set up the subroutine indexes
     GLuint programHandle = current_program_iter_ ->second.getHandle();
     pass1Index_ = glGetSubroutineIndex( programHandle, GL_FRAGMENT_SHADER, "pass1");
     pass2Index_ = glGetSubroutineIndex( programHandle, GL_FRAGMENT_SHADER, "pass2");
 
-    current_program_iter_ ->second.setUniform("PositionTex", 0);
-    current_program_iter_ ->second.setUniform("NormalTex", 1);
-    current_program_iter_ ->second.setUniform("ColorTex", 2);
+    GLint values;
+    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &values);
+    std::printf("GL_ACTIVE_SUBROUTINE_UNIFORMS %i\n", values);
+    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS, &values);
+    std::printf("GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS %i\n", values);
+    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINES, &values);
+    std::printf("GL_ACTIVE_SUBROUTINES %i\n", values);
+    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &values);
+    std::printf("GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTHS %i\n", values);
+    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_MAX_LENGTH, &values);
+    std::printf("GL_ACTIVE_SUBROUTINE_MAX_LENGTH %i\n", values);
+    GLchar name[101];
+    glGetActiveSubroutineName(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, pass1Index_, 100, 0, name);
+    std::printf("Active subroutine at index %i = %s\n", pass1Index_, name);
+    glGetActiveSubroutineName(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, pass1Index_, 100, 0, name);
+    std::printf("Active subroutine at index %i = %s\n", pass2Index_, name);
 }
 
 
@@ -123,7 +137,7 @@ void GLSceneDeferred::initializeFBO()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // Attach the images to the framebuffer
+    // Attach the images to the frame buffer
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf_);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, posTex_, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normTex_, 0);
@@ -134,6 +148,10 @@ void GLSceneDeferred::initializeFBO()
     glDrawBuffers(4, drawBuffers);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    current_program_iter_ ->second.setUniform("PositionTex", 0);
+    current_program_iter_ ->second.setUniform("NormalTex", 1);
+    current_program_iter_ ->second.setUniform("ColorTex", 2);
 }
 
 
@@ -167,10 +185,12 @@ void GLSceneDeferred::initializeMaterials()
 
 void GLSceneDeferred::initializeTextures()
 {
+	/*
     TextureManager::loadTexture("test",  "texture/test.tga");
     TextureManager::loadTexture("brick", "texture/brick1.jpg");
     TextureManager::loadTexture("pool",  "texture/pool.png");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
+    */
 }
 
 
@@ -547,7 +567,12 @@ void GLSceneDeferred::update(JU::f32 time)
 */
 void GLSceneDeferred::render(void)
 {
-	renderPass1();
+	// WARNING: EVERY TIME you call glUseProgram​, glBindProgramPipeline​ or glUseProgramStages​,
+	// all of the current subroutine state is completely lost. This state is never preserved,
+	// so you should consider it ephemeral.
+    //current_program_iter_->second.use();
+
+    renderPass1();
 	renderPass2();
 }
 
@@ -564,12 +589,16 @@ void GLSceneDeferred::renderPass1()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    //glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &pass1Index_);
 
-    current_program_iter_->second.use();
+    // WARNING: Cannot change CONTEXT STATE after making this call
+    // Explanation: The state for the selection of which subroutine functions to use
+    // for which subroutine uniforms is not part of the program object. Instead, it is
+    // part of the context state, similar to how texture bindings and uniform buffer
+    // bindings are part of context state.
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index_);
 
     // LOAD LIGHTS
-    loadLights();
+    //loadLights();
     
     // Model Matrix
     glm::mat4 M(1.0f);
@@ -583,7 +612,7 @@ void GLSceneDeferred::renderPass1()
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
 
-    TextureManager::unbindAllTextures();
+    //TextureManager::unbindAllTextures();
 
     // Wait for the buffer to be filled
     glFinish();
@@ -601,16 +630,12 @@ void GLSceneDeferred::renderPass2()
     // Revert to default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &pass2Index_);
+    //pass1Index_ = glGetSubroutineIndex( current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "pass2");
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass2Index_);
 
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
-
-    current_program_iter_->second.use();
-
-    current_program_iter_ ->second.setUniform("PositionTex", 0);
-    current_program_iter_ ->second.setUniform("NormalTex", 1);
-    current_program_iter_ ->second.setUniform("ColorTex", 2);
 
     // LOAD LIGHTS
     loadLights();

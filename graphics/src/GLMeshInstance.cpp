@@ -133,8 +133,6 @@ GLMeshInstance::~GLMeshInstance()
 */
 void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, const glm::mat4 &view, const glm::mat4 &projection) const
 {
-	program.use();
-
     // Update Model matrix with the local scale
     glm::mat4 new_model = model * glm::scale(glm::vec3(scaleX_, scaleY_, scaleZ_));
     // View * Model
@@ -162,7 +160,8 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
     }
 
     // Bind NORMAL TEXTURE
-    TextureManager::bindTexture(program, normal_map_texture_name_,GLSLProgram::NORMAL_MAP_TEX_PREFIX);
+    if (normal_map_texture_name_.size() != 0)
+    	TextureManager::bindTexture(program, normal_map_texture_name_,GLSLProgram::NORMAL_MAP_TEX_PREFIX);
 
     mesh_->draw();
 

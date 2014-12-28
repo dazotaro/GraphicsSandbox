@@ -165,8 +165,5 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
 
     mesh_->draw();
 
-    TextureManager::unbindAllTextures();
-
-    // Deactivate Shader Program
-    //glUseProgram(0);
+    //TextureManager::unbindAllTextures();
 }

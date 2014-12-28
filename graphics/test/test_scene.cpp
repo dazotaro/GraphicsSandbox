@@ -11,6 +11,7 @@
 #include "GLSceneParticles.hpp"			// GLSceneParticles
 #include "GLSceneCometTail.hpp"         // GLSceneCometTail
 #include "GLSceneMultipleLights.hpp"	// GLSceneMultipleLights
+#include "GLSceneDeferred.hpp"			// GLSceneDeferred
 #include "glm/gtc/matrix_transform.hpp" // glm::perspective
 #ifndef WIN32
 	#include <JU/Timer.hpp>                 // Timer
@@ -152,7 +153,8 @@ static void init(void)
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
-    scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
+    //scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
+    scene = new GLSceneDeferred(WIDTH, HEIGHT);
 
     scene->init();
 

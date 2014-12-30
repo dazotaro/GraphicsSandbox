@@ -121,9 +121,6 @@ void pass2()
     // Spotlight
     for (int index = 0; index < num_spot_lights; ++index)
         FragColor += vec4(adsSpotlight(index, pos, norm, DiffColor), 1.0f);
-    
-    //FragColor = vec4(0.8f, 0.0f, 0.0f, 1.0f);
-    FragColor = vec4(norm, 1.0f);
 }
 
 

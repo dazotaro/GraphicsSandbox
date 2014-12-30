@@ -58,7 +58,7 @@ void GLSceneDeferred::init(void)
 
     initializePrograms();
     initializeFBO();
-	initializeMaterials();
+    initializeMaterials();
     initializeTextures();
     initializeObjects();
     initializeCameras();
@@ -74,11 +74,16 @@ void GLSceneDeferred::initializePrograms()
     current_program_iter_ = glsl_program_map_.find("deferred");
     current_program_iter_->second.use();
 
+    current_program_iter_ ->second.setUniform("PositionTex", 0);
+    current_program_iter_ ->second.setUniform("NormalTex", 1);
+    current_program_iter_ ->second.setUniform("ColorTex", 2);
+
     // Set up the subroutine indexes
     GLuint programHandle = current_program_iter_ ->second.getHandle();
     pass1Index_ = glGetSubroutineIndex( programHandle, GL_FRAGMENT_SHADER, "pass1");
     pass2Index_ = glGetSubroutineIndex( programHandle, GL_FRAGMENT_SHADER, "pass2");
 
+    /*
     GLint values;
     glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &values);
     std::printf("GL_ACTIVE_SUBROUTINE_UNIFORMS %i\n", values);
@@ -95,6 +100,7 @@ void GLSceneDeferred::initializePrograms()
     std::printf("Active subroutine at index %i = %s\n", pass1Index_, name);
     glGetActiveSubroutineName(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, pass1Index_, 100, 0, name);
     std::printf("Active subroutine at index %i = %s\n", pass2Index_, name);
+	*/
 }
 
 
@@ -143,15 +149,10 @@ void GLSceneDeferred::initializeFBO()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normTex_, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, colorTex_, 0);
 
-    GLenum drawBuffers[] = {GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1,
-                        GL_COLOR_ATTACHMENT2};
+    GLenum drawBuffers[] = {GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
     glDrawBuffers(4, drawBuffers);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    current_program_iter_ ->second.setUniform("PositionTex", 0);
-    current_program_iter_ ->second.setUniform("NormalTex", 1);
-    current_program_iter_ ->second.setUniform("ColorTex", 2);
 }
 
 
@@ -223,7 +224,7 @@ void GLSceneDeferred::initializeObjects()
 	mesh_map_["torus_64_32"] = pmesh;
 	// MESH INSTANCE
 	pmesh_instance = new GLMeshInstance(pmesh, 5.0f, 5.0f, 5.0f, material_map_["ruby"]);
-	pmesh_instance->addColorTexture("pool");
+	//pmesh_instance->addColorTexture("pool");
 	mesh_instance_map_["torus_ruby"] = pmesh_instance;
 	// NODE
 	// Give the sphere a position and a orientation
@@ -246,7 +247,7 @@ void GLSceneDeferred::initializeObjects()
     mesh_map_["plane"] = pmesh;
     // MESH INSTANCE
     pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 1.0f, material_map_["gray_rubber"]);
-    pmesh_instance->addColorTexture("brick");
+    //pmesh_instance->addColorTexture("brick");
     mesh_instance_map_["plane_green"];
     // NODE
     // Give the plane a position and a orientation

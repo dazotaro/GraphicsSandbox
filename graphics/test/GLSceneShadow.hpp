@@ -70,30 +70,35 @@ class GLSceneShadow : public GLScene
         void spitOutDepthBuffer() const;
 
     private:
-        GLMeshInstance*  	gl_plane_shadow_instance_;
-        Node3D*          	shadow_plane_node_;
-        Object3D*        	camera_gps_;
-        CameraFirstPerson*	fp_camera_;
-        CameraFirstPerson*	light_frustum_;
-        CameraThirdPerson*	tp_camera_;
-        CameraInterface* 	camera_;
-        MeshMap 			mesh_map_;
-        MeshInstanceMap 	mesh_instance_map_;
-        NodeMap				node_map_;
-
+        // SHADOW MAPPING specific
         int shadow_map_width_;
         int shadow_map_height_;
         bool pcf_enabled_;
         GLuint shadowFBO_;
         GLuint depthTex_;
+        GLuint pass1Index_;
+        GLuint pass2Index_;
 
+        // ASSET MANAGEMENT
+        GLMeshInstance*  	gl_plane_shadow_instance_;
+        Node3D*          	shadow_plane_node_;
+        MeshMap 			mesh_map_;
+        MeshInstanceMap 	mesh_instance_map_;
+        NodeMap				node_map_;
+
+        // CAMERA CONTROLS
+        Object3D*        	camera_gps_;
+        CameraFirstPerson*	fp_camera_;
+        CameraFirstPerson*	light_frustum_;
+        CameraThirdPerson*	tp_camera_;
+        CameraInterface* 	camera_;
         bool control_camera_;
+        ArcBallController camera_controller_;
 
+        // LIGHT MANAGEMENT
         LightPositionalVector  lights_positional_;
         LightDirectionalVector lights_directional_;
         LightSpotlightVector   lights_spotlight_;
-
-        ArcBallController camera_controller_;
 };
 
 #endif /* GLSCENESHADOW_HPP_ */

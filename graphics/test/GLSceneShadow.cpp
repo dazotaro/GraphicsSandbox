@@ -27,10 +27,9 @@
 
 
 GLSceneShadow::GLSceneShadow(int width, int height) : GLScene(width, height),
-									 camera_gps_(0), camera_(0),
-                                     shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
-                                     shadowFBO_(0), depthTex_(0), control_camera_(true),
-                                     camera_controller_(width, height, 0.5f)
+									shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
+                                    shadowFBO_(0), depthTex_(0), pass1Index_(0), pass2Index_(0),
+									camera_gps_(0), camera_(0), control_camera_(true), camera_controller_(width, height, 0.5f)
 {
 }
 
@@ -58,6 +57,9 @@ void GLSceneShadow::initializeGLSLPrograms()
 
     current_program_iter_ = glsl_program_map_.find("shadow_mapping");
     current_program_iter_->second.use();
+
+    pass1Index_ = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "recordDepth");
+    pass2Index_ = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");
 }
 
 
@@ -551,6 +553,8 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
     glm::mat4 P(camera_->getPerspectiveMatrix());
     // Draw each object
     drawScene(camera_);
+
+    TextureManager::unbindAllTextures();
 }
 
 /**
@@ -558,7 +562,9 @@ void GLSceneShadow::renderPerfragmentLighting(void) const
 */
 void GLSceneShadow::renderShadow(void) const
 {
-    // PASS 1 (RECORD DEPTH)
+	current_program_iter_->second.use();
+
+	// PASS 1 (RECORD DEPTH)
     // ----------------------------------
     // LOAD LIGHTS
     loadLights();
@@ -575,8 +581,7 @@ void GLSceneShadow::renderShadow(void) const
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // Select the fragment shader subroutine to record the depth
-    GLuint pass1Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "recordDepth");
-    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index);
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index_);
 
     // Enable front-face culling
     glEnable(GL_CULL_FACE);
@@ -609,8 +614,7 @@ void GLSceneShadow::renderShadow(void) const
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 
     // Select the fragment shader subroutine to shade the scene with the shadow map
-    GLuint pass2Index = glGetSubroutineIndex(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");
-    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass2Index);
+    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass2Index_);
     // Disable culling (we could also switch back to back-face culling)
     //glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -636,6 +640,8 @@ void GLSceneShadow::renderShadow(void) const
 
     // Render
     shadow_plane_node_->draw(iter->second, M, V, P);
+
+    TextureManager::unbindAllTextures();
 }
 
 /**

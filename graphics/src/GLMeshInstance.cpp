@@ -165,5 +165,5 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
 
     mesh_->draw();
 
-    //TextureManager::unbindAllTextures();
+    TextureManager::unbindAllTextures();
 }

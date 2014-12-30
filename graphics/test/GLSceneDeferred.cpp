@@ -74,9 +74,11 @@ void GLSceneDeferred::initializePrograms()
     current_program_iter_ = glsl_program_map_.find("deferred");
     current_program_iter_->second.use();
 
+    /*
     current_program_iter_ ->second.setUniform("PositionTex", 0);
     current_program_iter_ ->second.setUniform("NormalTex", 1);
     current_program_iter_ ->second.setUniform("ColorTex", 2);
+    */
 
     // Set up the subroutine indexes
     GLuint programHandle = current_program_iter_ ->second.getHandle();
@@ -152,6 +154,11 @@ void GLSceneDeferred::initializeFBO()
     GLenum drawBuffers[] = {GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
     glDrawBuffers(4, drawBuffers);
 
+    // Register the texture handles with TextureManager
+    TextureManager::registerTexture("PositionTex", 	posTex_);
+    TextureManager::registerTexture("NormalTex", 	normTex_);
+    TextureManager::registerTexture("ColorTex", 	colorTex_);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -186,12 +193,10 @@ void GLSceneDeferred::initializeMaterials()
 
 void GLSceneDeferred::initializeTextures()
 {
-	/*
     TextureManager::loadTexture("test",  "texture/test.tga");
     TextureManager::loadTexture("brick", "texture/brick1.jpg");
     TextureManager::loadTexture("pool",  "texture/pool.png");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
-    */
 }
 
 
@@ -224,7 +229,7 @@ void GLSceneDeferred::initializeObjects()
 	mesh_map_["torus_64_32"] = pmesh;
 	// MESH INSTANCE
 	pmesh_instance = new GLMeshInstance(pmesh, 5.0f, 5.0f, 5.0f, material_map_["ruby"]);
-	//pmesh_instance->addColorTexture("pool");
+	pmesh_instance->addColorTexture("pool");
 	mesh_instance_map_["torus_ruby"] = pmesh_instance;
 	// NODE
 	// Give the sphere a position and a orientation
@@ -247,7 +252,7 @@ void GLSceneDeferred::initializeObjects()
     mesh_map_["plane"] = pmesh;
     // MESH INSTANCE
     pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 1.0f, material_map_["gray_rubber"]);
-    //pmesh_instance->addColorTexture("brick");
+    pmesh_instance->addColorTexture("brick");
     mesh_instance_map_["plane_green"];
     // NODE
     // Give the plane a position and a orientation
@@ -613,7 +618,7 @@ void GLSceneDeferred::renderPass1()
         (iter->second)->draw(current_program_iter_->second, M, V, P);
     }
 
-    //TextureManager::unbindAllTextures();
+    TextureManager::unbindAllTextures();
 
     // Wait for the buffer to be filled
     glFinish();
@@ -641,6 +646,11 @@ void GLSceneDeferred::renderPass2()
     // LOAD LIGHTS
     loadLights();
 
+    // Load G-Buffer
+    TextureManager::bindTexture(current_program_iter_->second, "PositionTex", "PositionTex");
+    TextureManager::bindTexture(current_program_iter_->second, "NormalTex",   "NormalTex");
+    TextureManager::bindTexture(current_program_iter_->second, "ColorTex", 	  "ColorTex");
+
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
@@ -649,6 +659,8 @@ void GLSceneDeferred::renderPass2()
     glm::mat4 P(1.0f);
 
     mesh_instance_map_["screen_quad"]->draw(current_program_iter_->second, M, V, P);
+
+    TextureManager::unbindAllTextures();
 }
 
 

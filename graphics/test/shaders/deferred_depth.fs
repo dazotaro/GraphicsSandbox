@@ -92,7 +92,7 @@ vec3 adsSpotlight(uint index, vec3 position, vec3 norm, vec3 Kd)
 }
 
 
-vec4 withoutAntialiasing()
+vec4 shade()
 {
     // Get the position, normal and diffuse coeffient from the G-buffer
     vec3 pos  = vec3( texture(PositionTex, TexCoord));
@@ -120,74 +120,21 @@ float sobely[9] = { 1,  1,  1,
                     0,  0,  0,
                    -1, -1, -1};
 
-vec4 withAntialiasing()
+// Applies Sobel kernels and returns their value as a monochrome color
+float getSobelSquaredValue()
 {
-    vec4 color = vec4(0.0f);
-    float threshold = 70.0f;
-
-    // Edge Detection: Do we need to blur?
-    bool blur = false;
-    float depth = texture(DepthTex, TexCoord);
-    
     float sx = 0.0f, sy = 0.0f;
-    for (int i = -1; i <= 1; ++i)
+    for (int i = 0; i <= 2; ++i)
     {
-        for (int j = -1; j <= 1; ++j)
+        for (int j = 0; j <= 2; ++j)
         {
-            float depth = textureOffset(DepthTex, TexCoord, ivec2(i,j));
+            float depth = textureOffset(DepthTex, TexCoord, ivec2(i-1, j-1));
             sx += sobelx[i*3 + j] * depth;
             sy += sobely[i*3 + j] * depth;
         }
     }
     
-    if ((sx*sx + sy*sy) > threshold)
-        blur = true; 
-        
-    if (!blur)
-    {
-        // Get the position, normal and diffuse coeffient from the G-buffer
-        vec3 pos  = vec3( texture(PositionTex, TexCoord));
-        vec3 norm = vec3( texture(NormalTex, TexCoord));
-        vec3 DiffColor = vec3( texture(ColorTex, TexCoord));
-        
-        // Positional
-        for (int index = 0; index < num_pos_lights; ++index)
-            color += vec4(adsPositional(index, pos, norm, DiffColor), 1.0f);
-            
-        // Spotlight
-        for (int index = 0; index < num_spot_lights; ++index)
-            color += vec4(adsSpotlight(index, pos, norm, DiffColor), 1.0f);
-    }
-    else
-    {
-        for (int i = -1; i <= 1; ++i)
-        {
-            for (int j = -1; j <= 1; ++j)
-            {
-                // Get the position, normal and diffuse coeffient from the G-buffer
-                vec3 pos  = vec3( textureOffset(PositionTex, TexCoord, ivec2(i, j)));
-                vec3 norm = vec3( textureOffset(NormalTex, TexCoord, ivec2(i, j)));
-                vec3 DiffColor = vec3( textureOffset(ColorTex, TexCoord, ivec2(i, j)));
-                
-                // Positional
-                for (int index = 0; index < num_pos_lights; ++index)
-                    color += vec4(adsPositional(index, pos, norm, DiffColor), 1.0f);
-                    
-                // Spotlight
-                for (int index = 0; index < num_spot_lights; ++index)
-                    color += vec4(adsSpotlight(index, pos, norm, DiffColor), 1.0f);
-            }
-        }
-        
-        color /= 9;
-    }
-
-    if (blur)
-    {
-        color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-        
-    return color;
+    return (sx*sx + sy*sy);
 }
 
 
@@ -207,13 +154,16 @@ void pass1()
 subroutine (RenderPassType)
 void pass2()
 {
-    bool antialiasing = true;
-    FragColor = vec4(0.0f);
+    //FragColor = vec4(0.0f);
+    //float sobel_squared = getSobelSquaredValue();
+    // 1- Draw the value returned by Sobel
+    //float sobel = sqrt(sobel_squared);
+    //FragColor = vec4(sobel, sobel, sobel, 1.0f);
+    // 2- Draw the edge (either black or white)
+    //if (sobel_squared > 0.001f)
+    //    FragColor = vec4(1.0f);
 
-    if (antialiasing)
-        FragColor = withAntialiasing();
-    else
-        FragColor = withoutAntialiasing();
+    FragColor = shade();
 }
 
 

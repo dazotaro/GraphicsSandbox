@@ -154,6 +154,10 @@ void GLSceneDeferred::initializeFBO()
     GLenum drawBuffers[] = {GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
     glDrawBuffers(4, drawBuffers);
 
+    // Check that our framebuffer is good
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    	exit(EXIT_FAILURE);
+
     // Register the texture handles with TextureManager
     TextureManager::registerTexture("PositionTex", 	posTex_);
     TextureManager::registerTexture("NormalTex", 	normTex_);

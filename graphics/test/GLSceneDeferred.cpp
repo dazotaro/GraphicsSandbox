@@ -154,7 +154,7 @@ void GLSceneDeferred::initializeFBO()
     GLenum drawBuffers[] = {GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
     glDrawBuffers(4, drawBuffers);
 
-    // Check that our framebuffer is good
+    // Check that our frame buffer is complete
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     	exit(EXIT_FAILURE);
 

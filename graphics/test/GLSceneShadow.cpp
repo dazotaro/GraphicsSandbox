@@ -382,12 +382,9 @@ void GLSceneShadow::setupFBO(void)
     GLenum drawBuffers[] = {GL_NONE};
     glDrawBuffers(1, drawBuffers);
 
-	GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if( result == GL_FRAMEBUFFER_COMPLETE) {
-        printf("Framebuffer is complete.\n");
-    } else {
-        printf("Framebuffer is not complete.\n");
-    }
+    // Check that our frame buffer is complete
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    	exit(EXIT_FAILURE);
 
     glBindFramebuffer(GL_FRAMEBUFFER,0);
 }

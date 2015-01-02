@@ -90,6 +90,7 @@ class GLSceneDeferred : public GLScene
         GLuint				colorTex_;
         GLuint 				pass1Index_;
         GLuint 				pass2Index_;
+        bool				record_depth_;
 
         // ASSET MANAGEMENT
         MeshMap 			mesh_map_;

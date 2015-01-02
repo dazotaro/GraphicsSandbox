@@ -27,7 +27,7 @@
 
 GLSceneDeferred::GLSceneDeferred(int width, int height) : GLScene(width, height),
 									 deferredFBO_(0), depthBuf_(0), posTex_(0), normTex_(0), colorTex_(0),
-									 pass1Index_(0), pass2Index_(0),
+									 pass1Index_(0), pass2Index_(0), record_depth_(true),
 									 tp_camera_(0), camera_(0), control_camera_(true), camera_controller_(width, height, 0.2f),
 									 light_mode_(LightManager::SPOTLIGHT), num_lights_(1)
 {
@@ -69,7 +69,14 @@ void GLSceneDeferred::init(void)
 
 void GLSceneDeferred::initializePrograms()
 {
-    glsl_program_map_["deferred"]  = compileAndLinkShader("shaders/deferred.vs", "shaders/deferred.fs");
+	if (record_depth_)
+	{
+		glsl_program_map_["deferred"]  = compileAndLinkShader("shaders/deferred.vs", "shaders/deferred_depth.fs");
+	}
+	else
+	{
+		glsl_program_map_["deferred"]  = compileAndLinkShader("shaders/deferred.vs", "shaders/deferred.fs");
+	}
 
     current_program_iter_ = glsl_program_map_.find("deferred");
     current_program_iter_->second.use();
@@ -116,13 +123,28 @@ void GLSceneDeferred::initializeFBO()
     glGenFramebuffers(1, &deferredFBO_);
     glBindFramebuffer(GL_FRAMEBUFFER, deferredFBO_);
 
-    // The depth buffer
-    glGenRenderbuffers(1, &depthBuf_);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthBuf_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
+    // The DEPTH buffer
+    if (record_depth_)
+    {
+        // if want to access it in the shader
+        glGenTextures(1, &depthBuf_);
+        glBindTexture(GL_TEXTURE_2D, depthBuf_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width_, height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBuf_, 0);
+        TextureManager::registerTexture("DepthTex", depthBuf_);
+    }
+    else
+    {
+    	// if we do not need to explicitly access it
+		glGenRenderbuffers(1, &depthBuf_);
+		glBindRenderbuffer(GL_RENDERBUFFER, depthBuf_);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
+	    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf_);
+    }
 
     // The position buffer
-    glActiveTexture(GL_TEXTURE0);   // Use texture unit 0
     glGenTextures(1, &posTex_);
     glBindTexture(GL_TEXTURE_2D, posTex_);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -130,7 +152,6 @@ void GLSceneDeferred::initializeFBO()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // The normal buffer
-    glActiveTexture(GL_TEXTURE1);
     glGenTextures(1, &normTex_);
     glBindTexture(GL_TEXTURE_2D, normTex_);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -138,7 +159,6 @@ void GLSceneDeferred::initializeFBO()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // The color buffer
-    glActiveTexture(GL_TEXTURE2);
     glGenTextures(1, &colorTex_);
     glBindTexture(GL_TEXTURE_2D, colorTex_);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -146,7 +166,6 @@ void GLSceneDeferred::initializeFBO()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Attach the images to the frame buffer
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf_);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, posTex_, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normTex_, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, colorTex_, 0);
@@ -637,7 +656,7 @@ void GLSceneDeferred::renderPass1()
 */
 void GLSceneDeferred::renderPass2()
 {
-    // Revert to default framebuffer
+    // Revert to default frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     //pass1Index_ = glGetSubroutineIndex( current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, "pass2");
@@ -654,6 +673,8 @@ void GLSceneDeferred::renderPass2()
     TextureManager::bindTexture(current_program_iter_->second, "PositionTex", "PositionTex");
     TextureManager::bindTexture(current_program_iter_->second, "NormalTex",   "NormalTex");
     TextureManager::bindTexture(current_program_iter_->second, "ColorTex", 	  "ColorTex");
+    if (record_depth_)
+    	TextureManager::bindTexture(current_program_iter_->second, "DepthTex", 	  "DepthTex");
 
     // Model Matrix
     glm::mat4 M(1.0f);
@@ -775,7 +796,10 @@ void GLSceneDeferred::clear(void)
 {
 	// FBOs and Textures
 	glDeleteFramebuffers (1, &deferredFBO_);
-	glDeleteRenderbuffers(1, &depthBuf_);
+	if (record_depth_)
+		glDeleteTextures(1, &depthBuf_);
+	else
+		glDeleteRenderbuffers(1, &depthBuf_);
 	glDeleteTextures     (1, &posTex_);
 	glDeleteTextures	 (1, &normTex_);
 	glDeleteTextures	 (1, &colorTex_);

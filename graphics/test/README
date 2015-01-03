@@ -3,3 +3,6 @@
 - GLSceneShadow: tests shadow mapping 
 - GLSceneParticles: tests updating the VBOs dynamically (drawing particles)
 - GLSceneCometTail: as with GLSceneParticles it tests dynamic use of VBO, but in this case by drawing a tail to the path of the mouse pointer
+- GLSceneMultipleLights: It implements multiple spotlight and positional lights
+GLSceneDeferred: It implements deferred shading
+

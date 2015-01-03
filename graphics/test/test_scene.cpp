@@ -22,7 +22,7 @@
 // -----------
 // DEFINITIONS
 // -----------
-#define DEBUG_MEM
+//#define DEBUG_MEM
 #ifdef DEBUG_MEM
     #define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
     #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048

@@ -54,7 +54,6 @@ static GLScene *scene;
 //This is an opportunity to call glViewport or glScissor to keep up with the change in size.
 static void reshape (int w, int h)
 {
-    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     scene->resize(w, h);
 }
  
@@ -148,13 +147,13 @@ static void init(void)
 #endif
 
 
-    //scene = new GLSceneNormal(WIDTH, HEIGHT);
+    scene = new GLSceneNormal(WIDTH, HEIGHT);
     //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
     //scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
-    scene = new GLSceneDeferred(WIDTH, HEIGHT);
+    //scene = new GLSceneDeferred(WIDTH, HEIGHT);
 
     scene->init();
 

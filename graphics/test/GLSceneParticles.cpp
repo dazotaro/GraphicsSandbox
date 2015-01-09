@@ -164,6 +164,7 @@ void GLSceneParticles::render(void)
 void GLSceneParticles::resize(int width, int height)
 {
     GLScene::resize(width, height);
+    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     tp_camera_->setAspectRatio(static_cast<float>(width)/height);
     camera_controller_.windowResize(width, height);
 }

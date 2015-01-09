@@ -516,6 +516,7 @@ void GLSceneMultipleLights::render(void)
 void GLSceneMultipleLights::resize(int width, int height)
 {
     GLScene::resize(width, height);
+    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     camera_->setAspectRatio(static_cast<JU::f32>(width)/height);
     camera_controller_.windowResize(width, height);
 }

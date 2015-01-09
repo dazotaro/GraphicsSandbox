@@ -280,7 +280,7 @@ void GLSceneLighting::render(void)
 
 
 /**
-* @brief Resize the scene
+* @brief Resize the scene and the viewport
 *
 * @param width  Width of the window
 * @param height Height of the window
@@ -288,6 +288,7 @@ void GLSceneLighting::render(void)
 void GLSceneLighting::resize(int width, int height)
 {
     GLScene::resize(width, height);
+    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     camera_->setAspectRatio(static_cast<float>(width)/height);
     camera_controller_.windowResize(width, height);
 }

@@ -53,6 +53,7 @@ vec3 phongModel(vec3 norm, vec3 diffR)
 void main()
 {
     // Lookup the normal from the normal map
+    // (it could also get loaded with a GL_RGB_SNORM format in glTexImage2D to avoid the avoid the * 2.0 - 1.0 calculation)
 	vec4 normal = normalize(texture(NormalMapTex, TexCoord) * 2.0 - 1.0);
     /*vec4 normal = texture(NormalMapTex, TexCoord);
     normal.x -= 0.5;

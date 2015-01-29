@@ -22,14 +22,17 @@
 // -----------
 // DEFINITIONS
 // -----------
-//#define DEBUG_MEM
-#ifdef DEBUG_MEM
-    #define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
-    #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
-    #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
-    #define GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX 0x904A
-    #define GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX 0x904B
-#endif
+#define DEBUG_GPU_PARAMETERS
+	#ifdef DEBUG_GPU_PARAMETERS
+	//#define DEBUG_MEM
+		#ifdef DEBUG_MEM
+			#define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
+			#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+			#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+			#define GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX 0x904A
+			#define GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX 0x904B
+		#endif
+	#endif // DEBUG_GPU_PARAMETERS
 
 #ifdef _WIN32
     #define ESC_KEY VK_ESCAPE
@@ -42,8 +45,8 @@
 // GLOBAL/STATIC
 // -------------
 static int winID;
-static GLsizei WIDTH  = 800;
-static GLsizei HEIGHT = 450;
+static GLsizei WIDTH  = 800 * 1.2f;
+static GLsizei HEIGHT = 600;
 
 static GLScene *scene;
 #ifndef WIN32
@@ -87,18 +90,20 @@ static void mouseMotion(int x, int y)
 //If you need continuous updates of the screen, call glutPostRedisplay() at the end of the function.
 static void display()
 {
-#ifdef DEBUG_MEM
-    GLint cur_avail_mem_kb = 0;
-    glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
-    std::printf("Currently available Memory = %i (KB)\n", cur_avail_mem_kb);
+#ifdef DEBUG_GPU_PARAMETERS
+	#ifdef DEBUG_MEM
+		GLint cur_avail_mem_kb = 0;
+		glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+		std::printf("Currently available Memory = %i (KB)\n", cur_avail_mem_kb);
 
-    GLint num_evictions = 0;
-    glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX, &num_evictions);
-    std::printf("Number of evictions since OS or application started = %i\n", num_evictions);
+		GLint num_evictions = 0;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX, &num_evictions);
+		std::printf("Number of evictions since OS or application started = %i\n", num_evictions);
 
-    GLint evicted_mem_kb = 0;
-    glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX, &evicted_mem_kb);
-    std::printf("Amount of evicted memory since OS or application started = %i (KB)\n", evicted_mem_kb);
+		GLint evicted_mem_kb = 0;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX, &evicted_mem_kb);
+		std::printf("Amount of evicted memory since OS or application started = %i (KB)\n", evicted_mem_kb);
+	#endif
 #endif
 
 
@@ -136,24 +141,30 @@ static void display()
 
 static void init(void)
 {
-#ifdef DEBUG_MEM
-    GLint gpu_mem_kb = 0;
-    glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &gpu_mem_kb);
-    std::printf("Total Available DedicatedMemory = %i (KB)\n", gpu_mem_kb);
+#ifdef DEBUG_GPU_PARAMETERS
+	GLint max_color_attachments = 0;
+	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_color_attachments);
+	std::printf("Maximum Number of Color Attachments = %i\n", max_color_attachments);
 
-    GLint total_mem_kb = 0;
-    glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
-    std::printf("Maximum Available Dedicated Memory = %i (KB)\n", total_mem_kb);
+	#ifdef DEBUG_MEM
+		GLint gpu_mem_kb = 0;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &gpu_mem_kb);
+		std::printf("Total Available DedicatedMemory = %i (KB)\n", gpu_mem_kb);
+
+		GLint total_mem_kb = 0;
+		glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+		std::printf("Maximum Available Dedicated Memory = %i (KB)\n", total_mem_kb);
+	#endif
 #endif
 
 
-    scene = new GLSceneNormal(WIDTH, HEIGHT);
+    //scene = new GLSceneNormal(WIDTH, HEIGHT);
     //scene = new GLSceneLighting(WIDTH, HEIGHT);
     //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
     //scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
-    //scene = new GLSceneDeferred(WIDTH, HEIGHT);
+    scene = new GLSceneDeferred(WIDTH, HEIGHT);
 
     scene->init();
 
@@ -195,7 +206,7 @@ int main(int argc, char** argv)
     
     glutInitWindowSize(WIDTH, HEIGHT);
     glutInitWindowPosition(100,100);
-    winID = glutCreateWindow("OpenGL - First window demo");
+    winID = glutCreateWindow("OpenGL Demo");
 
     printf("GL Vendor: %s\n", glGetString(GL_VENDOR));
     printf("GL Renderer: %s\n", glGetString(GL_RENDERER));

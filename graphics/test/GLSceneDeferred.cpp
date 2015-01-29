@@ -26,11 +26,13 @@
 
 
 GLSceneDeferred::GLSceneDeferred(int width, int height) : GLScene(width, height),
-									 deferredFBO_(0), depthBuf_(0), posTex_(0), normTex_(0), colorTex_(0),
+									 scene_width_(0), scene_height_(0),
+									 deferredFBO_(0), depthBuf_(0), posTex_(0), normTex_(0), colorTex_(0), shininessTex_(0),
 									 pass1Index_(0), pass2Index_(0), record_depth_(true),
 									 tp_camera_(0), camera_(0), control_camera_(true), camera_controller_(width, height, 0.2f),
 									 light_mode_(LightManager::SPOTLIGHT), num_lights_(1)
 {
+	computeSceneSize(width, height);
 	main_node_iter = node_map_.end();
 }
 
@@ -69,6 +71,8 @@ void GLSceneDeferred::init(void)
 
 void GLSceneDeferred::initializePrograms()
 {
+	glsl_program_map_["debug"]  = compileAndLinkShader("shaders/deferred.vs", "shaders/image_texture.fs");
+
 	if (record_depth_)
 	{
 		glsl_program_map_["deferred"]  = compileAndLinkShader("shaders/deferred.vs", "shaders/deferred_depth.fs");
@@ -91,25 +95,6 @@ void GLSceneDeferred::initializePrograms()
     GLuint programHandle = current_program_iter_ ->second.getHandle();
     pass1Index_ = glGetSubroutineIndex( programHandle, GL_FRAGMENT_SHADER, "pass1");
     pass2Index_ = glGetSubroutineIndex( programHandle, GL_FRAGMENT_SHADER, "pass2");
-
-    /*
-    GLint values;
-    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &values);
-    std::printf("GL_ACTIVE_SUBROUTINE_UNIFORMS %i\n", values);
-    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS, &values);
-    std::printf("GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS %i\n", values);
-    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINES, &values);
-    std::printf("GL_ACTIVE_SUBROUTINES %i\n", values);
-    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH, &values);
-    std::printf("GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTHS %i\n", values);
-    glGetProgramStageiv(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_MAX_LENGTH, &values);
-    std::printf("GL_ACTIVE_SUBROUTINE_MAX_LENGTH %i\n", values);
-    GLchar name[101];
-    glGetActiveSubroutineName(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, pass1Index_, 100, 0, name);
-    std::printf("Active subroutine at index %i = %s\n", pass1Index_, name);
-    glGetActiveSubroutineName(current_program_iter_->second.getHandle(), GL_FRAGMENT_SHADER, pass1Index_, 100, 0, name);
-    std::printf("Active subroutine at index %i = %s\n", pass2Index_, name);
-	*/
 }
 
 
@@ -129,7 +114,7 @@ void GLSceneDeferred::initializeFBO()
         // if want to access it in the shader
         glGenTextures(1, &depthBuf_);
         glBindTexture(GL_TEXTURE_2D, depthBuf_);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width_, height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, scene_width_, scene_height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBuf_, 0);
@@ -140,28 +125,35 @@ void GLSceneDeferred::initializeFBO()
     	// if we do not need to explicitly access it
 		glGenRenderbuffers(1, &depthBuf_);
 		glBindRenderbuffer(GL_RENDERBUFFER, depthBuf_);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width_, height_);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, scene_width_, scene_height_);
 	    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuf_);
     }
 
     // The position buffer
     glGenTextures(1, &posTex_);
     glBindTexture(GL_TEXTURE_2D, posTex_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, scene_width_, scene_height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // The normal buffer
     glGenTextures(1, &normTex_);
     glBindTexture(GL_TEXTURE_2D, normTex_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, scene_width_, scene_height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // The color buffer
     glGenTextures(1, &colorTex_);
     glBindTexture(GL_TEXTURE_2D, colorTex_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scene_width_, scene_height_, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // The shininess buffer
+    glGenTextures(1, &shininessTex_);
+    glBindTexture(GL_TEXTURE_2D, shininessTex_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, scene_width_, scene_height_, 0,  GL_RED, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -169,9 +161,14 @@ void GLSceneDeferred::initializeFBO()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, posTex_, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normTex_, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, colorTex_, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, shininessTex_, 0);
 
-    GLenum drawBuffers[] = {GL_NONE, GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
-    glDrawBuffers(4, drawBuffers);
+    GLenum drawBuffers[] = {GL_NONE,
+    						GL_COLOR_ATTACHMENT0,
+							GL_COLOR_ATTACHMENT1,
+							GL_COLOR_ATTACHMENT2,
+							GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(5, drawBuffers);
 
     // Check that our frame buffer is complete
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -181,6 +178,7 @@ void GLSceneDeferred::initializeFBO()
     TextureManager::registerTexture("PositionTex", 	posTex_);
     TextureManager::registerTexture("NormalTex", 	normTex_);
     TextureManager::registerTexture("ColorTex", 	colorTex_);
+    TextureManager::registerTexture("ShininessTex", shininessTex_);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -296,7 +294,7 @@ void GLSceneDeferred::initializeObjects()
 
 void GLSceneDeferred::initializeCameras()
 {
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(JU::f32)height_, 0.5f, 1000.f),
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, scene_width_/(JU::f32)scene_height_, 0.5f, 1000.f),
     								   static_cast<Object3D>(*main_node_iter->second),
     								   15.0f, 0.0f, M_PI / 4.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
@@ -603,6 +601,7 @@ void GLSceneDeferred::render(void)
 
     renderPass1();
 	renderPass2();
+	renderDebug();
 }
 
 
@@ -614,10 +613,15 @@ void GLSceneDeferred::render(void)
 */
 void GLSceneDeferred::renderPass1()
 {
+    glViewport(0, 0, (GLsizei) scene_width_, (GLsizei) scene_height_);
+
     glBindFramebuffer(GL_FRAMEBUFFER, deferredFBO_);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+
+    current_program_iter_ = glsl_program_map_.find("deferred");
+    current_program_iter_->second.use();
 
     // WARNING: Cannot change CONTEXT STATE after making this call
     // Explanation: The state for the selection of which subroutine functions to use
@@ -673,6 +677,7 @@ void GLSceneDeferred::renderPass2()
     TextureManager::bindTexture(current_program_iter_->second, "PositionTex", "PositionTex");
     TextureManager::bindTexture(current_program_iter_->second, "NormalTex",   "NormalTex");
     TextureManager::bindTexture(current_program_iter_->second, "ColorTex", 	  "ColorTex");
+    TextureManager::bindTexture(current_program_iter_->second, "ShininessTex","ShininessTex");
     if (record_depth_)
     	TextureManager::bindTexture(current_program_iter_->second, "DepthTex", 	  "DepthTex");
 
@@ -691,6 +696,73 @@ void GLSceneDeferred::renderPass2()
 
 
 /**
+* @brief Debug rendering of textures
+*
+* Render the auxiliary textures for debug purposes. To be called after the last pass
+* of Deferred Shading
+*/
+void GLSceneDeferred::renderDebug()
+{
+    current_program_iter_ = glsl_program_map_.find("debug");
+    current_program_iter_->second.use();
+
+    // Model Matrix
+    glm::mat4 M(1.0f);
+    // View matrix
+    glm::mat4 V(1.0f);
+    // Perspective Matrix
+    glm::mat4 P(1.0f);
+
+    // Size of each mini-viewport
+    JU::uint32 mini_width  = width_ - scene_width_;
+    JU::uint32 mini_height = scene_height_ / 5;
+    JU::uint32 height = 0;
+    // Position
+    glViewport(scene_width_, height, (GLsizei) mini_width, (GLsizei) mini_height);
+    TextureManager::bindTexture(current_program_iter_->second, "PositionTex", "tex_image");
+    mesh_instance_map_["screen_quad"]->draw(current_program_iter_->second, M, V, P);
+    height += mini_height;
+
+    // Normal
+    glViewport(scene_width_, height, (GLsizei) mini_width, (GLsizei) mini_height);
+    TextureManager::bindTexture(current_program_iter_->second, "NormalTex",   "tex_image");
+    mesh_instance_map_["screen_quad"]->draw(current_program_iter_->second, M, V, P);
+    height += mini_height;
+
+    // Color
+    glViewport(scene_width_, height, (GLsizei) mini_width, (GLsizei) mini_height);
+    TextureManager::bindTexture(current_program_iter_->second, "ColorTex", 	  "tex_image");
+    mesh_instance_map_["screen_quad"]->draw(current_program_iter_->second, M, V, P);
+    height += mini_height;
+
+    // Shininess
+    glViewport(scene_width_, height, (GLsizei) mini_width, (GLsizei) mini_height);
+    TextureManager::bindTexture(current_program_iter_->second, "ShininessTex","tex_image");
+    mesh_instance_map_["screen_quad"]->draw(current_program_iter_->second, M, V, P);
+    height += mini_height;
+
+    // Depth
+    if (record_depth_)
+    {
+        glViewport(scene_width_, height, (GLsizei) mini_width, (GLsizei) mini_height);
+    	TextureManager::bindTexture(current_program_iter_->second, "DepthTex", "tex_image");
+    	mesh_instance_map_["screen_quad"]->draw(current_program_iter_->second, M, V, P);
+    }
+
+
+    TextureManager::unbindAllTextures();
+}
+
+
+
+void GLSceneDeferred::computeSceneSize(JU::uint32 width, JU::uint32 height)
+{
+    // Leave 20% of the canvas for displaying the auxiliary textures
+    scene_width_  = width * 0.8f;
+    scene_height_ = height;
+}
+
+/**
 * @brief Resize the scene
 *
 * @param width  Width of the window
@@ -698,10 +770,13 @@ void GLSceneDeferred::renderPass2()
 */
 void GLSceneDeferred::resize(int width, int height)
 {
+	// Actual viewport will be smaller to accommodate textures
+	// in the right pane of the interface
     GLScene::resize(width, height);
-    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-    camera_->setAspectRatio(static_cast<JU::f32>(width)/height);
-    camera_controller_.windowResize(width, height);
+    computeSceneSize(width, height);
+    glViewport(0, 0, (GLsizei) scene_width_, (GLsizei) scene_height_);
+    camera_->setAspectRatio(static_cast<JU::f32>(scene_width_)/scene_height_);
+    camera_controller_.windowResize(scene_width_, scene_height_);
 }
 
 

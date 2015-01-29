@@ -55,6 +55,8 @@ class GLSceneDeferred : public GLScene
         void reload();
         void clear(void);
 
+        void computeSceneSize(JU::uint32 width, JU::uint32 height);
+
         void initializePrograms();
         void initializeFBO();
         void initializeMaterials();
@@ -80,14 +82,20 @@ class GLSceneDeferred : public GLScene
 
         void renderPass1();
         void renderPass2();
+        void renderDebug();
 
     private:
+        // INTERFACE
+        JU::uint32 			scene_width_;
+        JU::uint32 			scene_height_;
+
         // DEFERRED SHADING SPECIFIC
         GLuint 				deferredFBO_;
         GLuint 				depthBuf_;
         GLuint				posTex_;
         GLuint				normTex_;
         GLuint				colorTex_;
+        GLuint				shininessTex_;
         GLuint 				pass1Index_;
         GLuint 				pass2Index_;
         bool				record_depth_;

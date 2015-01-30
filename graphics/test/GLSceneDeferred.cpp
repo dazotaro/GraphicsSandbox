@@ -172,7 +172,10 @@ void GLSceneDeferred::initializeFBO()
 
     // Check that our frame buffer is complete
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+    	std::printf("Incomplete FrameBuffer Status. Bailing out!!!");
     	exit(EXIT_FAILURE);
+    }
 
     // Register the texture handles with TextureManager
     TextureManager::registerTexture("PositionTex", 	posTex_);
@@ -630,9 +633,6 @@ void GLSceneDeferred::renderPass1()
     // bindings are part of context state.
     glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index_);
 
-    // LOAD LIGHTS
-    //loadLights();
-    
     // Model Matrix
     glm::mat4 M(1.0f);
     // View matrix
@@ -879,6 +879,7 @@ void GLSceneDeferred::clear(void)
 	glDeleteTextures     (1, &posTex_);
 	glDeleteTextures	 (1, &normTex_);
 	glDeleteTextures	 (1, &colorTex_);
+	glDeleteTextures	 (1, &shininessTex_);
 
 	// Camera
     delete tp_camera_;

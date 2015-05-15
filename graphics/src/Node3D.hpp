@@ -40,10 +40,7 @@ class Node3D : public Object3D, public DrawInterface
     private:
         const DrawInterface *node_drawable_;    //!< Pointer to the 'drawable' data of this node
         NodePointerList children_;              //!< All the children below this level
-        bool visible_;                          //!< To draw, or not draw, that is the question
+        bool visible_;                          //!< To draw or not draw, that is the question
 };
-
-typedef std::vector<Node3D *> NodePointerList;
-typedef NodePointerList::const_iterator NodePointerListIterator;
 
 #endif /* NODE3D_HPP_ */

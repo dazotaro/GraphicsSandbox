@@ -1,1 +1,9 @@
 shapes
+
+# Library
+src/libgraphics.a
+
+# Documentation
+src/html
+src/latex
+

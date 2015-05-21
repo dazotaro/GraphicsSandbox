@@ -8,9 +8,13 @@
 #ifndef GLSCENEANTTWEAKBAR_HPP_
 #define GLSCENEANTTWEAKBAR_HPP_
 
+// Local includes
 #include "GLScene.hpp"      // GLScene
 #include "Lights.hpp"       		// LightPositionalVector, LightDirectionalVector, LightSpotlightVector
 #include "ArcBallController.hpp"	// ArcBallController
+
+// Global includes
+#include <AntTweakBar.h>			// TwBar and Tw* functions
 
 // Forward Declarations
 class GLMesh;
@@ -61,6 +65,7 @@ class GLSceneAntTweakBar : public GLScene
     	void initializeLights();
     	void initializeObjects();
     	void initializeShadowMap();
+    	void initAntTweakBar();
 
         void renderPerfragmentLighting(void) const;
         void renderShadow(void) const;
@@ -99,6 +104,10 @@ class GLSceneAntTweakBar : public GLScene
         LightPositionalVector  lights_positional_;
         LightDirectionalVector lights_directional_;
         LightSpotlightVector   lights_spotlight_;
+
+        // AntTweakBar
+        bool show_bar_;
+        TwBar* pTwBar_;
 };
 
 #endif /* GLSCENEANTTWEAKBAR_HPP_ */

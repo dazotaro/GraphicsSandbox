@@ -6,7 +6,8 @@
  */
 
 // Local includes
-#include "GLSceneAntTweakBar.hpp"      // GLSceneAntTweakBar
+#include "GraphicsDefs.hpp"			// TAB_KEY
+#include "GLSceneAntTweakBar.hpp"   // GLSceneAntTweakBar
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
@@ -23,13 +24,15 @@
 #include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
 #include <SOIL.h>                   // SOIL_save_image
 #include <math.h>					// M_PI
+#include <iostream>					// std::printf
 
 
 
 GLSceneAntTweakBar::GLSceneAntTweakBar(int width, int height) : GLScene(width, height),
 									shadow_map_width_(2048), shadow_map_height_(2048), pcf_enabled_(false),
                                     shadowFBO_(0), depthTex_(0), pass1Index_(0), pass2Index_(0),
-									camera_gps_(0), camera_(0), control_camera_(true), camera_controller_(width, height, 0.5f)
+									camera_gps_(nullptr), camera_(nullptr), control_camera_(true), camera_controller_(width, height, 0.5f),
+									show_bar_(false), pTwBar_(nullptr)
 {
 }
 
@@ -318,8 +321,25 @@ void GLSceneAntTweakBar::initializeShadowMap()
 /**
 * @brief Initialized the Scene
 */
+void GLSceneAntTweakBar::initAntTweakBar(void)
+{
+	// Initialize AntTweakBar
+	TwInit(TW_OPENGL_CORE, NULL); // for core profile
+
+	pTwBar_ = TwNewBar("Shadow Mapping with PCF");
+
+    TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLUT and OpenGL.' "); // Message added to the help bar.
+    TwDefine(" TweakBar size='200 400' color='96 216 224' "); // change default tweak bar size and color
+}
+
+
+
+/**
+* @brief Initialized the Scene
+*/
 void GLSceneAntTweakBar::init(void)
 {
+	// Scene
 	initializeGLSLPrograms();
 	initializeMeshes();
 	initializeObjects();
@@ -327,7 +347,10 @@ void GLSceneAntTweakBar::init(void)
 	initializeCameras();
 	initializeShadowMap();
 
+	// AntTweakBar
+	initAntTweakBar();
 
+	// Set up OpenGL
     glClearColor(0.0,0.0,0.0,1.0);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
@@ -522,6 +545,10 @@ void GLSceneAntTweakBar::render(void)
     camera_ = fp_camera_;
     renderShadow();
     */
+
+    // AntTweakBar
+    if (show_bar_)
+    	TwDraw();  // draw the tweak bar(s)
 }
 
 /**
@@ -653,6 +680,9 @@ void GLSceneAntTweakBar::resize(int width, int height)
     glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     tp_camera_->setAspectRatio(static_cast<float>(width)/height);
     camera_controller_.windowResize(width, height);
+
+    // AntTweakBar
+	TwWindowSize(width, height);
 }
 
 
@@ -683,79 +713,13 @@ void GLSceneAntTweakBar::keyboard(unsigned char key, int x, int y)
 
             break;
 
+        case TAB_KEY:
+        	show_bar_ = !show_bar_;
+        	break;
+
         case 'c':
         case 'C':
             control_camera_ = !control_camera_;
-            break;
-
-        case 'a':
-        case 'A':
-            node_map_["sphere"]->rotateX(-1.0f);
-            break;
-
-        case 'd':
-        case 'D':
-            node_map_["sphere"]->rotateX(1.0f);
-            break;
-
-        case 'q':
-        case 'Q':
-            node_map_["sphere"]->rotateY(1.0f);
-            break;
-
-        case 'e':
-        case 'E':
-            node_map_["sphere"]->rotateY(-1.0f);
-            break;
-
-        case 'w':
-        case 'W':
-            node_map_["sphere"]->rotateZ(-1.0f);
-            break;
-
-        case 's':
-        case 'S':
-            node_map_["sphere"]->rotateZ(1.0f);
-            break;
-
-        case 'k':
-        case 'K':
-            fp_camera_->rotateY(1.0f);  // Yaw
-            break;
-
-        case ';':
-        case ':':
-            fp_camera_->rotateY(-1.0f);  // Yaw
-            break;
-
-        case 'i':
-        case 'I':
-            fp_camera_->rotateZ(1.0f);  // Roll
-            break;
-
-        case 'p':
-        case 'P':
-            fp_camera_->rotateZ(-1.0f); // Roll
-            break;
-
-        case 'o':
-        case 'O':
-            fp_camera_->rotateX(-1.0f);  // Pitch
-            break;
-
-        case 'l':
-        case 'L':
-            fp_camera_->rotateX(1.0f); // Pitch
-            break;
-
-        case 'u':
-        case 'U':
-            fp_camera_->translate(glm::vec3(0.0f, 0.0f, -0.1f));
-            break;
-
-        case 'j':
-        case 'J':
-            fp_camera_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
             break;
 
         case '1':
@@ -807,6 +771,9 @@ void GLSceneAntTweakBar::clear(void)
     delete light_frustum_;
     delete gl_plane_shadow_instance_;
     delete shadow_plane_node_;
+
+    // Release AntTweakBar
+	TwTerminate();
 }
 
 void GLSceneAntTweakBar::spitOutDepthBuffer() const

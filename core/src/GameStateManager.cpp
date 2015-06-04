@@ -10,7 +10,51 @@
 namespace JU
 {
 
+bool GameState::load()
+{
 
+    return true;
+}
+
+
+
+bool GameState::initialize()
+{
+
+    return true;
+}
+
+
+
+bool GameState::update()
+{
+
+    return true;
+}
+
+
+
+bool GameState::draw()
+{
+
+    return true;
+}
+
+
+
+bool GameState::free()
+{
+
+    return true;
+}
+
+
+
+bool GameState::unload()
+{
+
+    return true;
+}
 
 GameStateManager::GameStateManager ()
 {
@@ -26,15 +70,6 @@ GameStateManager::~GameStateManager ()
 }
 
 
-
-bool GameStateManager::load()
-{
-
-    return true;
-}
-
-
-
 bool GameStateManager::initialize()
 {
 
@@ -42,35 +77,9 @@ bool GameStateManager::initialize()
 }
 
 
-
-bool GameStateManager::update()
+void GameStateManager::exit()
 {
 
-    return true;
-}
-
-
-
-bool GameStateManager::draw()
-{
-
-    return true;
-}
-
-
-
-bool GameStateManager::free()
-{
-
-    return true;
-}
-
-
-
-bool GameStateManager::unload()
-{
-
-    return true;
 }
 
 

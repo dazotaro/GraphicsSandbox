@@ -8,21 +8,14 @@
 #ifndef GAMESTATEMANAGER_HPP_
 #define GAMESTATEMANAGER_HPP_
 
-#include <map>  // std::map
+// Local Includes
+#include "GameState.hpp"		// GameState
+// Global Includes
+#include <string>				// std::string
+#include <map>  				// std::map
 
 namespace JU
 {
-
-class GameState
-{
-    public:
-        bool load();
-        bool initialize();
-        bool update();
-        bool draw();
-        bool free();
-        bool unload();
-};
 
 class GameStateManager
 {
@@ -30,11 +23,19 @@ class GameStateManager
         GameStateManager ();
         virtual ~GameStateManager ();
 
-        bool initialize();
-        void exit();
+        // Interface Functions
+        virtual bool initialize();
+        virtual void exit();
+		virtual bool changeState() = 0;
+		virtual bool draw();
 
     private:
-        std::map<std::string, GameState> state_map_;
+		// Type Definitions
+		typedef std::map<std::string, GameState> StateMap;
+		typedef StateMap::const_iterator StateMapConstIter;
+		// Member Variables
+		StateMap 			state_map_;
+		StateMapConstIter	curr_state_;
 };
 
 } /* namespace JU */

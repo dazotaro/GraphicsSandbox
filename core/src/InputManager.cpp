@@ -79,7 +79,7 @@ namespace JU
 
                     case SDL_KEYDOWN:
                     case SDL_KEYUP:
-                        keyboard_(event.key);
+                        keyboard_.handleEvent(event.key);
                         break;
 
                     default:

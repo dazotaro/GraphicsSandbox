@@ -19,7 +19,7 @@ namespace JU
         enum KeyState
         {
             KEY_DOWN = SDL_PRESSED,
-            kEY_UP   = SDL_RELEASED
+            KEY_UP   = SDL_RELEASED
         };
 
         public:

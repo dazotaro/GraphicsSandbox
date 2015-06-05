@@ -14,7 +14,7 @@
 namespace JU
 {
 
-    GameManager::GameManager ()
+    GameManager::GameManager () : running_(true)
     {
         // TODO Auto-generated constructor stub
 
@@ -29,7 +29,7 @@ namespace JU
 
     bool GameManager::initialize()
     {
-        if (!window_.initialize())
+        if (!window_.initialize(800, 600))
         {
             std::printf("Window failed to initialize!!!\n");
             return false;
@@ -57,6 +57,9 @@ namespace JU
     {
     	while(running_)
     	{
+    		input_manager_.update();
+    		running_ = input_manager_.quitting();
+
 
     	}
     }

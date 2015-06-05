@@ -7,6 +7,7 @@
 
 // Local Include
 #include "Window.hpp"
+#include "gl_core_4_2.h"				// OpenGL 4.2 Core Profile
 
 
 namespace JU

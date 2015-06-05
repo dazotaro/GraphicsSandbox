@@ -23,9 +23,11 @@ namespace JU
         public:
             bool initialize();
             bool update();
+            bool quitting() const;
 
         public:
             Keyboard keyboard_;
+            bool 	 quit_;
     };
 
 } /* namespace JU */

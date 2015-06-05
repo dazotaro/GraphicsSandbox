@@ -8,12 +8,15 @@
 #ifndef GAMESTATE_HPP_
 #define GAMESTATE_HPP_
 
+class GLScene;
+
 namespace JU
 {
 
 class GameState
 {
     public:
+		GameState();
 		virtual ~GameState();
 		virtual bool load();
         virtual bool initialize();
@@ -21,6 +24,11 @@ class GameState
         virtual bool draw();
         virtual bool free();
         virtual bool unload();
+
+        void registerGLScene(GLScene* scene);
+
+    protected:
+        GLScene* p_scene_;
 };
 
 } /* namespace JU */

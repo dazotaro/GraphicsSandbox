@@ -17,7 +17,7 @@ LIBS_DIR = -L.
 INC =
 MACROS =
 OPTS = -g -std=c++11
-OBJS = XMLHandler.o JSONHandler.o Object3D.o GameState.o GameStateManager.o Keyboard.o InputManager.o SystemLog.o Window.o
+OBJS = XMLHandler.o JSONHandler.o Object3D.o GameManager.o GameState.o GameStateManager.o Keyboard.o InputManager.o SystemLog.o Window.o gl_core_4_2.o 
 
 # TARGETS
 # -------

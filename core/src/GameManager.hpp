@@ -10,6 +10,8 @@
 
 #include "GameStateManager.hpp" // GameStateManager
 #include "Window.hpp"           // Window
+#include "InputManager.hpp"		// InputManager
+
 
 namespace JU
 {
@@ -20,9 +22,9 @@ class GameManager
         GameManager ();
         virtual ~GameManager ();
 
-        bool initialize();
-        void loop();
-        void exit();
+        virtual bool initialize();
+        virtual void loop();
+        virtual void exit();
 
     private:
         GameStateManager state_manager_;

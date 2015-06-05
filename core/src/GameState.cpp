@@ -5,10 +5,19 @@
  *      Author: jusabiaga
  */
 
+// Local includes
 #include "GameState.hpp"
+
+// Global includes
+#include <JU/graphics/GLScene.hpp>
 
 namespace JU
 {
+
+GameState::GameState() : p_scene_(nullptr)
+{
+}
+
 
 GameState::~GameState()
 {
@@ -40,6 +49,8 @@ bool GameState::update()
 
 bool GameState::draw()
 {
+	if (p_scene_)
+		p_scene_->render();
 
     return true;
 }
@@ -59,5 +70,13 @@ bool GameState::unload()
 
     return true;
 }
+
+
+void GameState::registerGLScene(GLScene* scene)
+{
+	p_scene_ = scene;
+}
+
+
 
 } /* namespace JU */

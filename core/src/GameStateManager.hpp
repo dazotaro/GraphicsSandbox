@@ -26,16 +26,18 @@ class GameStateManager
         // Interface Functions
         virtual bool initialize();
         virtual void exit();
-		virtual bool changeState() = 0;
+		virtual bool changeState();
 		virtual bool draw();
+		void addState(const char* name, GameState* game_state);
+		bool changeState(const char* name);
 
     private:
 		// Type Definitions
-		typedef std::map<std::string, GameState> StateMap;
-		typedef StateMap::const_iterator StateMapConstIter;
+		typedef std::map<std::string, GameState*> StateMap;
+		typedef StateMap::iterator StateMapIter;
 		// Member Variables
 		StateMap 			state_map_;
-		StateMapConstIter	curr_state_;
+		StateMapIter		curr_state_;
 };
 
 } /* namespace JU */

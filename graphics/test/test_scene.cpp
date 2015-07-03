@@ -165,8 +165,8 @@ static void init(void)
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
     //scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
-	//scene = new GLSceneDeferred(WIDTH, HEIGHT);
-	scene = new GLSceneAntTweakBar(WIDTH, HEIGHT);
+	scene = new GLSceneDeferred(WIDTH, HEIGHT);
+	//scene = new GLSceneAntTweakBar(WIDTH, HEIGHT);
 
     scene->init();
 

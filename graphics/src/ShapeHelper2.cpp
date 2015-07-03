@@ -227,11 +227,11 @@ inline void addTriangulatedQuad(const ShapeHelper2::Vertex& v0,
 *
 * @return The Mesh
 */
-void ShapeHelper2::buildTerrain(std::string& name,
-       						    JU::f32**	 height_map,
-       						    JU::uint32	 num_rows,
-       						    JU::uint32	 num_cols,
-								Mesh2&		 mesh)
+void ShapeHelper2::buildTerrain(std::string&   name,
+       						    const JU::f32* height_map,
+       						    JU::uint32	   num_rows,
+       						    JU::uint32	   num_cols,
+								Mesh2&		   mesh)
 {
 	Mesh2::VectorPositions  	  vPositions;
 	Mesh2::VectorNormals 		  vNormals;
@@ -284,11 +284,12 @@ void ShapeHelper2::buildTerrain(std::string& name,
 
     	for (JU::uint32 col = 0; col < (num_cols - 1); ++col)
     	{
+    		std::printf ("(%i, %i)\n", row, col);
     		// Positions
-    		glm::vec3 p0(       x,        y, height_map[row][col]);
-    		glm::vec3 p1(       x, y - incy, height_map[row][col]);
-    		glm::vec3 p2(x + incx, y - incy, height_map[row][col]);
-    		glm::vec3 p3(x + incx,        y, height_map[row][col]);
+    		glm::vec3 p0(       x,        y, height_map[row * num_cols+ col]);
+    		glm::vec3 p1(       x, y - incy, height_map[row * num_cols+ col]);
+    		glm::vec3 p2(x + incx, y - incy, height_map[row * num_cols+ col]);
+    		glm::vec3 p3(x + incx,        y, height_map[row * num_cols+ col]);
     		// Normal
     		glm::vec3 n(glm::normalize(glm::cross(p1 - p0, p2 - p0)));
     		// Texture Coordinates

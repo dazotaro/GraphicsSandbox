@@ -77,11 +77,11 @@ class ShapeHelper2
 		// BUILDER FUNCTIONS: they build the desired shape
 		//-------------------------------------------------
 
-		static void buildTerrain(std::string& name,
-								 JU::f32**	  height_map,
-								 JU::uint32	  num_rows,
-								 JU::uint32	  num_cols,
-								 Mesh2& 	  mesh);
+		static void buildTerrain(std::string&   name,
+								 const JU::f32* height_map,
+								 JU::uint32	    num_rows,
+								 JU::uint32	    num_cols,
+								 Mesh2& 	    mesh);
 
 		static void buildMesh(Mesh2& mesh, ShapeType shape_type,
 							  JU::uint32 num_slices = 10,

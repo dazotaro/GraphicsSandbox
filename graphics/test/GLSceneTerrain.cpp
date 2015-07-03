@@ -204,9 +204,9 @@ void GLSceneTerrain::initializeMaterials()
     material_map_["ruby"] = pmat;
 
     pmat = new Material;
-    if (!MaterialManager::getMaterial("gray_rubber", *pmat))
+    if (!MaterialManager::getMaterial("green_rubber", *pmat))
         exit(EXIT_FAILURE);
-    material_map_["gray_rubber"] = pmat;
+    material_map_["green_rubber"] = pmat;
 
     pmat = new Material;
     if (!MaterialManager::getMaterial("pearl", *pmat))
@@ -231,15 +231,20 @@ void GLSceneTerrain::initializeTextures()
 
 void GLSceneTerrain::initializeHeightMap()
 {
-	std::string filename("texture/TerrainSmall.jpg");
+	std::string filename("texture/ripple128.png");
 
     int width, height, channels;
     unsigned char *image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
+
+    std::printf("Loading \"%s\": number or channels = %i\n", filename.c_str(), channels);
 
     GLuint mode;
 
     switch (channels)
     {
+    	case 1:
+    		break;
+
         case 3:
             mode = GL_RGB;
             break;
@@ -254,14 +259,13 @@ void GLSceneTerrain::initializeHeightMap()
     }
 
     // Flip the image vertically
-    JU::imageInvertVertically(width, height, channels, image);
+    //JU::imageInvertVertically(width, height, channels, image);
 
     std::printf ("Height map dimensions (%i, %i)\n", width, height);
 
     // Allocate the height map
-    JU::uint8 sub = 1;
-    height_num_rows_ = height / sub;
-    height_num_cols_ = width / sub;
+    height_num_rows_ = height;
+    height_num_cols_ = width;
 
     pheight_data_ = new JU::f32[width * height];
 
@@ -269,7 +273,18 @@ void GLSceneTerrain::initializeHeightMap()
     {
     	for (JU::uint32 col = 0; col < height_num_cols_; ++col)
     	{
-    		pheight_data_[row * width + col] = static_cast<double>(image[(row * sub) * width + col * sub]) / 255.0f;
+    		JU::uint32 index = (row * width + col) * channels;
+    		JU::f32 intensity = 0.0f;
+    		if (mode == GL_RGB || mode == GL_RGBA)
+    		{
+    			intensity = (image[index] + image[index + 1] + image[index + 2]);
+    			intensity /= 3 * 255.f;
+    		}
+    		else
+    		{
+    			intensity = image[index] / 255.f;
+    		}
+    		pheight_data_[row * width + col] = intensity;
     	}
     }
 
@@ -323,7 +338,7 @@ void GLSceneTerrain::initializeObjects()
     // PLANE
     // ------
     // MESH
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    //ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
     std::string name("myterrain");
     ShapeHelper2::buildTerrain(name, pheight_data_, height_num_rows_, height_num_cols_, mesh);
     pmesh = new GLMesh(mesh);
@@ -331,8 +346,8 @@ void GLSceneTerrain::initializeObjects()
     pmesh->init();
     mesh_map_["plane"] = pmesh;
     // MESH INSTANCE
-    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 5.0f, material_map_["gold"]);
-    pmesh_instance->addColorTexture("brick");
+    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 6.0f, material_map_["green_rubber"]);
+    //pmesh_instance->addColorTexture("brick");
     mesh_instance_map_["plane_green"];
     // NODE
     // Give the plane a position and a orientation
@@ -594,10 +609,18 @@ void GLSceneTerrain::updatePositionalLights(JU::f32 time)
     JU::uint32 index = 0;
     for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
+    	/*
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
         light->position_.x = position.x;
         light->position_.y = position.y;
         light->position_.z = position.z;
+		*/
+
+    	glm::vec3 cam_position(tp_camera_->getPosition());
+
+        light->position_.x = cam_position.x;
+        light->position_.y = cam_position.y;
+        light->position_.z = cam_position.z;
 
         node_map_[std::string("light_pos") + std::to_string(index)]->setPosition(light->position_);
 
@@ -622,10 +645,18 @@ void GLSceneTerrain::updateSpotlightLights(JU::f32 time)
     JU::uint32 index = 0;
     for (LightSpotlightVector::iterator light = lights_spotlight_.begin(); light != lights_spotlight_.end(); ++light)
     {
+    	/*
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
         light->position_.x = position.x;
         light->position_.y = position.y;
         light->position_.z = position.z;
+        */
+
+    	glm::vec3 cam_position(tp_camera_->getPosition());
+
+        light->position_.x = cam_position.x;
+        light->position_.y = cam_position.y;
+        light->position_.z = cam_position.z;
 
         node_map_[std::string("light_pos") + std::to_string(index)]->setPosition(light->position_);
 

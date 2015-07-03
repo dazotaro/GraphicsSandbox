@@ -284,6 +284,7 @@ void ShapeHelper2::buildTerrain(std::string&   name,
             JU::uint32 index = row * num_cols + col;
 
     		std::printf ("(%i, %i)\n", row, col);
+
     		// Positions
     		p0.x =        x; p0.y =        y; p0.z = height_map[row * num_cols + col];
     		p1.x =        x; p1.y = y - incy; p1.z = height_map[(row + 1) * num_cols + col];
@@ -298,12 +299,12 @@ void ShapeHelper2::buildTerrain(std::string&   name,
     		t3.s = tx + incx; t3.t = ty;
 
     		// DEBUG: START
-
+    		/*
     		debug::print("P0 = ", p0);
     		debug::print("P1 = ", p1);
     		debug::print("P2 = ", p2);
     		debug::print("P3 = ", p3);
-
+			*/
     		// DEBUG: END
 
     	    Vertex v0(p0, n, t0);

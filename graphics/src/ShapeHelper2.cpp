@@ -8,6 +8,7 @@
 // Local includes
 #include "ShapeHelper2.hpp"
 #include "Mesh2.hpp"		// Mesh2
+#include "DebugGlm.hpp"
 
 // Global includes
 #include <unordered_map>    // std::unordered_map
@@ -233,10 +234,12 @@ void ShapeHelper2::buildTerrain(std::string&   name,
        						    JU::uint32	   num_cols,
 								Mesh2&		   mesh)
 {
-	Mesh2::VectorPositions  	  vPositions;
-	Mesh2::VectorNormals 		  vNormals;
-	Mesh2::VectorTexCoords		  vTexCoords;
+	Mesh2::VectorPositions  	  vPositions (num_rows * num_cols);
+	Mesh2::VectorNormals 		  vNormals (num_rows * num_cols);
+	Mesh2::VectorTexCoords		  vTexCoords (num_rows * num_cols);
+	//Mesh2::VectorVertexIndices    vVertexIndices (num_rows * num_cols);
 	Mesh2::VectorVertexIndices    vVertexIndices;
+	//Mesh2::VectorTriangleIndices  vTriangleIndices (num_rows * num_cols * 2);
 	Mesh2::VectorTriangleIndices  vTriangleIndices;
 
     vPositions.clear();
@@ -248,20 +251,7 @@ void ShapeHelper2::buildTerrain(std::string&   name,
     MapVec3 mPositions	(vec3Compare);
     MapVec3 mNormals  	(vec3Compare);
     MapVec2 mTexCoords (vec2Compare);
-    HashMapVertexIndices hmVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
-
-    Vertex v0(-0.5f,  0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               0.0f,  1.0f);      // texture coordinates
-    Vertex v1(-0.5f, -0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               0.0f,  0.0f);      // texture coordinates
-    Vertex v2( 0.5f, -0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               1.0f,  0.0f);      // texture coordinates
-    Vertex v3( 0.5f,  0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               1.0f,  1.0f);      // texture coordinates
+    HashMapVertexIndices hmVertexIndices(num_rows * num_cols * 3, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
     // Error out if wrong dimensions
     if (num_rows < 2 || num_cols < 2)
@@ -277,26 +267,44 @@ void ShapeHelper2::buildTerrain(std::string&   name,
     JU::f32 tx = 0.0f;
     JU::f32 ty = 1.0f;
 
+    // Positions
+    glm::vec3 p0, p1, p2, p3;
+    // Normal
+    glm::vec3 n;
+    // Texture Coordinates
+    glm::vec2 t0, t1, t2, t3;
+
     for (JU::uint32 row = 0; row < (num_rows - 1); ++row)
     {
-    	x = 0.5f;
+    	x = -0.5f;
     	tx = 0.0f;
 
     	for (JU::uint32 col = 0; col < (num_cols - 1); ++col)
     	{
+            JU::uint32 index = row * num_cols + col;
+
     		std::printf ("(%i, %i)\n", row, col);
     		// Positions
-    		glm::vec3 p0(       x,        y, height_map[row * num_cols+ col]);
-    		glm::vec3 p1(       x, y - incy, height_map[row * num_cols+ col]);
-    		glm::vec3 p2(x + incx, y - incy, height_map[row * num_cols+ col]);
-    		glm::vec3 p3(x + incx,        y, height_map[row * num_cols+ col]);
+    		p0.x =        x; p0.y =        y; p0.z = height_map[row * num_cols + col];
+    		p1.x =        x; p1.y = y - incy; p1.z = height_map[(row + 1) * num_cols + col];
+    		p2.x = x + incx; p2.y = y - incy; p2.z = height_map[(row + 1) * num_cols + (col + 1)];
+    		p3.x = x + incx; p3.y =        y; p3.z = height_map[row * num_cols + (col + 1)];
     		// Normal
     		glm::vec3 n(glm::normalize(glm::cross(p1 - p0, p2 - p0)));
     		// Texture Coordinates
-    		glm::vec2 t0(       tx,        ty);
-    		glm::vec2 t1(       tx, ty - incy);
-    		glm::vec2 t2(tx + incx, ty - incy);
-    		glm::vec2 t3(tx + incx,        ty);
+    		t0.s = tx;        t0.t = ty;
+    		t1.s = tx;        t1.t = ty - incy;
+    		t2.s = tx + incx; t2.t = ty - incy;
+    		t3.s = tx + incx; t3.t = ty;
+
+    		// DEBUG: START
+
+    		debug::print("P0 = ", p0);
+    		debug::print("P1 = ", p1);
+    		debug::print("P2 = ", p2);
+    		debug::print("P3 = ", p3);
+
+    		// DEBUG: END
 
     	    Vertex v0(p0, n, t0);
     	    Vertex v1(p1, n, t1);

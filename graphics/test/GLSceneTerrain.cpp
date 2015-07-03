@@ -231,7 +231,7 @@ void GLSceneTerrain::initializeTextures()
 
 void GLSceneTerrain::initializeHeightMap()
 {
-	std::string filename("texture/Terrain.jpg");
+	std::string filename("texture/TerrainSmall.jpg");
 
     int width, height, channels;
     unsigned char *image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
@@ -259,16 +259,17 @@ void GLSceneTerrain::initializeHeightMap()
     std::printf ("Height map dimensions (%i, %i)\n", width, height);
 
     // Allocate the height map
-    height_num_rows_ = height;
-    height_num_cols_ = width;
+    JU::uint8 sub = 1;
+    height_num_rows_ = height / sub;
+    height_num_cols_ = width / sub;
 
-    pheight_data_ = new JU::f32[width *height];
+    pheight_data_ = new JU::f32[width * height];
 
-    for (JU::uint32 row = 0; row < height; ++row)
+    for (JU::uint32 row = 0; row < height_num_rows_; ++row)
     {
-    	for (JU::uint32 col = 0; col < width; ++col)
+    	for (JU::uint32 col = 0; col < height_num_cols_; ++col)
     	{
-    		pheight_data_[row * width + col] = image[row * width + col] / 255;
+    		pheight_data_[row * width + col] = static_cast<double>(image[(row * sub) * width + col * sub]) / 255.0f;
     	}
     }
 
@@ -330,7 +331,7 @@ void GLSceneTerrain::initializeObjects()
     pmesh->init();
     mesh_map_["plane"] = pmesh;
     // MESH INSTANCE
-    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 1.0f, material_map_["gray_rubber"]);
+    pmesh_instance = new GLMeshInstance(pmesh, 50.0f, 50.0f, 5.0f, material_map_["gold"]);
     pmesh_instance->addColorTexture("brick");
     mesh_instance_map_["plane_green"];
     // NODE
@@ -427,7 +428,7 @@ void GLSceneTerrain::initializeDirectionalLights()
 void GLSceneTerrain::initializeSpotlightLights()
 {
 	JU::f32 radius = 10.0f;
-	JU::f32 channel_intensity = 1.0f / num_lights_;
+	JU::f32 channel_intensity = 2.0f / num_lights_;
     glm::vec3 light_intensity (channel_intensity);
     JU::f32 cutoff = M_PI / 4.0f;
 

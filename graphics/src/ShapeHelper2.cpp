@@ -216,6 +216,107 @@ inline void addTriangulatedQuad(const ShapeHelper2::Vertex& v0,
 
 
 /**
+* @brief Terrain Builder function
+*
+* It generates the Mesh for the given shape
+*
+* @oaram mesh       The Mesh object
+* @oaram shape_type Shape to build (cube, sphere...)
+* @param num_slices To be used only with cylinders, cones and spheres.
+* @param num_stacs  To be used with spheres only.
+*
+* @return The Mesh
+*/
+void ShapeHelper2::buildTerrain(std::string& name,
+       						    JU::f32**	 height_map,
+       						    JU::uint32	 num_rows,
+       						    JU::uint32	 num_cols,
+								Mesh2&		 mesh)
+{
+	Mesh2::VectorPositions  	  vPositions;
+	Mesh2::VectorNormals 		  vNormals;
+	Mesh2::VectorTexCoords		  vTexCoords;
+	Mesh2::VectorVertexIndices    vVertexIndices;
+	Mesh2::VectorTriangleIndices  vTriangleIndices;
+
+    vPositions.clear();
+    vNormals.clear();
+    vTexCoords.clear();
+    vVertexIndices.clear();
+
+    Vertex vertex;						// Vertex data
+    MapVec3 mPositions	(vec3Compare);
+    MapVec3 mNormals  	(vec3Compare);
+    MapVec2 mTexCoords (vec2Compare);
+    HashMapVertexIndices hmVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
+
+    Vertex v0(-0.5f,  0.5f, 0.0f, // position
+               0.0f,  0.0f, 1.0f, // normal
+               0.0f,  1.0f);      // texture coordinates
+    Vertex v1(-0.5f, -0.5f, 0.0f, // position
+               0.0f,  0.0f, 1.0f, // normal
+               0.0f,  0.0f);      // texture coordinates
+    Vertex v2( 0.5f, -0.5f, 0.0f, // position
+               0.0f,  0.0f, 1.0f, // normal
+               1.0f,  0.0f);      // texture coordinates
+    Vertex v3( 0.5f,  0.5f, 0.0f, // position
+               0.0f,  0.0f, 1.0f, // normal
+               1.0f,  1.0f);      // texture coordinates
+
+    // Error out if wrong dimensions
+    if (num_rows < 2 || num_cols < 2)
+    {
+    	std::printf("Dimensions of height map (%i, %i) do not allow for mesh creation\n", num_rows, num_cols);
+    	exit(EXIT_FAILURE);
+    }
+
+    JU::f32 incx = 1.0f / num_cols;
+    JU::f32 incy = 1.0f / num_rows;
+    JU::f32 x = -0.5f;
+    JU::f32 y =  0.5f;
+    JU::f32 tx = 0.0f;
+    JU::f32 ty = 1.0f;
+
+    for (JU::uint32 row = 0; row < (num_rows - 1); ++row)
+    {
+    	x = 0.5f;
+    	tx = 0.0f;
+
+    	for (JU::uint32 col = 0; col < (num_cols - 1); ++col)
+    	{
+    		// Positions
+    		glm::vec3 p0(       x,        y, height_map[row][col]);
+    		glm::vec3 p1(       x, y - incy, height_map[row][col]);
+    		glm::vec3 p2(x + incx, y - incy, height_map[row][col]);
+    		glm::vec3 p3(x + incx,        y, height_map[row][col]);
+    		// Normal
+    		glm::vec3 n(glm::normalize(glm::cross(p1 - p0, p2 - p0)));
+    		// Texture Coordinates
+    		glm::vec2 t0(       tx,        ty);
+    		glm::vec2 t1(       tx, ty - incy);
+    		glm::vec2 t2(tx + incx, ty - incy);
+    		glm::vec2 t3(tx + incx,        ty);
+
+    	    Vertex v0(p0, n, t0);
+    	    Vertex v1(p1, n, t1);
+    	    Vertex v2(p2, n, t2);
+    	    Vertex v3(p3, n, t3);
+
+    	    addTriangulatedQuad(v0, v1, v2, v3,
+    	    					mPositions, mNormals, mTexCoords, hmVertexIndices,
+    	    					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+    	    x += incx;
+    	    tx += incx;
+    	}
+    	y -= incy;
+    	ty -= incy;
+    }
+
+    mesh = Mesh2(name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+}
+
+/**
 * @brief Builder function
 *
 * It generates the Mesh for the given shape
@@ -459,7 +560,7 @@ void ShapeHelper2::buildCylinder(std::string&  					name,
     }
 
     char buffer[100];
-    sprintf(buffer, "cylinder_%i\0", num_slices);
+    sprintf(buffer, "cylinder_%i", num_slices);
     name = std::string(buffer);
 
     vPositions.clear();
@@ -588,7 +689,7 @@ void ShapeHelper2::buildCone(std::string&  					name,
     }
 
     char buffer[100];
-    sprintf(buffer, "cone_%i\0", num_slices);
+    sprintf(buffer, "cone_%i", num_slices);
     name = std::string(buffer);
 
     vPositions.clear();
@@ -696,7 +797,7 @@ void ShapeHelper2::buildSphere(std::string&  				 name,
     }
 
     char buffer[100];
-    sprintf(buffer, "sphere_%i_%i\0", num_slices, num_stacks);
+    sprintf(buffer, "sphere_%i_%i", num_slices, num_stacks);
     name = std::string(buffer);
 
     vPositions.clear();
@@ -872,7 +973,7 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
     }
 
     char buffer[100];
-    sprintf(buffer, "torus_%i_%i_%.2f\0", num_slices1, num_slices2, radius);
+    sprintf(buffer, "torus_%i_%i_%.2f", num_slices1, num_slices2, radius);
     name = std::string(buffer);
 
     vPositions.clear();
@@ -944,3 +1045,5 @@ void ShapeHelper2::buildTorus(std::string&  				 name,
     	}
     }
 }
+
+

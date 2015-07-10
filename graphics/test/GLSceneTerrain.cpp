@@ -231,7 +231,7 @@ void GLSceneTerrain::initializeTextures()
 
 void GLSceneTerrain::initializeHeightMap()
 {
-	std::string filename("texture/ripple128.png");
+	std::string filename("texture/Terrain4x4.png");
 
     int width, height, channels;
     unsigned char *image = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);

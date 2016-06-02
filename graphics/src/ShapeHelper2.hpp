@@ -93,7 +93,9 @@ class ShapeHelper2
 							   Mesh2::VectorNormals& 		 vNormals,
 							   Mesh2::VectorTexCoords&		 vTexCoords,
 							   Mesh2::VectorVertexIndices& 	 vVertexIndices,
-							   Mesh2::VectorTriangleIndices& vTriangleIndices);
+							   Mesh2::VectorTriangleIndices& vTriangleIndices,
+                               JU::uint32                    num_slices,
+                               JU::uint32                    num_stacks);
 
 		static void buildCube(std::string&  				name,
 				   	   	   	  Mesh2::VectorPositions&  		vPositions,

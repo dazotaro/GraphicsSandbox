@@ -60,7 +60,7 @@ bool TextureManager::loadTexture(const std::string &texture_name, const std::str
     glBindTexture(GL_TEXTURE_2D, texture_map_[texture_name]);
     glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, image);
 
-    GLfloat filtering_mode = GL_NEAREST;
+    GLfloat filtering_mode = GL_LINEAR;
 
 
     //GLfloat filtering_mode = GL_LINEAR_MIPMAP_LINEAR;

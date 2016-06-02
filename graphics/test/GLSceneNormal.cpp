@@ -27,7 +27,8 @@ GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
                                      camera_gps_(0), camera_(0), control_camera_(true),
-                                     camera_controller_(width, height, 0.2f)
+                                     camera_controller_(width, height, 0.2f),
+                                     animate_(true)
 {
 }
 
@@ -64,6 +65,7 @@ void GLSceneNormal::init(void)
 
     // TEXTURE LOADING
     // --------------
+    //TextureManager::loadTexture("normal_map", "texture/monster.png");
     TextureManager::loadTexture("normal_map", "texture/multi_normal_map.tga");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
     TextureManager::loadTexture("test", "texture/test.tga");
@@ -92,7 +94,7 @@ void GLSceneNormal::init(void)
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);//, &mat_sphere);
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 4.0f, 5.0f, 6.0f);//, &mat_sphere);
     gl_sphere_instance_->addColorTexture("rusted");
     gl_sphere_instance_->addNormalTexture("normal_map");
     // Give the sphere a position and a orientation
@@ -107,7 +109,8 @@ void GLSceneNormal::init(void)
     // PLANE
     // ------
     // Create Mesh
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE, 48, 48);
+    mesh.computeTangents();
     gl_plane_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
@@ -148,7 +151,7 @@ void GLSceneNormal::init(void)
 
     // LIGHTS
     //---------
-    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 light_position (0.0f, 20.0f, 30.0f);
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
@@ -235,7 +238,10 @@ void GLSceneNormal::update(float time)
 	// LIGHTS: update position
     static const float angle_speed = (2.0f * M_PI * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
 
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rotation;
+    if (animate_)
+        rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+
     for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
@@ -394,6 +400,11 @@ void GLSceneNormal::keyboard(unsigned char key, int x, int y)
         case 'J':
             camera_gps_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
             //tp_camera_->addDistanceToTarget(-0.1f);
+            break;
+
+        case 'm':
+        case 'M':
+            animate_ = !animate_;
             break;
     }
 }

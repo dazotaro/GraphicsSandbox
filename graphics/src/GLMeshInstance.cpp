@@ -143,7 +143,10 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
     // LOAD UNIFORMS
     program.setUniform("Model", new_model);
     program.setUniform("ModelViewMatrix", mv);
-    program.setUniform("NormalMatrix", glm::mat3(glm::vec3(mv[0]), glm::vec3(mv[1]), glm::vec3(mv[2])));
+
+        glm::mat4 normalmat4 = glm::transpose(glm::inverse(mv));
+        program.setUniform("NormalMatrix", glm::mat3(normalmat4));
+
     program.setUniform("MVP", MVP);
 
     if (material_)

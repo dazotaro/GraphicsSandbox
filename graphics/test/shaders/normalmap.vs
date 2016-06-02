@@ -43,7 +43,9 @@ void main()
     
     //Transform normal and tangent to eye space
     normal_geometry_eye = normalize(NormalMatrix * VertexNormal).xyz;
-    tangent_eye = normalize(ModelViewMatrix * VertexTangent).xyz;
+    // Note sure which one of the two matrices should be used to transform the tangent (the normal matrix of the model-view)
+    //tangent_eye = normalize(NormalMatrix * VertexTangent.xyz).xyz;
+    tangent_eye = normalize(mat3(ModelViewMatrix) * VertexTangent.xyz);
 
     // Compute the binormal
     bitangent_eye = normalize(cross(normal_geometry_eye, tangent_eye)) * VertexTangent.w;

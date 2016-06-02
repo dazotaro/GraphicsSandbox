@@ -94,7 +94,7 @@ void GLSceneNormal::init(void)
     // Load the Mesh into VBO and VAO
     gl_sphere_->init();
     // Create instance of GLMEsh (there could be more than one)
-    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 4.0f, 5.0f, 6.0f);//, &mat_sphere);
+    gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 5.0f, 5.0f, 5.0f);//, &mat_sphere);
     gl_sphere_instance_->addColorTexture("rusted");
     gl_sphere_instance_->addNormalTexture("normal_map");
     // Give the sphere a position and a orientation

@@ -58,8 +58,9 @@ void GLSceneNormal::init(void)
 
 	// SHADERS: load, compile and link them
     // --------------
-	glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+	//glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
     glsl_program_map_["normal_mapping"] = compileAndLinkShader("shaders/normalmap.vs", "shaders/normalmap.fs");
+    glsl_program_map_["ntb"] = compileAndLinkShader("shaders/normal_drawing.vs", "shaders/ntb_drawing.gs", "shaders/simple.fs");
 
     current_program_iter_ = glsl_program_map_.find("normal_mapping");
 

@@ -139,7 +139,7 @@ void GLSceneNormal::init(void)
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.1f, 100.f),
     								   static_cast<Object3D>(*sphere_node),
     								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);

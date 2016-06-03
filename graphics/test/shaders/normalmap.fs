@@ -39,7 +39,9 @@ layout( location = 0 ) out vec4 FragColor;
 vec3 phongModel(vec3 norm, vec3 diffR)
 {
     vec3 ambient = Light.Intensity * 0.2f * diffR;
-
+    vec3 spec_mat = vec3(1.0f, 1.0f, 1.0f);
+    float shininess = 100.0f;
+    
     float sDotN = clamp(dot(LightDir_tangent, norm), 0, 1);
     vec3 diffuse = Light.Intensity * diffR * sDotN;
 
@@ -49,10 +51,10 @@ vec3 phongModel(vec3 norm, vec3 diffR)
     {
         vec3 r = reflect(-LightDir_tangent, norm );
         rDotV = max(dot(r, ViewDir_tangent), 0.0);
-        spec = Light.Intensity * material.Ks * pow(max(dot(r,ViewDir_tangent), 0.0), material.shininess);
+        spec = Light.Intensity * spec_mat * pow(rDotV, shininess);
     }
 
-    return diffuse;// + spec;
+    return ambient + diffuse + spec;// + spec;
 }
 
 void main()

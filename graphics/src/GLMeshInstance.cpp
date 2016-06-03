@@ -148,6 +148,7 @@ void GLMeshInstance::draw(const GLSLProgram &program, const glm::mat4 & model, c
         program.setUniform("NormalMatrix", glm::mat3(normalmat4));
 
     program.setUniform("MVP", MVP);
+    program.setUniform("Projection", projection);
 
     if (material_)
     {

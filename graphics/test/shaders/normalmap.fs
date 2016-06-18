@@ -1,17 +1,8 @@
 #version 400
 
-in vec3 LightDir_view;
 in vec3 LightDir_tangent;
 in vec3 ViewDir_tangent;
 in vec2 TexCoord;
-
-in vec3 tangent_model;
-in vec3 bitangent_model;
-in vec3 normal_geometry_model;
-
-in vec3 tangent_eye;
-in vec3 bitangent_eye;
-in vec3 normal_geometry_eye;
 
 uniform sampler2D ColorTex0;
 uniform sampler2D NormalMapTex;
@@ -56,7 +47,7 @@ vec3 phongModel(vec3 norm, vec3 diffR)
         spec = Light.Intensity * spec_mat * pow(rDotV, shininess);
     }
 
-    return ambient + diffuse + spec;// + spec;
+    return ambient + diffuse + spec;
 }
 
 void main()
@@ -64,14 +55,8 @@ void main()
     // Lookup the normal from the normal map
     // (it could also get loaded with a GL_RGB_SNORM format in glTexImage2D to avoid the avoid the * 2.0 - 1.0 calculation)
 	vec3 normal = normalize(texture(NormalMapTex, TexCoord).rgb * 2.0 - 1.0);
-    /*vec4 normal = texture(NormalMapTex, TexCoord);
-    normal.x -= 0.5;
-    normal.y -= 0.5;
-    normal = normalize(normal);*/
-	//vec4 normal = texture(NormalMapTex, TexCoord);
 
 	vec4 texColor = texture(ColorTex0, TexCoord);
 
     FragColor = vec4(phongModel(normal, texColor.rgb), 1.0);
-    //FragColor = vec4(normal, 1.0);
 }

@@ -43,12 +43,13 @@ void main()
 	vec3 totalAmbDiff = vec3(0.0);
 	vec3 totalSpec    = vec3(0.0);
 	vec4 texColor = texture(Tex1, TexCoord);
+	vec3 normal = normalize(Normal);
 
     // Evaluate the lighting equation, for each light
     for (int i = 0; i < 8; i++)
     {
     	vec3 AaD, spec;
-        ads(i, vec4(Position, 1.0f), Normal, AaD, spec);
+        ads(i, vec4(Position, 1.0f), normal, AaD, spec);
         totalAmbDiff += AaD;
         totalSpec    += spec;
 	}

@@ -42,5 +42,5 @@ vec3 ads(vec4 position, vec3 norm)
 
 void main()
 {
-    FragColor = vec4(ads(vec4(Position_eye, 1.0f), Normal_eye), 1.0);
+    FragColor = vec4(ads(vec4(Position_eye, 1.0f), normalize(Normal_eye)), 1.0);
 }

@@ -29,7 +29,7 @@ int pfc_size = 1;
 
 vec3 phongModelDiffAndSpec()
 {
-    vec3 n = Normal;
+    vec3 n = normalize(Normal);
     //if( !gl_FrontFacing ) n = -n;
     vec3 s = normalize(vec3(Light.Position) - Position);
     vec3 v = normalize(-Position.xyz);

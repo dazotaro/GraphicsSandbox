@@ -14,6 +14,7 @@
 #include <unordered_map>    // std::unordered_map
 #include <map>              // std::map
 #include <functional>       // std::function
+#include <cstdio>           // std::printf
 
 
 bool vec3Compare(const glm::vec3& a, const glm::vec3& b)

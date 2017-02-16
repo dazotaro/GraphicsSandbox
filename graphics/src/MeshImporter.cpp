@@ -6,7 +6,8 @@
  */
 
 #include "MeshImporter.hpp"
-#include <assimp/Importer.hpp>      // C++ importer interface
+#include "Mesh2.hpp"                // Mesh2
+#include <assimp/Importer.hpp>      //  C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 #include <cstdio>                   // std::printf
@@ -33,7 +34,7 @@ MeshImporter::~MeshImporter()
 * @param filename Name of the file with the scene to import
 * @param mesh     Mesh to store the object loaded
 */
-bool import(const char* filename, Mesh2& mesh) const
+bool MeshImporter::import(const char* filename, Mesh2& mesh) const
 {
     // Create an instance of the Importer class
     Assimp::Importer importer;
@@ -83,6 +84,13 @@ bool import(const char* filename, Mesh2& mesh) const
         std::printf("Number of vertices = %i\n", scene->mMeshes[0]->mNumVertices);
         std::printf("Number of faces    = %i\n", scene->mMeshes[0]->mNumFaces);
         std::printf("Number of indices per face = %i\n", scene->mMeshes[0]->mFaces[0].mNumIndices);
+
+        std::string name;
+        Mesh2::VectorPositions        vPositions;
+        Mesh2::VectorNormals          vNormals;
+        Mesh2::VectorTexCoords        vTexCoords;
+        Mesh2::VectorVertexIndices    vVertexIndices;
+        Mesh2::VectorTriangleIndices  vTriangleIndices;
 
         /*
         std::printf("Vertex 0 = (%f, %f, %f)\n", scene->mMeshes[0]->mVertices[0].x,

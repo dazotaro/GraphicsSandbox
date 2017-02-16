@@ -99,7 +99,7 @@ vec4 shade()
     vec3 pos  = vec3( texture(PositionTex, TexCoord));
     vec3 norm = vec3( texture(NormalTex, TexCoord));
     vec3 color = vec3( texture(ColorTex, TexCoord));
-    float shininess = texture(ShininessTex, TexCoord);
+    float shininess = texture(ShininessTex, TexCoord).r;
     
     vec4 output_color = vec4(0.0f);
     
@@ -130,7 +130,7 @@ float getSobelSquaredValue()
     {
         for (int j = 0; j <= 2; ++j)
         {
-            float depth = textureOffset(DepthTex, TexCoord, ivec2(i-1, j-1));
+            float depth = textureOffset(DepthTex, TexCoord, ivec2(i-1, j-1)).r;
             sx += sobelx[i*3 + j] * depth;
             sy += sobely[i*3 + j] * depth;
         }
@@ -146,7 +146,7 @@ void pass1()
 {
     // Store position, normal and diffuse color in g-buffer
     PositionData = Position_eye;
-    NormalData   = Normal_eye;
+    NormalData   = normalize(Normal_eye);
     ColorData    = material.Kd;
     ShininessData	= material.shininess;
     

@@ -350,7 +350,7 @@ void ShapeHelper2::buildMesh(Mesh2& mesh, ShapeType shape_type, JU::uint32 num_s
     switch(shape_type)
     {
         case PLANE:
-            ShapeHelper2::buildPlane(shape_name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+            ShapeHelper2::buildPlane(shape_name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices, num_slices, num_stacks);
             break;
 
         case CUBE:
@@ -386,7 +386,9 @@ void ShapeHelper2::buildPlane(std::string&  				name,
 		   	   	   	   	   	  Mesh2::VectorNormals& 		vNormals,
 		   	   	   	   	   	  Mesh2::VectorTexCoords&		vTexCoords,
 		   	   	   	   	   	  Mesh2::VectorVertexIndices& 	vVertexIndices,
-							  Mesh2::VectorTriangleIndices& vTriangleIndices)
+							  Mesh2::VectorTriangleIndices& vTriangleIndices,
+                              JU::uint32                    num_slices,
+                              JU::uint32                    num_stacks)
 {
     name = std::string("plane");
 
@@ -401,22 +403,45 @@ void ShapeHelper2::buildPlane(std::string&  				name,
     MapVec2 mTexCoords (vec2Compare);
     HashMapVertexIndices hmVertexIndices(8, vertexIndicesHash);		// Hash map to keep track of uniqueness of vertices and their indices
 
-    Vertex v0(-0.5f,  0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               0.0f,  1.0f);      // texture coordinates
-    Vertex v1(-0.5f, -0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               0.0f,  0.0f);      // texture coordinates
-    Vertex v2( 0.5f, -0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               1.0f,  0.0f);      // texture coordinates
-    Vertex v3( 0.5f,  0.5f, 0.0f, // position
-               0.0f,  0.0f, 1.0f, // normal
-               1.0f,  1.0f);      // texture coordinates
+    JU::f32 yinc = 1.0f / num_stacks;
+    JU::f32 vinc = 1.0f / num_stacks;
+    JU::f32 y = 0.5f;
+    JU::f32 v = 1.0f;
 
-    addTriangulatedQuad(v0, v1, v2, v3,
-    					mPositions, mNormals, mTexCoords, hmVertexIndices,
-    					vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+    for (JU::uint16 row = 0; row < num_stacks; ++row)
+    {
+        JU::f32 xinc = 1.0f / num_slices;
+        JU::f32 uinc = 1.0f / num_slices;
+        JU::f32 x = -0.5f;
+        JU::f32 u = 0.0f;
+
+        for (JU::uint16 col = 0; col < num_slices; ++col)
+        {
+            Vertex v0( x, y, 0.0f, // position
+                      0.0f, 0.0f, 1.0f, // normal
+                      u, v);      // texture coordinates
+            Vertex v1(x, y - yinc, 0.0f, // position
+                      0.0f,  0.0f, 1.0f, // normal
+                      u, v - vinc);      // texture coordinates
+            Vertex v2(x + xinc, y - yinc, 0.0f, // position
+                      0.0f,  0.0f, 1.0f, // normal
+                      u + uinc, v - vinc);      // texture coordinates
+            Vertex v3(x + xinc, y, 0.0f, // position
+                      0.0f, 0.0f, 1.0f, // normal
+                      u + uinc, v);      // texture coordinates
+
+            addTriangulatedQuad(v0, v1, v2, v3,
+                                mPositions, mNormals, mTexCoords, hmVertexIndices,
+                                vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
+
+            x += xinc;
+            u += vinc;
+        }
+
+        y -= yinc;
+        v -= vinc;
+    }
+
 }
 
 

@@ -34,10 +34,10 @@ vec3 ads(int lightIndex, vec4 position, vec3 norm)
 void main()
 {
     vec3 color = vec3(0.0f);
-
+    vec3 normal = normalize(Normal);
     // Evaluate the lighting equation, for each light
     for( int i = 0; i < 8; i++ )
-        color += ads( i, vec4(Position, 1.0f), Normal);
+        color += ads( i, vec4(Position, 1.0f), normal);
 
     FragColor = vec4(color, 1.0);
 }

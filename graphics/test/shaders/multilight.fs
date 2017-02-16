@@ -87,12 +87,14 @@ void main()
 {
 	FragColor = vec4(0.0f);
     
+    vec3 normal = normalize(Normal_eye);
+    
     // Positional
 	for (int index = 0; index < num_pos_lights; ++index)
-    	FragColor += vec4(adsPositional(index, vec4(Position_eye, 1.0f), Normal_eye), 1.0f);
+    	FragColor += vec4(adsPositional(index, vec4(Position_eye, 1.0f), normal), 1.0f);
     	
     // Spotlight
     for (int index = 0; index < num_spot_lights; ++index)
-        FragColor += vec4(adsSpotlight(index, vec4(Position_eye, 1.0f), Normal_eye), 1.0f);
+        FragColor += vec4(adsSpotlight(index, vec4(Position_eye, 1.0f), normal), 1.0f);
 
 }

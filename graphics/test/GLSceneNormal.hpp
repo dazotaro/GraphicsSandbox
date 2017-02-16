@@ -70,6 +70,8 @@ class GLSceneNormal : public GLScene
         LightSpotlightVector   lights_spotlight_;
 
         ArcBallController camera_controller_;
+
+        bool animate_;
 };
 
 #endif /* GLSCENENORMAL_HPP_ */

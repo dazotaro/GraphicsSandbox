@@ -21,10 +21,6 @@ out vec3 LightDir_tangent;
 out vec3 ViewDir_tangent;
 out vec2 TexCoord;
 
-out vec3 tangent;
-out vec3 bitangent;
-out vec3 normal_geometry;
-
 uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
 uniform mat4 ProjectionMatrix;
@@ -32,21 +28,21 @@ uniform mat4 MVP;
 
 void main()
 {
-    tangent = VertexTangent.xyz;
-    normal_geometry = VertexNormal.xyz;
-    bitangent = normalize( cross(VertexNormal, VertexTangent.xyz) ) * VertexTangent.w;
+    vec3 tangent_model = VertexTangent.xyz;
+    vec3 normal_geometry_model = VertexNormal.xyz;
+    vec3 bitangent_model = normalize( cross(VertexNormal, VertexTangent.xyz) ) * VertexTangent.w;
     
     //Transform normal and tangent to eye space
-    vec3 norm_eye = normalize(NormalMatrix * VertexNormal);
-    vec3 tang_eye = normalize(NormalMatrix * VertexTangent.xyz);
-
+    vec3 normal_geometry_eye = normalize(NormalMatrix * VertexNormal).xyz;
+    vec3 tangent_eye = normalize(mat3(ModelViewMatrix) * VertexTangent.xyz);
     // Compute the binormal
-    vec3 binormal_eye = normalize( cross( norm_eye, tang_eye ) ) * VertexTangent.w;
+    vec3 bitangent_eye = normalize(cross(normal_geometry_eye, tangent_eye)) * VertexTangent.w;
 
     // Matrix for transformation to tangent space (remember that glsl matrices are column-major order)
-    mat3 fromEyeToTangentSpace = mat3(tang_eye.x, binormal_eye.x, norm_eye.x,
-                                      tang_eye.y, binormal_eye.y, norm_eye.y,
-                                      tang_eye.z, binormal_eye.z, norm_eye.z);
+    mat3 fromEyeToTangentSpace = mat3(tangent_eye.x, bitangent_eye.x, normal_geometry_eye.x,
+                                      tangent_eye.y, bitangent_eye.y, normal_geometry_eye.y,
+                                      tangent_eye.z, bitangent_eye.z, normal_geometry_eye.z);
+                                      
 
     // The fragment shader needs the light and view vectors in Tangent Space
     vec3 pos_eye = vec3(ModelViewMatrix * vec4(VertexPosition,1.0));

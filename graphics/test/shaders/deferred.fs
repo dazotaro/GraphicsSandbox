@@ -98,7 +98,7 @@ void pass1()
 {
     // Store position, normal and diffuse color in g-buffer
     PositionData 	= Position_eye;
-    NormalData   	= Normal_eye;
+    NormalData   	= normalize(Normal_eye);
     ColorData    	= material.Kd;
     ShininessData	= material.shininess;
     
@@ -113,7 +113,7 @@ void pass2()
     vec3 pos  = vec3( texture(PositionTex, TexCoord));
     vec3 norm = vec3( texture(NormalTex, TexCoord));
     vec3 color = vec3( texture(ColorTex, TexCoord));
-    float shininess = texture(ShininessTex, TexCoord));
+    float shininess = texture(ShininessTex, TexCoord).r;
     
     FragColor = vec4(0.0f);
     

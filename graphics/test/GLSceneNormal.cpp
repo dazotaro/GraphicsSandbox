@@ -27,7 +27,8 @@ GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
                                      gl_plane_(0), gl_plane_instance_(0),
                                      camera_gps_(0), camera_(0), control_camera_(true),
-                                     camera_controller_(width, height, 0.2f)
+                                     camera_controller_(width, height, 0.2f),
+                                     animate_(true)
 {
 }
 
@@ -57,13 +58,15 @@ void GLSceneNormal::init(void)
 
 	// SHADERS: load, compile and link them
     // --------------
-	glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
+	//glsl_program_map_["perfragment_texture"] = compileAndLinkShader("shaders/perfrag_texture.vs", "shaders/perfrag_texture.fs");
     glsl_program_map_["normal_mapping"] = compileAndLinkShader("shaders/normalmap.vs", "shaders/normalmap.fs");
+    glsl_program_map_["ntb"] = compileAndLinkShader("shaders/normal_drawing.vs", "shaders/ntb_drawing.gs", "shaders/simple.fs");
 
     current_program_iter_ = glsl_program_map_.find("normal_mapping");
 
     // TEXTURE LOADING
     // --------------
+    //TextureManager::loadTexture("normal_map", "texture/monster.png");
     TextureManager::loadTexture("normal_map", "texture/multi_normal_map.tga");
     TextureManager::loadTexture("light", "texture/light_texture.tga");
     TextureManager::loadTexture("test", "texture/test.tga");
@@ -107,7 +110,8 @@ void GLSceneNormal::init(void)
     // PLANE
     // ------
     // Create Mesh
-    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE);
+    ShapeHelper2::buildMesh(mesh, ShapeHelper2::PLANE, 48, 48);
+    mesh.computeTangents();
     gl_plane_ = new GLMesh(mesh);
     // Load the Mesh into VBO and VAO
     gl_plane_->init();
@@ -135,7 +139,7 @@ void GLSceneNormal::init(void)
                                camera_y, // camera_'s Y axis
                                camera_z);// VIEWING AXIS (the camera_ is looking into its NEGATIVE Z axis)
     //fp_camera_ = new CameraFirstPerson(CameraIntrinsic(90.f, width_/(float)height_, 1.f, 1000.f), *camera_gps_);
-    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.5f, 1000.f),
+    tp_camera_ = new CameraThirdPerson(CameraIntrinsic(90.f, width_/(float)height_, 0.1f, 100.f),
     								   static_cast<Object3D>(*sphere_node),
     								   10.0f, 0.0f, M_PI / 2.0f);
     camera_ = dynamic_cast<CameraInterface *>(tp_camera_);
@@ -148,7 +152,7 @@ void GLSceneNormal::init(void)
 
     // LIGHTS
     //---------
-    glm::vec3 light_position (0.0f, 20.0f, 10.0f);
+    glm::vec3 light_position (0.0f, 20.0f, 30.0f);
     glm::vec3 light_intensity (1.0f, 1.0f, 1.0f);
     // Create instance of GLMEsh (there could be more than one)
     gl_sphere_instance_ = new GLMeshInstance(gl_sphere_, 1.0f, 1.0f, 1.0f);
@@ -235,7 +239,10 @@ void GLSceneNormal::update(float time)
 	// LIGHTS: update position
     static const float angle_speed = (2.0f * M_PI * 0.1f) * 0.001f ; // 20 seconds to complete a revolution
 
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rotation;
+    if (animate_)
+        rotation = glm::rotate(glm::mat4(1.f), angle_speed * time, glm::vec3(0.0f, 1.0f, 0.0f));
+
     for (LightPositionalVector::iterator light = lights_positional_.begin(); light != lights_positional_.end(); ++light)
     {
         glm::vec4 position = rotation * glm::vec4(light->position_, 0.0f);
@@ -394,6 +401,11 @@ void GLSceneNormal::keyboard(unsigned char key, int x, int y)
         case 'J':
             camera_gps_->translate(glm::vec3(0.0f, 0.0f, 0.1f));
             //tp_camera_->addDistanceToTarget(-0.1f);
+            break;
+
+        case 'm':
+        case 'M':
+            animate_ = !animate_;
             break;
     }
 }

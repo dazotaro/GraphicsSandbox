@@ -10,7 +10,7 @@ INC = -iquote../src/
 
 LIBDIR = -L../src/
 
-LIBS = -l$(LIB_NAME) -lSOIL -lglut -lGL -lTiming -lrt -lcore -lAntTweakBar
+LIBS = -l$(LIB_NAME) -lSOIL -lglut -lGL -lTiming -lrt -lcore -lAntTweakBar -lassimp
 
 TARGET = graphics 
 

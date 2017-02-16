@@ -6,17 +6,18 @@
  */
 
 // Local includes
-#include "GLSceneShadow.hpp"      // GLSceneShadow
+#include "GLSceneShadow.hpp"        // GLSceneShadow
 #include "GLMesh.hpp"               // GLMesh
 #include "GLMeshInstance.hpp"       // GLMeshInstance
 #include "Node3D.hpp"               // Node3D
 #include "CameraInterface.hpp"      // camera_Interface
 #include "CameraFirstPerson.hpp"    // camera_FirstPerson
 #include "CameraThirdPerson.hpp"    // camera_FirstPerson
-#include "ShapeHelper2.hpp"          // build Mesh helper funtions
+#include "ShapeHelper2.hpp"         // build Mesh helper funtions
 #include "TextureManager.hpp"       // loadTexture()
 #include "DebugGlm.hpp"				// operator<<
 #include "Material.hpp"				// MaterialManager
+#include "MeshImporter.hpp"         // MeshImporter
 
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
@@ -104,11 +105,23 @@ void GLSceneShadow::initializeMeshes()
     pGlMesh->init();
     mesh_map_["sphere"] = pGlMesh;
 
+    /*
     ShapeHelper2::buildMesh(mesh, ShapeHelper2::TORUS, 64, 64);
     mesh.computeTangents();
     pGlMesh = new GLMesh(mesh);
     pGlMesh->init();
-    mesh_map_["torus"] = pGlMesh;
+    mesh_map_["monkey"] = pGlMesh;
+    */
+
+    if (!JU::MeshImporter::import("./models/monkey.obj", mesh))
+    {
+        std::printf("Could not load %s\n", "./models/monkey.obj");
+        exit(EXIT_FAILURE);
+    }
+    //mesh.computeTangents();
+    pGlMesh = new GLMesh(mesh);
+    pGlMesh->init();
+    mesh_map_["monkey"] = pGlMesh;
 }
 
 
@@ -167,11 +180,17 @@ void GLSceneShadow::initializeObjects()
 
     // TORUS
     // ------
+    material_name = "gold";
+    if (!MaterialManager::getMaterial(material_name, material))
+    {
+        std::printf("Material %s not found\n", material_name.c_str());
+        exit(EXIT_FAILURE);
+    }
     mesh_instance = new GLMeshInstance;
-    mesh_instance->setMesh(mesh_map_["torus"]);
+    mesh_instance->setMesh(mesh_map_["monkey"]);
     mesh_instance->setScale(5.0f, 5.0f, 5.0f);
     mesh_instance->setMaterial(&material);
-    mesh_instance_map_["torus"] = mesh_instance;
+    mesh_instance_map_["monkey"] = mesh_instance;
 
     // PLANE
     // ------
@@ -250,12 +269,12 @@ void GLSceneShadow::initializeObjects()
     // Torus
     // ----
     // Give the sphere a position and a orientation
-    Object3D torus (glm::vec3( 5.0f, 10.0f,  0.0f), // Model's position
+    Object3D monkey (glm::vec3( 10.0f, 10.0f,  0.0f), // Model's position
                     glm::vec3( 1.0f,  0.0f,  0.0f), // Model's X axis
                     glm::vec3( 0.0f,  1.0f,  0.0f), // Model's Y axis
                     glm::vec3( 0.0f,  0.0f,  1.0f));// Model's Z axis
-    pnode = new Node3D(torus, mesh_instance_map_["torus"], true);
-    node_map_["torus"] = pnode;
+    pnode = new Node3D(monkey, mesh_instance_map_["monkey"], true);
+    node_map_["monkey"] = pnode;
 
     // Plane
     // -----

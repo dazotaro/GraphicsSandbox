@@ -15,18 +15,6 @@
 namespace JU
 {
 
-MeshImporter::MeshImporter()
-{
-    // TODO Auto-generated constructor stub
-
-}
-
-MeshImporter::~MeshImporter()
-{
-    // TODO Auto-generated destructor stub
-}
-
-
 /**
 * @brief Assimp importer. Although Assimp will load a whole scene (meshes, animations, bones...)
 * we only read one mesh at this point (to be fixed later)
@@ -34,7 +22,7 @@ MeshImporter::~MeshImporter()
 * @param filename Name of the file with the scene to import
 * @param mesh     Mesh to store the object loaded
 */
-bool MeshImporter::import(const char* filename, Mesh2& mesh) const
+bool MeshImporter::import(const char* filename, Mesh2& mesh)
 {
     // Create an instance of the Importer class
     Assimp::Importer importer;
@@ -42,6 +30,7 @@ bool MeshImporter::import(const char* filename, Mesh2& mesh) const
     // Usually - if speed is not the most important aspect for you - you'll
     // propably to request more postprocessing than we do in this example.
     const aiScene* scene = importer.ReadFile(filename,
+                                             aiProcess_GenNormals             |
                                              aiProcess_CalcTangentSpace       |
                                              aiProcess_Triangulate            |
                                              aiProcess_JoinIdenticalVertices  |
@@ -73,36 +62,69 @@ bool MeshImporter::import(const char* filename, Mesh2& mesh) const
             exit(EXIT_FAILURE);
         }
 
-        std::printf("Number of color channels = %i\n", scene->mMeshes[0]->GetNumColorChannels());
-        std::printf("Number of UV channels    = %i\n", scene->mMeshes[0]->GetNumUVChannels());
-        std::printf("Has positions  = %s\n", scene->mMeshes[0]->HasPositions() ? "true" : "false");
-        std::printf("Has faces      = %s\n", scene->mMeshes[0]->HasFaces() ? "true" : "false");
-        std::printf("Has normals    = %s\n", scene->mMeshes[0]->HasNormals() ? "true" : "false");
-        std::printf("Has tan/bit    = %s\n", scene->mMeshes[0]->HasTangentsAndBitangents() ? "true" : "false");
-        std::printf("Has bones      = %s\n", scene->mMeshes[0]->HasBones() ? "true" : "false");
+        const aiMesh* pmesh = scene->mMeshes[0];
 
-        std::printf("Number of vertices = %i\n", scene->mMeshes[0]->mNumVertices);
-        std::printf("Number of faces    = %i\n", scene->mMeshes[0]->mNumFaces);
-        std::printf("Number of indices per face = %i\n", scene->mMeshes[0]->mFaces[0].mNumIndices);
+        std::printf("Number of color channels = %i\n", pmesh->GetNumColorChannels());
+        std::printf("Number of UV channels    = %i\n", pmesh->GetNumUVChannels());
+        std::printf("Has positions  = %s\n", pmesh->HasPositions() ? "true" : "false");
+        std::printf("Has faces      = %s\n", pmesh->HasFaces() ? "true" : "false");
+        std::printf("Has normals    = %s\n", pmesh->HasNormals() ? "true" : "false");
+        std::printf("Has tan/bit    = %s\n", pmesh->HasTangentsAndBitangents() ? "true" : "false");
+        std::printf("Has bones      = %s\n", pmesh->HasBones() ? "true" : "false");
 
-        std::string name;
-        Mesh2::VectorPositions        vPositions;
-        Mesh2::VectorNormals          vNormals;
-        Mesh2::VectorTexCoords        vTexCoords;
-        Mesh2::VectorVertexIndices    vVertexIndices;
-        Mesh2::VectorTriangleIndices  vTriangleIndices;
+        std::printf("Number of vertices = %i\n", pmesh->mNumVertices);
+        std::printf("Number of faces    = %i\n", pmesh->mNumFaces);
+        std::printf("Number of indices per face = %i\n", pmesh->mFaces[0].mNumIndices);
 
-        /*
-        std::printf("Vertex 0 = (%f, %f, %f)\n", scene->mMeshes[0]->mVertices[0].x,
-                                                 scene->mMeshes[0]->mVertices[0].y,
-                                                 scene->mMeshes[0]->mVertices[0].z);
-        std::printf("Normal 0 = (%f, %f, %f)\n", scene->mMeshes[0]->mNormals[0].x,
-                                                 scene->mMeshes[0]->mNormals[0].y,
-                                                 scene->mMeshes[0]->mNormals[0].z);
-        std::printf("Face 0 = (%i, %i, %i)\n", scene->mMeshes[0]->mFaces[0].mIndices[0],
-                                               scene->mMeshes[0]->mFaces[0].mIndices[1],
-                                               scene->mMeshes[0]->mFaces[0].mIndices[2]);
-       */
+        if (!pmesh->mNumVertices || !pmesh->mNumFaces)
+        {
+            std::printf("Zero vertices or faces (%i, %i)\n", pmesh->mNumVertices, pmesh->mNumFaces);
+            exit(EXIT_FAILURE);
+        }
+
+        if (pmesh->mFaces[0].mNumIndices != 3)
+        {
+            std::printf("Number of vertices (%i) != 3\n", pmesh->mFaces[0].mNumIndices);
+            exit(EXIT_FAILURE);
+        }
+
+        const uint32& num_vertices = pmesh->mNumVertices;
+        const uint32& num_faces    = pmesh->mNumFaces;
+
+        std::string name(filename);
+        Mesh2::VectorPositions        vPositions(num_vertices);
+        Mesh2::VectorNormals          vNormals(num_vertices);
+        Mesh2::VectorTexCoords        vTexCoords(num_vertices);
+        Mesh2::VectorVertexIndices    vVertexIndices(num_vertices);
+        Mesh2::VectorTriangleIndices  vTriangleIndices(num_faces);
+
+        // Load vertices into Mesh2 format
+        memcpy(&vPositions[0], pmesh->mVertices, sizeof(pmesh->mVertices[0]) *  num_vertices);
+
+        // Load normals into Mesh2 format
+        memcpy(&vNormals[0], pmesh->mNormals, sizeof(pmesh->mNormals[0]) * num_vertices);
+
+        // Load texture coordinates into Mesh2 format
+        memcpy(&vTexCoords[0], pmesh->mTextureCoords, sizeof(pmesh->mTextureCoords[0]) * num_vertices);
+
+        // Load vertex indices to position array, normal array and texture coordinates array
+        for (uint32 vertexid = 0; vertexid < num_vertices; vertexid++)
+        {
+            vVertexIndices[vertexid].position_ = vertexid;
+            vVertexIndices[vertexid].normal_   = vertexid;
+            vVertexIndices[vertexid].tex_      = vertexid;
+        }
+
+        // Load face info into Mesh2 format
+        for (uint32 faceid = 0; faceid < num_faces; faceid++)
+        {
+            vTriangleIndices[faceid].v0_ = pmesh->mFaces[faceid].mIndices[0];
+            vTriangleIndices[faceid].v1_ = pmesh->mFaces[faceid].mIndices[1];
+            vTriangleIndices[faceid].v2_ = pmesh->mFaces[faceid].mIndices[2];
+        }
+
+
+        mesh = Mesh2(name, vPositions, vNormals, vTexCoords, vVertexIndices, vTriangleIndices);
     }
 
 

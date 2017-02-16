@@ -18,11 +18,7 @@ namespace JU
 class MeshImporter
 {
     public:
-        MeshImporter();
-        virtual ~MeshImporter();
-
-    public:
-        bool import(const char* filename, Mesh2& mesh) const;
+        static bool import(const char* filename, Mesh2& mesh);
 };
 
 } /* namespace JU */

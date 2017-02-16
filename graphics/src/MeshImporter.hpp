@@ -8,11 +8,12 @@
 #ifndef MESHIMPORTER_HPP_
 #define MESHIMPORTER_HPP_
 
+// Forward Declarations
+class Mesh2;
+
 namespace JU
 {
 
-// Forward Declarations
-class Mesh2;
 
 class MeshImporter
 {

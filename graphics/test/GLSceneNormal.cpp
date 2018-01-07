@@ -22,6 +22,8 @@
 #include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform.hpp>	// glm::rotate
 #include <math.h>					// M_PI
+#include <glm/gtc/quaternion.hpp>   // glm::quat
+#include <glm/gtx/quaternion.hpp>   // glm::rotate
 
 GLSceneNormal::GLSceneNormal(int width, int height) : GLScene(width, height),
 									 gl_sphere_(0), gl_sphere_instance_(0),
@@ -222,6 +224,39 @@ void GLSceneNormal::update(float time)
     float radius_delta, angle;
     glm::vec3 axis;
     camera_controller_.update(radius_delta, angle, axis);
+
+    //----------------------------------------------------------------------------------------------------
+    // Time (it assumes a 60 fps; i.e., screen refreshed Vsynched
+    static glm::f32 t = 0.0f;
+    t += (1.0f / 60.0f);
+
+    // Position and Orientation Collection Starts:
+    // Use the arcball controller to collect position and orientation data of a simulated head:
+    const glm::vec3 head_height(0.0f, 0.0f, 1.80f); // User is roughly 1.8 meters tall (at least the center of the head)
+    const glm::vec3 head_depth(0.0f, 0.15f, 0.0f);  // User's forehead is 15 centimeters away from the head center
+    static glm::quat orientation;
+
+    const glm::quat delta_quat(glm::angleAxis(angle, axis));
+    orientation = delta_quat * orientation;
+    const glm::vec3 position = glm::rotate(orientation, head_depth) + head_height;
+
+    printf("%12.9f, %12.9f, %12.9f, %12.9f, %12.9f, %12.9f, %12.9f, %12.9f\n",
+            t,
+            position.x, position.y, position.z,
+            orientation.w, orientation.x, orientation.y, orientation.z);
+
+    // debug: start
+    const glm::mat3 rot(glm::mat3_cast(orientation));
+    const glm::vec3 local_x(1.0f, 0.0f, 0.0f);
+    const glm::vec3 local_y(0.0f, 1.0f, 0.0f);
+    const glm::vec3 global_x(glm::rotate(orientation, local_x));
+    const glm::vec3 global_y(glm::rotate(orientation, local_y));
+    /*printf("X = (%12.9f, %12.9f, %12.9f); Y = (%12.9f, %12.9f, %12.9f)\n",
+                    global_x.x, global_x.y, global_x.z, global_y.x, global_y.y, global_y.z);
+                    */
+    // debug: end
+    //----------------------------------------------------------------------------------------------------
+
 
     // Use the arcball to control the camera or an object?
     if (control_camera_)

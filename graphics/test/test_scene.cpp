@@ -47,8 +47,9 @@
 // GLOBAL/STATIC
 // -------------
 static int winID;
-static GLsizei WIDTH  = 800 * 1.2f;
-static GLsizei HEIGHT = 600;
+//static GLsizei WIDTH  = 800 * 1.2f;
+static GLsizei WIDTH  = 1280;
+static GLsizei HEIGHT = 960;
 
 static GLScene *scene;
 #ifndef WIN32
@@ -131,11 +132,13 @@ static void display()
 	static int frames = 0;
 	if (!(++frames % 100))
 	{
+	    /*
 		printf("\rFPS = %f; Current Shader Program = %s                        ",
 			   frame_rate.getFPS(),
 			   scene->getGLSLCurrentProgramString());
 
 		fflush(stdout);
+		*/
 	}
 	last_time = time;
     #endif
@@ -160,9 +163,9 @@ static void init(void)
 #endif
 
 
-    //scene = new GLSceneNormal(WIDTH, HEIGHT);
+    scene = new GLSceneNormal(WIDTH, HEIGHT);
     //scene = new GLSceneLighting(WIDTH, HEIGHT);
-    scene = new GLSceneShadow(WIDTH, HEIGHT);
+    //scene = new GLSceneShadow(WIDTH, HEIGHT);
     //scene = new GLSceneParticles(WIDTH, HEIGHT);
     //scene = new GLSceneCometTail(WIDTH, HEIGHT, 100);
     //scene = new GLSceneMultipleLights(WIDTH, HEIGHT);
@@ -209,7 +212,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
     
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutInitWindowPosition(100,100);
+    glutInitWindowPosition(400,100);
     winID = glutCreateWindow("OpenGL Demo");
 
     printf("GL Vendor: %s\n", glGetString(GL_VENDOR));

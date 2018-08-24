@@ -27,7 +27,8 @@ bool load(const char* filename, boost::property_tree::ptree& pt)
 void save(const char* filename, const boost::property_tree::ptree& pt)
 {
     // Set the tab to four spaces
-    boost::property_tree::xml_parser::xml_writer_settings<char> settings(' ', 4);
+    //boost::property_tree::xml_parser::xml_writer_settings<char> settings(' ', 4);
+    auto settings = boost::property_tree::xml_writer_make_settings<std::string> (' ', 4);
     // Write the property tree to the XML file.
     write_xml(filename, pt, std::locale(), settings);
 }

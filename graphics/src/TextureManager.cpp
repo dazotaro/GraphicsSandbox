@@ -10,7 +10,7 @@
 #include "GLSLProgram.hpp"          // GLSLProgram
 #include "ImageHelper.hpp"			// imageInvertVertically
 // Global includes
-#include <SOIL.h>                   // SOIL_load_image
+#include <SOIL/SOIL.h>                   // SOIL_load_image
 #include <iostream>                 // cout, endl
 
 // STATIC MMEMBER VARIABLES

@@ -7,6 +7,7 @@
 
 // Global Includes
 #include <glm/gtc/matrix_transform.hpp>     // glm::scale
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform2.hpp>           // glm::scale
 #include <iostream>                         // std::cout, std::endl
 #include <sstream>                          // ostringstream

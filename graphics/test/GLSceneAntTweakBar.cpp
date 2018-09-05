@@ -22,7 +22,7 @@
 // Global includes
 #include <JU/core/Object3D.hpp>     // Object3D
 #include <glm/gtx/transform2.hpp>   // glm::rotate, glm::translate
-#include <SOIL.h>                   // SOIL_save_image
+#include <SOIL/SOIL.h>              // SOIL_save_image
 #include <math.h>					// M_PI
 #include <iostream>					// std::printf
 
